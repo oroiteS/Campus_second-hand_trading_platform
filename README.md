@@ -4,7 +4,7 @@
 
 Windows11
 
-Python 3.12.11 （uv）
+Python 3.12.11（uv）
 
 Go 1.24.4（go modules）
 
@@ -37,6 +37,9 @@ go mod tidy
 
 ## 修改项目依赖
 
+请注意在修改项目依赖后及时提交，避免不同人修改不同的依赖导致冲突
+
+
 ### backend/python
 
 ```shell
@@ -67,3 +70,6 @@ go run main.go //运行main.go
 //go build,go test等命令目前应该用不太到
 ```
 
+## 项目开发规范
+git的具体开发规范，开发分支等，请去问AI或者搜索！
+大概来讲就是每次开发都要创建一个新分支
