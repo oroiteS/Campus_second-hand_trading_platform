@@ -20,6 +20,7 @@ MongoDB
 
 ```shell
 git pull
+// 或者更安全、具体的git fetch + git merge
 ```
 
 ### backend/python
