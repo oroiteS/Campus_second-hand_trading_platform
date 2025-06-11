@@ -16,6 +16,12 @@ MongoDB
 
 以下命令都在powershell下运行（cmd可以自行尝试）
 
+### 拉取文件
+
+```shell
+git pull
+```
+
 ### backend/python
 
 ```shell
