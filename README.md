@@ -64,6 +64,6 @@ python main.py
 
 ```shell
 go run main.go //运行main.go
-//go build,go test等命令目前应该用不太到（）
+//go build,go test等命令目前应该用不太到
 ```
 
