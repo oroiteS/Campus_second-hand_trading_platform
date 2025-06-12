@@ -78,7 +78,7 @@ go run main.go //运行main.go
 5. 分支名请使用小写字母（例如：feature/add-user，而不是Feature/Add-User）
 #### 具体流程（以开发login为例）
 
-**如果出现了指令错误请告知**
+*如果出现了指令错误请告知*
 
 ```shell
 git checkout main //确保自己在main分支
@@ -108,5 +108,5 @@ git branch -d feature/login
 git push origin --delete feature/login
 ```
 
-过程中可以`随时`前往仓库查看是否==完成==了正确的指令！！！
+过程中可以随时前往仓库查看是否`完成`了正确的指令！！！
 
