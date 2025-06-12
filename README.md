@@ -70,13 +70,13 @@ go run main.go //运行main.go
 //go build,go test等命令目前应该用不太到
 ```
 
-### 开发规范
+### 项目开发规范
 1. 每次开发都要创建一个新分支
 2. 分支名请参考：feature/xxx（功能）、fix/xxx（修复bug）、hotfix/xxx（紧急修复bug）、docs/xxx（文档）、refactor/xxx（重构）、style/xxx（样式）、test/xxx（测试）
 3. 分支名请使用英文，不要使用中文
 4. 分支名请使用短横杠-分隔，不要使用下划线_（例如：feature/add-user）
 5. 分支名请使用小写字母（例如：feature/add-user，而不是Feature/Add-User）
-#### 项目具体流程（以开发login为例）
+#### 具体流程（以开发login为例）
 
 *如果出现了指令错误请告知*
 
