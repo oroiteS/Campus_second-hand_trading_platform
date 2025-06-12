@@ -76,7 +76,7 @@ go run main.go //运行main.go
 3. 分支名请使用英文，不要使用中文
 4. 分支名请使用短横杠-分隔，不要使用下划线_（例如：feature/add-user）
 5. 分支名请使用小写字母（例如：feature/add-user，而不是Feature/Add-User）
-#### 具体流程（以开发login为例）
+#### 项目具体流程（以开发login为例）
 
 *如果出现了指令错误请告知*
 
