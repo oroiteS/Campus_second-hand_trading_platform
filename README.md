@@ -70,6 +70,43 @@ go run main.go //运行main.go
 //go build,go test等命令目前应该用不太到
 ```
 
-## 项目开发规范
-git的具体开发规范，开发分支等，请去问AI或者搜索！
-大概来讲就是每次开发都要创建一个新分支
+### 开发规范
+1. 每次开发都要创建一个新分支
+2. 分支名请参考：feature/xxx（功能）、fix/xxx（修复bug）、hotfix/xxx（紧急修复bug）、docs/xxx（文档）、refactor/xxx（重构）、style/xxx（样式）、test/xxx（测试）
+3. 分支名请使用英文，不要使用中文
+4. 分支名请使用短横杠-分隔，不要使用下划线_（例如：feature/add-user）
+5. 分支名请使用小写字母（例如：feature/add-user，而不是Feature/Add-User）
+#### 具体流程（以开发login为例）
+
+**如果出现了指令错误请告知**
+
+```shell
+git checkout main //确保自己在main分支
+git pull origin main //拉取最新代码
+git checkout -b feature/login //创建新分支
+git status //检查状态，查看切换分支是否成功
+//修改文件
+git add . //或者指定文件
+git commit -m "feature(login): 增加用户认证接口"  # 类型+模块+描述
+git push origin feature/login
+git checkout main
+git pull origin main
+git merge feature/login 
+```
+如果出现了merge的错误:
+- 可能是有多个人同时修改了某个文件，这时候需要手动更新；
+- 也可能是你在编译器或者其他工具中打开了这个文件导致无法更新，此时关闭文件即可
+- 请注意：
+```shell
+# 合并冲突时，使用工具解决冲突后标记已解决
+git add .  # 标记冲突已解决
+git commit -m "解决合并冲突"  # 提交冲突修复
+```
+```shell
+git push origin main
+git branch -d feature/login
+git push origin --delete feature/login
+```
+
+过程中可以`随时`前往仓库查看是否==完成==了正确的指令！！！
+
