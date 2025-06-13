@@ -1,4 +1,5 @@
 CREATE database campus;
+use campus;
 CREATE TABLE IF NOT EXISTS `users` (
     `id` INT AUTO_INCREMENT PRIMARY KEY COMMENT '自增ID',
     `userid` VARCHAR(15) NOT NULL UNIQUE COMMENT '用户ID',
