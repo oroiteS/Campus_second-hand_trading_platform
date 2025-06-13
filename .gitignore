@@ -2,6 +2,6 @@
 backend/python/.venv
 
 # 不必要的文件
-.trae/
-backend/go/.idea/
-backend/python/.idea/
+.trae/*
+**/.idea/
+backend/go/scripts/response.txt

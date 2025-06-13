@@ -102,6 +102,7 @@ git merge feature/login
 git add .  # 标记冲突已解决
 git commit -m "解决合并冲突"  # 提交冲突修复
 ```
+请在git merge成功后（或者冲突解决后）运行如下指令：
 ```shell
 git push origin main
 git branch -d feature/login

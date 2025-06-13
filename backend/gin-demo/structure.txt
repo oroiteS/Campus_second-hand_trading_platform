@@ -1,0 +1,29 @@
+Campus_second-hand_trading_platform/backend/go/
+├── main.go                 // 程序入口
+├── go.mod
+├── go.sum
+├── config/                 // 配置文件夹
+│   └── config.go           // 配置文件及加载
+├── internal/               // 内部业务逻辑
+│   ├── api/                // API handlers (Gin)
+│   │   ├── auth_handler.go // 认证相关的 handler (登录、注册)
+│   │   └── request/        // API 请求结构体
+│   │           └── auth_request.go
+│   │   └── response/       // API 响应结构体
+│   │           └── auth_response.go
+│   ├── middleware/         // 中间件
+│   │   └── auth_middleware.go // JWT 认证中间件
+│   ├── models/             // 数据模型 (GORM)
+│   │   └── user.go         // 用户模型
+│   ├── repository/         // 数据仓库层 (数据库操作)
+│   │   └── user_repository.go
+│   ├── service/            // 业务逻辑服务层
+│   │   └── auth_service.go
+│   └── utils/              // 工具类
+│       ├── jwt.go          // JWT 工具
+│       └── password.go     // 密码处理工具
+├── pkg/                    // 可共享的包
+│   └── database/           // 数据库连接
+│       └── mysql.go
+└── routes/                 // 路由定义
+    └── router.go
