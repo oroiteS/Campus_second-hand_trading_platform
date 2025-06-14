@@ -18,9 +18,10 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
+        return http
             .csrf(csrf -> csrf.disable()) // 生产环境需启用并配置CSRF保护
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
@@ -28,8 +29,13 @@ public class SecurityConfig {
             )
             .logout(logout -> logout
                 .permitAll()
-            );
-        return http.build();
+            )
+            .build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
@@ -40,10 +46,5 @@ public class SecurityConfig {
             .roles("USER")
             .build();
         return new InMemoryUserDetailsManager(user);
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 }

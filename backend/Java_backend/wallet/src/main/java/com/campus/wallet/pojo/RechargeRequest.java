@@ -3,8 +3,9 @@ package com.campus.wallet.pojo;
 import java.math.BigDecimal;
 
 public class RechargeRequest {
+    private String UserID;
     private BigDecimal amount;
-    private String paymentMethod;
+
 
     public BigDecimal getAmount() {
         return amount;
@@ -14,11 +15,11 @@ public class RechargeRequest {
         this.amount = amount;
     }
 
-    public String getPaymentMethod() {
-        return paymentMethod;
+    public String getUserID() {
+        return UserID;
     }
 
-    public void setPaymentMethod(String paymentMethod) {
-        this.paymentMethod = paymentMethod;
+    public void setUserID(String userID) {
+        UserID = userID;
     }
 }

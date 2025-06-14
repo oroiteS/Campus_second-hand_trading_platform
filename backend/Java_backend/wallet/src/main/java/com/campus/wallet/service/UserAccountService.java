@@ -23,26 +23,26 @@ public class UserAccountService implements IUserAccountService{
 
     @Override
     public void confirmReceipt(String userID,String orderID) {
-        UserAccount userAccount = userAccountRepository.findByUser_ID(userID);
-        Order order = orderRepository.findByOrder_id(orderID);
+        UserAccount userAccount = userAccountRepository.selectByUserId(userID);
+        Order order = orderRepository.selectByOrderId(orderID);
         if (order == null) {
             throw new RuntimeException("订单不存在");
         }
         BigDecimal amount = order.getMoney();
         if(userAccount!= null){
             userAccount.setMoney(userAccount.getMoney().add(amount));
-            userAccountRepository.save(userAccount);
+            userAccountRepository.insert(userAccount);
         }
     }
 
     @Override
     public void withdraw(String userID, BigDecimal amount) {
-        UserAccount userAccount = userAccountRepository.findByUser_ID(userID);
+        UserAccount userAccount = userAccountRepository.selectByUserId(userID);
         if (userAccount != null && userAccount.getMoney() != null) {
             BigDecimal currentMoney = userAccount.getMoney();
             if (currentMoney.compareTo(amount) >= 0) {
                 userAccount.setMoney(currentMoney.subtract(amount));
-                userAccountRepository.save(userAccount);
+                userAccountRepository.insert(userAccount);
             } else {
                 throw new IllegalArgumentException("余额不足");
             }
@@ -53,22 +53,22 @@ public class UserAccountService implements IUserAccountService{
 
     @Override
     public void sellerRefund(String userID,String orderID) {
-        UserAccount userAccount=userAccountRepository.findByUser_ID(userID);
-        Order order=orderRepository.findByOrder_id(orderID);
+        UserAccount userAccount=userAccountRepository.selectByUserId(userID);
+        Order order=orderRepository.selectByOrderId(orderID);
         if (order == null) {
             throw new RuntimeException("订单不存在");
         }
         BigDecimal amount = order.getMoney();
         if (userAccount != null) {
             userAccount.setMoney(userAccount.getMoney().add(amount));
-            userAccountRepository.save(userAccount);
+            userAccountRepository.insert(userAccount);
         }
     }
 
     @Override
     public void Pay(String userID,String orderID) {
-        UserAccount userAccount=userAccountRepository.findByUser_ID(userID);
-        Order order=orderRepository.findByOrder_id(orderID);
+        UserAccount userAccount=userAccountRepository.selectByUserId(userID);
+        Order order=orderRepository.selectByOrderId(orderID);
 
         if(order == null){
             throw new RuntimeException("订单不存在");
@@ -78,7 +78,7 @@ public class UserAccountService implements IUserAccountService{
         if (userAccount != null) {
             if(amount.compareTo(balance) < 0){
                 userAccount.setMoney(userAccount.getMoney().subtract(amount));
-                userAccountRepository.save(userAccount);
+                userAccountRepository.insert(userAccount);
             }else{
                 throw new IllegalArgumentException("余额不足");
             }
@@ -89,12 +89,17 @@ public class UserAccountService implements IUserAccountService{
 
     @Override
     public void Recharge(String userID, BigDecimal amount){
-        UserAccount userAccount = userAccountRepository.findByUser_ID(userID);
+        System.out.println("DEBUG - Received userID: " + userID); // 简单输出
+        UserAccount userAccount = userAccountRepository.selectByUserId(userID);
         if (userAccount != null) {
             BigDecimal currentMoney = userAccount.getMoney();
             userAccount.setMoney(currentMoney.add(amount));
-            userAccountRepository.save(userAccount);
-        }else{
+            int updateResult = userAccountRepository.updateById(userAccount);
+
+            if (updateResult!=1) {
+                throw new RuntimeException("更新账户余额失败");
+            }
+        } else {
             throw new IllegalArgumentException("用户不存在");
         }
     }

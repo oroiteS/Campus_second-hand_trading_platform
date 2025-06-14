@@ -1,12 +1,16 @@
 package com.campus.wallet.pojo;
 
-import jakarta.persistence.Id;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.math.BigDecimal;
-
+@TableName("orders")
 public class Order {
-    @Id
+    @TableId(type = IdType.ASSIGN_ID)
     private String order_id;
+    @TableField("Money")
     private BigDecimal money;
 
     public String getOrder_id() {

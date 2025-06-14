@@ -25,6 +25,13 @@
     </properties>
 
     <dependencies>
+        <!-- 测试 -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <version>6.2.1</version>
+            <scope>test</scope>
+        </dependency>
         <!-- 缓存支持 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
