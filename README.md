@@ -6,7 +6,7 @@ Windows11
 
 Python 3.12.11（uv）
 
-Go 1.24.4（go modules）
+Java 17 (Maven)
 
 MySQL
 
@@ -29,11 +29,8 @@ git pull
 uv sync //同步依赖（环境更新后随时同步）
 ```
 
-### backend/go
-
-```shell
-go mod tidy
-```
+### backend/Java_backend
+创建新模块（springboot+maven）
 
 ## 修改项目依赖
 
@@ -48,12 +45,6 @@ uv add requests //以requests为例
 //uv add会自动更新toml配置文件，uv pip不会更新，所以尽量使用uv add
 ```
 
-### backend/go
-
-```shell
-go get -u github.com/gin-gonic/gin  //-u表示最新版
-```
-
 ## 运行环境
 
 ### backend/python
@@ -61,13 +52,6 @@ go get -u github.com/gin-gonic/gin  //-u表示最新版
 ```shell
 .venv/scripts/activate //类似于Anaconda的conda activate env_name
 python main.py
-```
-
-### backend/go
-
-```shell
-go run main.go //运行main.go
-//go build,go test等命令目前应该用不太到
 ```
 
 ### 项目开发规范
