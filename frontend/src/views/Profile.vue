@@ -106,10 +106,10 @@ export default {
       },
       menuItems: [
         { id: 1, name: '我的收藏', icon: '❤️', color: '#FF6B6B', action: 'favorites' },
-        { id: 2, name: '交易记录', icon: '📋', color: '#4ECDC4', action: 'orders' },
-        { id: 3, name: '账号设置', icon: '⚙️', color: '#45B7D1', action: 'settings' },
+        { id: 2, name: '订单管理', icon: '📋', color: '#4ECDC4', action: 'orders' },
+        { id: 3, name: '个人信息', icon: '⚙️', color: '#45B7D1', action: 'settings' },
         { id: 4, name: '安全中心', icon: '🔒', color: '#96CEB4', action: 'security' },
-        { id: 5, name: '帮助中心', icon: '❓', color: '#FFEAA7', action: 'help' },
+        { id: 5, name: '附近的人', icon: '❓', color: '#FFEAA7', action: 'help' },
         { id: 6, name: '意见反馈', icon: '💬', color: '#DDA0DD', action: 'feedback' }
       ],
       productTabs: [
@@ -158,10 +158,11 @@ export default {
           break
         case 'orders':
           // 可以添加交易记录页面
-          console.log('跳转到交易记录')
+          console.log('跳转到订单管理')
           break
         case 'settings':
           // 跳转到UserProfile.vue页面
+          console.log('跳转到个人信息')
           this.$router.push('/userprofile')
           break
         case 'security':
@@ -170,7 +171,8 @@ export default {
           break
         case 'help':
           // 可以添加帮助中心页面
-          console.log('跳转到帮助中心')
+          console.log('跳转到附近的人')
+          this.$router.push('/nearbyusers')
           break
         case 'feedback':
           // 可以添加意见反馈页面
