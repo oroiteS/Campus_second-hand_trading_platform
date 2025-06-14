@@ -18,8 +18,6 @@ public class UserAccountController {
         this.userAccountService = userAccountService;
     }
 
-
-
     @PostMapping("/confirmReceipt")
     public void confirmReceipt(@RequestBody ConfirmReceiptRequest request) {
         userAccountService.confirmReceipt(request.getUserID(), request.getOrderID());
@@ -30,13 +28,30 @@ public class UserAccountController {
         userAccountService.withdraw(request.getUserId(), request.getAmount());
     }
 
-    @PostMapping("/sellerRefund/{userID}")
-    public void sellerRefund(@PathVariable String userID) {
-        userAccountService.sellerRefund(userID);
+    import com.campus.wallet.pojo.RechargeRequest;
+    import com.campus.wallet.pojo.SellerRefundRequest;
+    import com.campus.wallet.pojo.PayRequest;
+
+    @PostMapping("/recharge")
+    public void recharge(@RequestBody RechargeRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userID = authentication.getName();
+        userAccountService.recharge(userID, request.getAmount(), request.getPaymentMethod());
     }
 
-    @PostMapping("/adminRefund/{userID}")
-    public void adminRefund(@PathVariable String userID) {
-        userAccountService.adminRefund(userID);
+    @PostMapping("/sellerRefund")
+    public void sellerRefund(@RequestBody SellerRefundRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userID = authentication.getName();
+        userAccountService.sellerRefund(userID, request.getOrderID());
     }
+
+    @PostMapping("/pay")
+    public void pay(@RequestBody PayRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userID = authentication.getName();
+        userAccountService.pay(userID, request.getOrderID());
+    }
+
+    
 }

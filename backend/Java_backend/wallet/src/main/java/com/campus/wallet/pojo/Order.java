@@ -1,6 +1,7 @@
 package com.campus.wallet.pojo;
 
-import javax.persistence.Id;
+import jakarta.persistence.Id;
+
 import java.math.BigDecimal;
 
 public class Order {

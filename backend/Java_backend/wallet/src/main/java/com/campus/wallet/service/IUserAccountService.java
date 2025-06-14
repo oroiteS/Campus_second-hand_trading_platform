@@ -9,8 +9,10 @@ public interface IUserAccountService {
     void withdraw(String userID, BigDecimal amount);
 
     // 卖家同意退款，将冻结金额转入用户余额
-    void sellerRefund(String userID);
+    void sellerRefund(String userID,String orderID);
 
-    // 管理员强制退款，从冻结金额扣除并返还给用户
-    void adminRefund(String userID);
+    // 支付
+    void Pay(String userID,String orderID);
+
+    void Recharge(String userID, BigDecimal amount);
 }

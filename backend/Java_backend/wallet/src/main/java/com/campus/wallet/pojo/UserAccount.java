@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 public class UserAccount {
     @Id
     private String User_ID;
-    private BigDecimal pending_income;
     private BigDecimal money;
 
     public String getUser_ID() {
@@ -16,13 +15,7 @@ public class UserAccount {
         User_ID = user_ID;
     }
 
-    public BigDecimal getPending_income() {
-        return pending_income;
-    }
 
-    public void setPending_income(BigDecimal pending_income) {
-        this.pending_income = pending_income;
-    }
 
     public BigDecimal getMoney() {
         return money;
@@ -36,7 +29,6 @@ public class UserAccount {
     public String toString() {
         return "UserAcount{" +
                 "User_ID='" + User_ID + '\'' +
-                ", pending_income=" + pending_income +
                 ", money=" + money +
                 '}';
     }

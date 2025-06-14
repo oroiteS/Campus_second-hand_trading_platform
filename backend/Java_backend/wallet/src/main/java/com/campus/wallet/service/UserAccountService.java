@@ -29,8 +29,9 @@ public class UserAccountService implements IUserAccountService{
             throw new RuntimeException("订单不存在");
         }
         BigDecimal amount = order.getMoney();
-        if(userAccount!= null && userAccount.getPending_income() != null){
+        if(userAccount!= null){
             userAccount.setMoney(userAccount.getMoney().add(amount));
+            userAccountRepository.save(userAccount);
         }
     }
 
@@ -51,32 +52,50 @@ public class UserAccountService implements IUserAccountService{
     }
 
     @Override
-    public void sellerRefund(String userID) {
-        UserAccount userAccount = userAccountRepository.findByUser_ID(userID);
-        if (userAccount != null && userAccount.getPending_income() != null) {
-            BigDecimal pendingIncome = userAccount.getPending_income();
-            if (userAccount.getMoney() == null) {
-                userAccount.setMoney(pendingIncome);
-            } else {
-                userAccount.setMoney(userAccount.getMoney().add(pendingIncome));
-            }
-            userAccount.setPending_income(BigDecimal.ZERO);
+    public void sellerRefund(String userID,String orderID) {
+        UserAccount userAccount=userAccountRepository.findByUser_ID(userID);
+        Order order=orderRepository.findByOrder_id(orderID);
+        if (order == null) {
+            throw new RuntimeException("订单不存在");
+        }
+        BigDecimal amount = order.getMoney();
+        if (userAccount != null) {
+            userAccount.setMoney(userAccount.getMoney().add(amount));
             userAccountRepository.save(userAccount);
         }
     }
 
     @Override
-    public void adminRefund(String userID) {
-        UserAccount userAccount = userAccountRepository.findByUser_ID(userID);
-        if (userAccount != null && userAccount.getPending_income() != null) {
-            BigDecimal pendingIncome = userAccount.getPending_income();
-            if (userAccount.getMoney() == null) {
-                userAccount.setMoney(pendingIncome);
-            } else {
-                userAccount.setMoney(userAccount.getMoney().add(pendingIncome));
+    public void Pay(String userID,String orderID) {
+        UserAccount userAccount=userAccountRepository.findByUser_ID(userID);
+        Order order=orderRepository.findByOrder_id(orderID);
+
+        if(order == null){
+            throw new RuntimeException("订单不存在");
+        }
+        BigDecimal amount = order.getMoney();
+        BigDecimal balance = userAccount.getMoney();
+        if (userAccount != null) {
+            if(amount.compareTo(balance) < 0){
+                userAccount.setMoney(userAccount.getMoney().subtract(amount));
+                userAccountRepository.save(userAccount);
+            }else{
+                throw new IllegalArgumentException("余额不足");
             }
-            userAccount.setPending_income(BigDecimal.ZERO);
+        }else{
+            throw new IllegalArgumentException("用户不存在");
+        }
+    }
+
+    @Override
+    public void Recharge(String userID, BigDecimal amount){
+        UserAccount userAccount = userAccountRepository.findByUser_ID(userID);
+        if (userAccount != null) {
+            BigDecimal currentMoney = userAccount.getMoney();
+            userAccount.setMoney(currentMoney.add(amount));
             userAccountRepository.save(userAccount);
+        }else{
+            throw new IllegalArgumentException("用户不存在");
         }
     }
 }
