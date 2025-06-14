@@ -4,8 +4,8 @@
 -- 1. 创建数据库
 CREATE DATABASE IF NOT EXISTS campus 
 DEFAULT CHARACTER SET utf8mb4 
-DEFAULT COLLATE utf8mb4_unicode_ci
-COMMENT '校园二手交易平台数据库';
+DEFAULT COLLATE utf8mb4_unicode_ci;
+
 
 -- 2. 创建数据库用户（如果不存在）
 CREATE USER IF NOT EXISTS 'campus_test'@'%' IDENTIFIED BY 'campus_suep';
