@@ -36,10 +36,7 @@ public class User {
     
     @TableField("User_Loc_longitude")
     private BigDecimal userLocLongitude;
-    
-    @TableField("User_Loc_latitude")
-    private BigDecimal userLocLatitude;
-    
+
     @TableField("User_sta")
     private Boolean userSta;
     
@@ -48,4 +45,7 @@ public class User {
     
     @TableField("ID")
     private String idCard;
+    
+    @TableField("User_Loc_latitude")
+    private BigDecimal userLocLatitude;
 }
