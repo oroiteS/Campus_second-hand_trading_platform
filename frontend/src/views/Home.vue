@@ -22,6 +22,7 @@
         </div>
         <div class="nav-actions">
           <a href="#" class="publish-btn">+ 发布闲置</a>
+          <router-link to="/profile" class="profile-link">个人信息</router-link>
           <router-link to="/login" class="login-link">登录</router-link>
           <router-link to="/register" class="register-link">注册</router-link>
         </div>
@@ -413,7 +414,7 @@ export default {
   transform: translateY(-1px);
 }
 
-.login-link, .register-link {
+.profile-link, .login-link, .register-link {
   color: white;
   text-decoration: none;
   font-weight: 500;
@@ -424,7 +425,7 @@ export default {
   margin-left: 10px;
 }
 
-.login-link:hover, .register-link:hover {
+.profile-link:hover, .login-link:hover, .register-link:hover {
   background: rgba(255,255,255,0.1);
 }
 
