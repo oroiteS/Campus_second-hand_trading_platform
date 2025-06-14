@@ -22,26 +22,25 @@
         </div>
         <div class="nav-actions">
           <a href="#" class="publish-btn">+ 发布闲置</a>
-          <router-link to="/profile" class="profile-link">个人信息</router-link>
-          <router-link to="/login" class="login-link">登录</router-link>
-          <router-link to="/register" class="register-link">注册</router-link>
+          <!-- 根据登录状态显示不同内容 -->
+          <div v-if="isLoggedIn" class="user-info">
+            <img :src="userInfo.avatar" :alt="userInfo.name + '的头像'" class="user-avatar" @click="goToProfile" />
+            <div class="user-details" @click="goToProfile">
+              <span class="user-name">{{ userInfo.name }}</span>
+              <span class="user-status">{{ userInfo.status }}</span>
+            </div>
+            <!-- 悬浮菜单 -->
+            <div class="user-dropdown">
+              <button @click.stop="logout" class="logout-btn">退出登录</button>
+            </div>
+          </div>
+          <div v-else class="auth-buttons">
+            <router-link to="/login" class="login-link">登录</router-link>
+            <router-link to="/register" class="register-link">注册</router-link>
+          </div>
         </div>
       </div>
     </header>
-
-    <!-- 主导航菜单 -->
-    <nav class="main-nav">
-      <div class="nav-content">
-        <a href="#" class="nav-item active">首页</a>
-        <a href="#" class="nav-item">数码电子</a>
-        <a href="#" class="nav-item">教材书籍</a>
-        <a href="#" class="nav-item">生活用品</a>
-        <a href="#" class="nav-item">服装配饰</a>
-        <a href="#" class="nav-item">运动器材</a>
-        <a href="#" class="nav-item">学习用品</a>
-        <a href="#" class="nav-item">其他</a>
-      </div>
-    </nav>
 
     <!-- 内容区域 -->
     <div class="content-wrapper">
@@ -174,6 +173,12 @@ export default {
   data() {
     return {
       searchQuery: '',
+      isLoggedIn: false,
+      userInfo: {
+        name: 'xy21675070351',
+        avatar: '/测试图片.jpg',
+        status: '在线'
+      },
       categories: [
         { id: 1, name: '数码电子', icon: '📱' },
         { id: 2, name: '教材书籍', icon: '📚' },
@@ -299,9 +304,89 @@ export default {
       ]
     }
   },
+  mounted() {
+    // 检查用户登录状态
+    this.checkLoginStatus();
+    // 添加存储监听器，当localStorage发生变化时更新状态
+    window.addEventListener('storage', this.handleStorageChange);
+  },
+  beforeUnmount() {
+    // 清理事件监听器
+    window.removeEventListener('storage', this.handleStorageChange);
+  },
+  watch: {
+    // 监听路由变化，每次进入页面都检查登录状态
+    '$route'() {
+      this.checkLoginStatus();
+    }
+  },
   methods: {
     searchProducts() {
       console.log('搜索:', this.searchQuery)
+    },
+    // 检查登录状态
+    checkLoginStatus() {
+      // 检查token
+      const token = localStorage.getItem('userToken');
+      this.isLoggedIn = !!token;
+      
+      // 如果已登录，获取用户信息
+      if (this.isLoggedIn) {
+        const userInfoStr = localStorage.getItem('userInfo');
+        if (userInfoStr) {
+          try {
+            this.userInfo = JSON.parse(userInfoStr);
+          } catch (e) {
+            console.error('解析用户信息失败:', e);
+            // 使用默认用户信息
+            this.userInfo = {
+              name: localStorage.getItem('username') || 'xy21675070351',
+              avatar: '/测试图片.jpg',
+              status: '在线'
+            };
+          }
+        }
+      }
+      
+      // 调试信息
+      console.log('登录状态检查:', {
+        token: token,
+        isLoggedIn: this.isLoggedIn,
+        userInfo: this.userInfo
+      });
+    },
+    // 处理存储变化
+    handleStorageChange(e) {
+      if (e.key === 'userToken' || e.key === 'userInfo') {
+        this.checkLoginStatus();
+      }
+    },
+    // 跳转到个人资料页面
+    goToProfile() {
+      this.$router.push('/profile');
+    },
+    // 手动更新登录状态
+    updateLoginStatus() {
+      this.checkLoginStatus();
+    },
+    // 退出登录
+    logout() {
+      // 清除本地存储的用户信息
+      localStorage.removeItem('userToken');
+      localStorage.removeItem('userInfo');
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('username');
+      
+      // 更新登录状态
+      this.isLoggedIn = false;
+      this.userInfo = {
+        name: 'xy21675070351',
+        avatar: '/测试图片.jpg',
+        status: '在线'
+      };
+      
+      // 跳转到首页
+      this.$router.push('/');
     }
   }
 }
@@ -412,6 +497,531 @@ export default {
 .publish-btn:hover {
   background: #E55A2B;
   transform: translateY(-1px);
+}
+
+.profile-link, .login-link, .register-link {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 8px 16px;
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 15px;
+  transition: all 0.3s ease;
+  margin-left: 10px;
+}
+
+.profile-link:hover, .login-link:hover, .register-link:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+/* 主导航菜单 */
+.main-nav {
+  background: white;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 0;
+}
+
+.nav-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  padding: 0 20px;
+}
+
+.nav-item {
+  padding: 15px 20px;
+  color: #666;
+  text-decoration: none;
+  font-size: 14px;
+  transition: all 0.3s;
+  border-bottom: 3px solid transparent;
+}
+
+.nav-item:hover, .nav-item.active {
+  color: #667eea;
+  border-bottom-color: #667eea;
+}
+
+/* 内容区域 */
+.content-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+}
+
+/* 侧边栏 */
+.sidebar {
+  width: 250px;
+  flex-shrink: 0;
+}
+
+.category-menu, .notice-board {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.category-title, .notice-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.category-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  cursor: pointer;
+  transition: all 0.3s;
+  border-radius: 8px;
+  margin-bottom: 5px;
+}
+
+.category-item:hover {
+  background: #f8f9fa;
+  padding-left: 10px;
+}
+
+.category-icon {
+  font-size: 18px;
+  margin-right: 12px;
+  width: 25px;
+}
+
+.category-name {
+  font-size: 14px;
+  color: #666;
+}
+
+.notice-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.notice-item:last-child {
+  border-bottom: none;
+}
+
+.notice-text {
+  font-size: 13px;
+  color: #666;
+}
+
+.notice-date {
+  font-size: 12px;
+  color: #999;
+}
+
+/* 主内容区 */
+.main-content {
+  flex: 1;
+}
+
+/* 欢迎横幅 */
+.featured-section {
+  margin-bottom: 30px;
+}
+
+.welcome-banner {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 15px;
+  padding: 30px;
+  color: white;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.welcome-banner::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 100%;
+  height: 100%;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+  animation: float 20s infinite linear;
+}
+
+@keyframes float {
+  0% { transform: translateX(0) translateY(0); }
+  100% { transform: translateX(-100px) translateY(-100px); }
+}
+
+.banner-content h2 {
+  font-size: 28px;
+  margin-bottom: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.banner-content p {
+  font-size: 16px;
+  opacity: 0.9;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.stats {
+  display: flex;
+  gap: 30px;
+  position: relative;
+  z-index: 1;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-number {
+  display: block;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.stat-label {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+/* 快速分类 */
+.quick-categories {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+}
+
+.quick-category {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: transform 0.3s;
+  cursor: pointer;
+}
+
+.quick-category:hover {
+  transform: translateY(-5px);
+}
+
+.quick-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  margin: 0 auto 10px;
+  color: white;
+}
+
+.quick-name {
+  display: block;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.quick-count {
+  font-size: 12px;
+  color: #999;
+}
+
+/* 区块标题 */
+.section {
+  margin-bottom: 30px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+}
+
+.more-link {
+  color: #667eea;
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.3s;
+}
+
+.more-link:hover {
+  color: #5a6fd8;
+}
+
+/* 商品网格 */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.product-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.product-image-container {
+  position: relative;
+}
+
+.product-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.product-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #FF6B35;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.time-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0,0,0,0.7);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+.product-info {
+  padding: 15px;
+}
+
+.product-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.product-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.product-price {
+  font-size: 20px;
+  font-weight: bold;
+  color: #FF6B35;
+}
+
+.product-original-price {
+  font-size: 14px;
+  color: #999;
+  text-decoration: line-through;
+}
+
+.product-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+
+.product-condition {
+  background: #E8F5E8;
+  color: #4CAF50;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 12px;
+}
+
+.product-location {
+  color: #666;
+}
+
+.seller-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.seller-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.seller-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+}
+
+.seller-school {
+  font-size: 12px;
+  color: #999;
+  margin-left: auto;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .content-wrapper {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    width: 100%;
+  }
+  
+  .quick-categories {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+  
+  .stats {
+    gap: 15px;
+  }
+  
+  .header-content {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .search-container {
+    margin: 0;
+    max-width: 100%;
+  }
+}
+
+/* 用户信息样式 */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.user-info:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+.user-info:hover .user-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.user-avatar {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255,255,255,0.3);
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.user-name {
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.user-status {
+  color: rgba(255,255,255,0.8);
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.auth-buttons {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* 悬浮菜单样式 */
+.user-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  padding: 8px;
+  margin-top: 8px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.logout-btn {
+  background: #ff4757;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  white-space: nowrap;
+}
+
+.logout-btn:hover {
+  background: #ff3742;
 }
 
 .profile-link, .login-link, .register-link {

@@ -36,7 +36,7 @@
 
 <script>
 export default {
-  name: 'LoginPage',  // 将'Login'改为'LoginPage'
+  name: 'LoginPage',
   data() {
     return {
       username: '',
@@ -71,9 +71,20 @@ export default {
         } else if (this.username === 'admin' && this.password === '123456') {
           // 普通用户登录成功
           alert('登录成功!')
-          // 存储登录状态
-          localStorage.setItem('isLoggedIn', 'true')
-          localStorage.setItem('username', this.username)
+          // 修改：统一使用userToken和userInfo
+          const userToken = 'user-token-' + Date.now()
+          const userInfo = {
+            username: this.username,
+            name: 'xy21675070351', // 显示名称
+            avatar: '/测试图片.jpg',
+            status: '在线'
+          }
+          
+          localStorage.setItem('userToken', userToken)
+          localStorage.setItem('userInfo', JSON.stringify(userInfo))
+          localStorage.setItem('isLoggedIn', 'true') // 保持兼容性
+          localStorage.setItem('username', this.username) // 保持兼容性
+          
           // 跳转到首页
           this.$router.push('/')
         } else {
@@ -82,37 +93,6 @@ export default {
         }
         this.isLoading = false
       }, 1000)
-      
-      /* 实际项目中的API调用示例
-      // 使用axios或fetch调用后端API
-      fetch('/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          username: this.username,
-          password: this.password
-        })
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          // 登录成功
-          localStorage.setItem('token', data.token)
-          this.$router.push('/')
-        } else {
-          // 登录失败
-          this.errorMessage = data.message || '登录失败'
-        }
-        this.isLoading = false
-      })
-      .catch(error => {
-        this.errorMessage = '网络错误，请稍后再试'
-        this.isLoading = false
-        console.error('Login error:', error)
-      })
-      */
     }
   }
 }
