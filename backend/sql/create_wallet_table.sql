@@ -23,3 +23,8 @@ CREATE TABLE IF NOT EXISTS `wallet` (
     CONSTRAINT `chk_pending_income_positive` CHECK (`pending_income` >= 0)
     
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='钱包表';
+
+
+
+-- 显示表结构
+DESCRIBE wallet;
