@@ -28,6 +28,7 @@
       </button>
       <div class="links">
         <router-link to="/" class="back-link">返回首页</router-link>
+        <router-link to="/register" class="register-link">没有账号？去注册</router-link>
       </div>
     </div>
   </div>
@@ -114,7 +115,10 @@ export default {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #f5f5f5;
+  background-image: url('../assets/background.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .login-box {
@@ -179,14 +183,16 @@ input {
 .links {
   margin-top: 20px;
   text-align: center;
+  display: flex;
+  justify-content: space-between;
 }
 
-.back-link {
+.back-link, .register-link {
   color: #42b983;
   text-decoration: none;
 }
 
-.back-link:hover {
+.back-link:hover, .register-link:hover {
   text-decoration: underline;
 }
 </style>

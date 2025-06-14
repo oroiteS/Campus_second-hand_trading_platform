@@ -23,6 +23,7 @@
         <div class="nav-actions">
           <a href="#" class="publish-btn">+ 发布闲置</a>
           <router-link to="/login" class="login-link">登录</router-link>
+          <router-link to="/register" class="register-link">注册</router-link>
         </div>
       </div>
     </header>
@@ -201,7 +202,7 @@ export default {
           originalPrice: 6999,
           condition: '9成新',
           location: '东校区',
-          image: 'https://via.placeholder.com/200x150/F0F0F0/666666?text=iPhone',
+          image: '/测试图片.jpg',
           badge: '热销',
           sellerName: '张同学',
           sellerSchool: '计算机学院',
@@ -412,17 +413,18 @@ export default {
   transform: translateY(-1px);
 }
 
-.login-link {
+.login-link, .register-link {
   color: white;
   text-decoration: none;
   font-weight: 500;
   padding: 8px 16px;
   border: 1px solid rgba(255,255,255,0.3);
   border-radius: 15px;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
+  margin-left: 10px;
 }
 
-.login-link:hover {
+.login-link:hover, .register-link:hover {
   background: rgba(255,255,255,0.1);
 }
 
