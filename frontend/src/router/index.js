@@ -3,6 +3,7 @@ import Home from '../views/Home.vue'
 import Login from '../views/Login.vue'
 import Register from '../views/Register.vue'
 import UserProfile from '../views/UserProfile.vue'
+import AdminDashboard from '../views/AdminDashboard.vue'
 
 const routes = [
   {
@@ -24,6 +25,11 @@ const routes = [
     path: '/profile',
     name: 'UserProfile',
     component: UserProfile
+  },
+  {
+    path: '/AdminDashboard',
+    name: 'AdminDashboard',
+    component: AdminDashboard
   }
 ]
 

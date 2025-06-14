@@ -59,8 +59,17 @@ export default {
       // 模拟API调用
       setTimeout(() => {
         // 这里是静态数据测试，实际项目中应该调用后端API
-        if (this.username === 'admin' && this.password === '123456') {
-          // 登录成功
+        if (this.username === '00000000' && this.password === '00000000') {
+          // 管理员登录成功
+          alert('管理员登录成功!')
+          // 存储管理员登录状态
+          localStorage.setItem('isAdminLoggedIn', 'true')
+          localStorage.setItem('adminToken', 'admin-token-' + Date.now())
+          localStorage.setItem('adminUsername', '管理员')
+          // 跳转到管理员后台
+          this.$router.push('/AdminDashboard')
+        } else if (this.username === 'admin' && this.password === '123456') {
+          // 普通用户登录成功
           alert('登录成功!')
           // 存储登录状态
           localStorage.setItem('isLoggedIn', 'true')
