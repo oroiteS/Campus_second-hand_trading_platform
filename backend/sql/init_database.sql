@@ -47,14 +47,14 @@ CREATE TABLE IF NOT EXISTS `users` (
 
 -- 6. 创建商品类别表
 CREATE TABLE IF NOT EXISTS `categories` (
-    `商品类ID` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '商品类别ID，主键',
-    `商品类` VARCHAR(64) NOT NULL COMMENT '存储商品具体类别',
+    `category_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '商品类别ID，主键',
+    `category` VARCHAR(64) NOT NULL COMMENT '存储商品具体类别',
     
     -- 创建索引
-    INDEX `idx_category_name` (`商品类`),
+    INDEX `idx_category_name` (`category`),
     
     -- 添加唯一约束
-    UNIQUE KEY `uk_category_name` (`商品类`)
+    UNIQUE KEY `uk_category_name` (`category`)
     
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='商品类别表';
 
@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS `commodities` (
     INDEX `idx_status_time` (`commodity_status`, `created_at`),
     
     -- 外键约束
-    CONSTRAINT `fk_commodities_category` FOREIGN KEY (`category_id`) REFERENCES `categories` (`商品类ID`) ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT `fk_commodities_category` FOREIGN KEY (`category_id`) REFERENCES `categories` (`category_id`) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT `fk_commodities_seller` FOREIGN KEY (`seller_id`) REFERENCES `users` (`User_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
     
     -- 检查约束
@@ -98,7 +98,7 @@ CREATE TABLE IF NOT EXISTS `commodities` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='商品表';
 
 -- 8. 插入基础商品类别数据
-INSERT INTO `categories` (`商品类`) VALUES
+INSERT INTO `categories` (`category`) VALUES
 ('电子产品'),
 ('图书教材'),
 ('生活用品'),
@@ -109,7 +109,7 @@ INSERT INTO `categories` (`商品类`) VALUES
 ('家居用品'),
 ('文具办公'),
 ('其他')
-ON DUPLICATE KEY UPDATE `商品类` = VALUES(`商品类`);
+ON DUPLICATE KEY UPDATE `category` = VALUES(`category`);
 
 -- 9. 创建订单表
 CREATE TABLE IF NOT EXISTS `orders` (

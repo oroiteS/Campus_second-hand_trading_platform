@@ -5,19 +5,19 @@ USE campus;
 
 -- 创建商品类别表
 CREATE TABLE IF NOT EXISTS `categories` (
-    `商品类ID` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '商品类别ID，主键',
-    `商品类` VARCHAR(64) NOT NULL COMMENT '存储商品具体类别',
+    `category_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '商品类别ID，主键',
+    `category` VARCHAR(64) NOT NULL COMMENT '存储商品具体类别',
     
     -- 创建索引
-    INDEX `idx_category_name` (`商品类`),
+    INDEX `idx_category_name` (`category`),
     
     -- 添加唯一约束
-    UNIQUE KEY `uk_category_name` (`商品类`)
+    UNIQUE KEY `uk_category_name` (`category`)
     
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='商品类别表';
 
 -- 插入一些基础商品类别数据
-INSERT INTO `categories` (`商品类`) VALUES
+INSERT INTO `categories` (`category`) VALUES
 ('电子产品'),
 ('图书教材'),
 ('生活用品'),
@@ -28,7 +28,7 @@ INSERT INTO `categories` (`商品类`) VALUES
 ('家居用品'),
 ('文具办公'),
 ('其他')
-ON DUPLICATE KEY UPDATE `商品类` = VALUES(`商品类`);
+ON DUPLICATE KEY UPDATE `category` = VALUES(`category`);
 
 -- 显示表结构
 DESCRIBE categories;
