@@ -10,7 +10,8 @@ class CommodityStatus(str, Enum):
     ON_SALE = "on_sale"
     SOLD = "sold"
     OFF_SALE = "off_sale"
-
+class Commodity_id(BaseModel):
+    commodity_id:str
 
 class CommodityBase(BaseModel):
     """商品基础字段"""

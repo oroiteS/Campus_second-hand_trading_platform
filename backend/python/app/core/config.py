@@ -11,7 +11,9 @@ class Settings(BaseSettings):
     
     # 数据库配置
     DATABASE_URL: str = "mysql+pymysql://campus_test:campus_suep@localhost:3306/campus"
-    
+    #MongoDB配置
+    MONGODB_URL:  str = "mongodb://localhost:27017/"
+    MONGODB_DATABASE: str = "campus"
 
     # 安全配置
     # SECRET_KEY: str = "your-secret-key-here-change-in-production"

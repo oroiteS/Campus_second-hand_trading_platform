@@ -47,3 +47,6 @@ def get_commodities_username(db: Session) -> List[Commodity_username]:
     #     Commodity_username.model_validate(row._asdict()) for row in results
     # ]
     return results
+def get_commodity_id(db: Session,user_id: str) -> List[Commodity_id]:
+    """获取推荐的商品id"""
+    
