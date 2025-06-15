@@ -5,3 +5,9 @@ backend/python/.venv
 .trae/*
 **/.idea/
 **/response.txt
+
+#pycharm缓存
+./backend/python/app/__pycache__
+
+# Ignore Python __pycache__ directories
+backend/python/**/__pycache__/

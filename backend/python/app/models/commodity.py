@@ -1,25 +1,38 @@
-from sqlalchemy import Column, String, Text, Integer, DECIMAL, Enum, DateTime, JSON
+from sqlalchemy import Column, String, Text, Integer, DECIMAL, DateTime, JSON
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
-from app.db.database import Base
-import enum
 
-class CommodityStatus(str, enum.Enum):
-    on_sale = "on_sale"
-    sold = "sold"
-    off_sale = "off_sale"
+Base = declarative_base()
 
+# 定义商品数据模型
 class Commodity(Base):
-    __tablename__ = "commodities"
+    __tablename__ = 'commodities'
     
+    # 主键字段
     commodity_id = Column(String(36), primary_key=True)
-    commodity_name = Column(String(100), nullable=False)
-    commodity_description = Column(Text, nullable=False)
-    category_id = Column(Integer, nullable=False)
+    
+    # 基本信息字段
+    commodity_name = Column(String(100))
+    commodity_description = Column(Text)
+    category_id = Column(Integer)
     tags = Column(JSON)
-    current_price = Column(DECIMAL(10, 2), nullable=False)
-    commodity_status = Column(Enum(CommodityStatus), nullable=False)
-    seller_id = Column(String(9), nullable=False)
-    main_image_url = Column(String(255), nullable=False)
+    
+    # 价格和状态字段
+    current_price = Column(DECIMAL(10, 2))
+    commodity_status = Column(String(50))
+    
+    # 关联字段
+    seller_id = Column(String(9))
+    
+    # 图片字段
+    main_image_url = Column(String(255))
     image_list = Column(JSON)
-    created_at = Column(DateTime, nullable=False, server_default=func.now())
-    updated_at = Column(DateTime, nullable=False, server_default=func.now(), onupdate=func.now())
+    
+    # 时间戳字段
+    created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+    
+    def __repr__(self):
+        return f"<Commodity(id={self.commodity_id}, name={self.commodity_name}, price={self.current_price})>"
+
+    
