@@ -87,4 +87,23 @@ public interface UserService {
      * @return 是否存在
      */
     boolean existsByIdCard(String idCard);
+
+    /**
+     * 更新用户信息
+     * 
+     * @param userId 用户ID
+     * @param userName 新的用户名
+     * @param telephone 新的电话号码
+     * @return 是否更新成功
+     */
+    boolean updateUserInfo(String userId, String userName, String telephone);
+
+    /**
+     * 更新用户头像
+     * 
+     * @param userId 用户ID
+     * @param avatarUrl 新的头像URL
+     * @return 是否更新成功
+     */
+    boolean updateUserAvatar(String userId, String avatarUrl);
 }

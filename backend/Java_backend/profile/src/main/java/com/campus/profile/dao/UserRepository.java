@@ -5,6 +5,7 @@ import com.campus.profile.pojo.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -151,4 +152,28 @@ public interface UserRepository extends BaseMapper<User> {
      */
     @Select("SELECT COUNT(*) FROM users WHERE User_sta = false")
     long countActiveUsers();
+
+    /**
+     * 更新用户信息（用户名和电话号码）
+     * 
+     * @param userId 用户ID
+     * @param userName 新的用户名
+     * @param telephone 新的电话号码
+     * @return 影响的行数
+     */
+    @Update("UPDATE users SET User_name = #{userName}, telephone = #{telephone} WHERE User_ID = #{userId}")
+    int updateUserInfo(@Param("userId") String userId, 
+                      @Param("userName") String userName, 
+                      @Param("telephone") String telephone);
+
+    /**
+     * 更新用户头像URL
+     * 
+     * @param userId 用户ID
+     * @param avatarUrl 新的头像URL
+     * @return 影响的行数
+     */
+    @Update("UPDATE users SET avatar_url = #{avatarUrl} WHERE User_ID = #{userId}")
+    int updateUserAvatar(@Param("userId") String userId, 
+                        @Param("avatarUrl") String avatarUrl);
 }
