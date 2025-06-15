@@ -1,9 +1,9 @@
 server:
-  port: 8080
+  port: 8082
 
 spring:
   application:
-    name: login-service
+    name: ban-service
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/campus?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
@@ -21,15 +21,10 @@ mybatis-plus:
       logic-delete-value: 1
       logic-not-delete-value: 0
 
-# JWT配置
-jwt:
-  secret: campus-secondhand-platform-secret-key-2024
-  expiration: 86400000  # 24小时
-
 # 日志配置
 logging:
   level:
-    com.campus.login: debug
+    com.example.ban: debug
     org.springframework.web: debug
 
 springdoc:
