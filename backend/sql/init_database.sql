@@ -181,7 +181,7 @@ CREATE TABLE IF NOT EXISTS `chat_sessions` (
     CONSTRAINT `fk_chat_sessions_seller` FOREIGN KEY (`seller_id`) REFERENCES `users` (`User_ID`) ON DELETE CASCADE,
 
 
-    -- 唯一约束：同一商品的买家和卖家只能有一个会话
+    -- 唯一约束：同一买家和卖家只能有一个会话
     UNIQUE KEY `uk_buyer_seller_commodity` (`buyer_id`, `seller_id`)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='聊天会话表';
