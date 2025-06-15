@@ -14,5 +14,6 @@ public interface IUserAccountService {
     // 支付
     void Pay(String userID,String orderID);
 
+
     void Recharge(String userID, BigDecimal amount);
 }

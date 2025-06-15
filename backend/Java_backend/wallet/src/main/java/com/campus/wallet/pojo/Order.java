@@ -8,17 +8,28 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.math.BigDecimal;
 @TableName("orders")
 public class Order {
-    @TableId(type = IdType.ASSIGN_ID)
-    private String order_id;
+    @TableField("order_id")
+    @TableId(value = "order_id", type = IdType.INPUT)// 显式指定数据库字段名
+    private String orderId;
     @TableField("Money")
     private BigDecimal money;
+    @TableField("order_status")
+    private OrderStatus orderStatus;
+
+    public OrderStatus getOrderStatus() {
+        return orderStatus;
+    }
+
+    public void setOrderStatus(OrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
+    }
 
     public String getOrder_id() {
-        return order_id;
+        return orderId;
     }
 
     public void setOrder_id(String order_id) {
-        this.order_id = order_id;
+        this.orderId = order_id;
     }
 
     public BigDecimal getMoney() {

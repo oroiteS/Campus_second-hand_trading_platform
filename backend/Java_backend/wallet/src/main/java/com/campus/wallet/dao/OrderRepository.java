@@ -11,6 +11,12 @@ import org.apache.ibatis.annotations.Mapper;
 @Repository
 public interface OrderRepository extends BaseMapper<Order> {
     // 根据订单ID查询订单信息
-    @Select("SELECT * FROM `order` WHERE order_id = #{orderId}")
+    @Select("SELECT * FROM `orders` WHERE order_id = #{orderId}")
     Order selectByOrderId(@Param("orderId") String orderId);
+
+    // 更新订单状态
+    void updateOrderStatus(@Param("orderId") String orderId, @Param("orderStatus") String orderStatus);
+    
+
+    
 }

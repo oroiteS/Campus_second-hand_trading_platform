@@ -1,8 +1,10 @@
 package com.campus.wallet.service;
 
+import ch.qos.logback.core.status.Status;
 import com.campus.wallet.dao.OrderRepository;
 import com.campus.wallet.dao.UserAccountRepository;
 import com.campus.wallet.pojo.Order;
+import com.campus.wallet.pojo.OrderStatus;
 import com.campus.wallet.pojo.UserAccount;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,10 +30,23 @@ public class UserAccountService implements IUserAccountService{
         if (order == null) {
             throw new RuntimeException("订单不存在");
         }
+        if (order.getOrderStatus() != OrderStatus.pending_transaction) {
+            throw new IllegalStateException("订单状态错误：当前状态为" + order.getOrderStatus());
+        }
         BigDecimal amount = order.getMoney();
         if(userAccount!= null){
             userAccount.setMoney(userAccount.getMoney().add(amount));
-            userAccountRepository.insert(userAccount);
+            order.setOrderStatus(OrderStatus.completed);
+            int updateResult = userAccountRepository.updateById(userAccount);
+            int updateOrderResult = orderRepository.updateById(order);
+        // 更新订单状态
+            if (updateResult != 1) {
+                throw new RuntimeException("更新账户余额失败");
+            }
+            if (updateOrderResult != 1) {
+                throw new RuntimeException("更新订单状态失败");
+            }
+
         }
     }
 
@@ -40,11 +55,15 @@ public class UserAccountService implements IUserAccountService{
         UserAccount userAccount = userAccountRepository.selectByUserId(userID);
         if (userAccount != null && userAccount.getMoney() != null) {
             BigDecimal currentMoney = userAccount.getMoney();
-            if (currentMoney.compareTo(amount) >= 0) {
+            if (currentMoney.compareTo(amount) >= 0&&amount.compareTo(BigDecimal.ZERO) > 0) {
                 userAccount.setMoney(currentMoney.subtract(amount));
-                userAccountRepository.insert(userAccount);
+                int updateResult = userAccountRepository.updateById(userAccount);
+
+                if (updateResult != 1) {
+                    throw new RuntimeException("更新账户余额失败");
+                }
             } else {
-                throw new IllegalArgumentException("余额不足");
+                throw new IllegalArgumentException("余额不足或体现金额数据不正确");
             }
         }else{
             throw new IllegalArgumentException("用户不存在或账户余额不足");
@@ -53,15 +72,27 @@ public class UserAccountService implements IUserAccountService{
 
     @Override
     public void sellerRefund(String userID,String orderID) {
-        UserAccount userAccount=userAccountRepository.selectByUserId(userID);
-        Order order=orderRepository.selectByOrderId(orderID);
+        UserAccount userAccount = userAccountRepository.selectByUserId(userID);
+        Order order = orderRepository.selectByOrderId(orderID);
         if (order == null) {
             throw new RuntimeException("订单不存在");
+        }
+        if (order.getOrderStatus() != OrderStatus.pending_transaction) {
+            throw new IllegalStateException("订单状态错误：当前状态为" + order.getOrderStatus());
         }
         BigDecimal amount = order.getMoney();
         if (userAccount != null) {
             userAccount.setMoney(userAccount.getMoney().add(amount));
-            userAccountRepository.insert(userAccount);
+            order.setOrderStatus(OrderStatus.completed);
+            int updateResult = userAccountRepository.updateById(userAccount);
+            int updateOrderResult = orderRepository.updateById(order);
+            // 更新订单状态
+            if (updateResult != 1) {
+                throw new RuntimeException("更新账户余额失败");
+            }
+            if (updateOrderResult != 1) {
+                throw new RuntimeException("更新订单状态失败");
+            }
         }
     }
 
@@ -69,6 +100,7 @@ public class UserAccountService implements IUserAccountService{
     public void Pay(String userID,String orderID) {
         UserAccount userAccount=userAccountRepository.selectByUserId(userID);
         Order order=orderRepository.selectByOrderId(orderID);
+
 
         if(order == null){
             throw new RuntimeException("订单不存在");
@@ -78,7 +110,11 @@ public class UserAccountService implements IUserAccountService{
         if (userAccount != null) {
             if(amount.compareTo(balance) < 0){
                 userAccount.setMoney(userAccount.getMoney().subtract(amount));
-                userAccountRepository.insert(userAccount);
+                int updateResult = userAccountRepository.updateById(userAccount);
+
+                if (updateResult != 1) {
+                    throw new RuntimeException("更新账户余额失败");
+                }
             }else{
                 throw new IllegalArgumentException("余额不足");
             }
@@ -89,15 +125,18 @@ public class UserAccountService implements IUserAccountService{
 
     @Override
     public void Recharge(String userID, BigDecimal amount){
-        System.out.println("DEBUG - Received userID: " + userID); // 简单输出
         UserAccount userAccount = userAccountRepository.selectByUserId(userID);
         if (userAccount != null) {
             BigDecimal currentMoney = userAccount.getMoney();
-            userAccount.setMoney(currentMoney.add(amount));
-            int updateResult = userAccountRepository.updateById(userAccount);
+            if(amount.compareTo(BigDecimal.ZERO)>0) {
+                userAccount.setMoney(currentMoney.add(amount));
+                int updateResult = userAccountRepository.updateById(userAccount);
 
-            if (updateResult!=1) {
-                throw new RuntimeException("更新账户余额失败");
+                if (updateResult != 1) {
+                    throw new RuntimeException("更新账户余额失败");
+                }
+            }else{
+                throw new IllegalArgumentException("充值金额必须大于0");
             }
         } else {
             throw new IllegalArgumentException("用户不存在");
