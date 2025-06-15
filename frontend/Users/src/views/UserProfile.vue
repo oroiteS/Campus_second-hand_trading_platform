@@ -1,5 +1,6 @@
 <template>
-  <div class="profile-container">
+  <div class="user-profile-page">
+    <div class="profile-container">
     <div class="profile-box">
       <h2>修改个人信息</h2>
       
@@ -120,6 +121,7 @@
         </button>
       </div>
     </div>
+  </div>
   </div>
 </template>
 
@@ -270,182 +272,5 @@ export default {
 </script>
 
 <style scoped>
-.profile-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background-color: #f8f9fa;
-  padding: 20px;
-}
-
-.profile-box {
-  width: 100%;
-  max-width: 500px;
-  background: white;
-  border-radius: 15px;
-  padding: 30px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-}
-
-h2 {
-  text-align: center;
-  margin-bottom: 30px;
-  color: #333;
-  font-weight: bold;
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 500;
-  color: #555;
-}
-
-input {
-  width: 100%;
-  padding: 12px 15px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 14px;
-  transition: border 0.3s;
-}
-
-input:focus {
-  border-color: #667eea;
-  outline: none;
-}
-
-input:disabled {
-  background-color: #f5f5f5;
-  cursor: not-allowed;
-}
-
-.input-tip {
-  font-size: 12px;
-  color: #888;
-  margin-top: 5px;
-}
-
-.error-message {
-  color: #e74c3c;
-  margin-bottom: 15px;
-  font-size: 14px;
-}
-
-.button-group {
-  display: flex;
-  gap: 15px;
-}
-
-.save-btn, .cancel-btn {
-  flex: 1;
-  padding: 12px 0;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.save-btn {
-  background: #667eea;
-  color: white;
-}
-
-.save-btn:hover {
-  background: #5a6fd8;
-}
-
-.save-btn:disabled {
-  background: #a5afd7;
-  cursor: not-allowed;
-}
-
-.cancel-btn {
-  background: #f0f0f0;
-  color: #666;
-}
-
-.cancel-btn:hover {
-  background: #e0e0e0;
-}
-
-.avatar-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 30px;
-}
-
-.avatar-preview-large {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid #667eea;
-  margin-bottom: 15px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-}
-
-.avatar-url-group {
-  width: 100%;
-}
-
-.avatar-container {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.avatar-preview {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #ddd;
-}
-
-.input-error {
-  color: #e74c3c;
-  font-size: 12px;
-  margin-top: 5px;
-}
-
-.location-group {
-  margin-bottom: 25px;
-}
-
-.location-inputs {
-  display: flex;
-  gap: 15px;
-}
-
-.location-input {
-  flex: 1;
-}
-
-.location-input label {
-  font-size: 12px;
-  margin-bottom: 5px;
-}
-
-@media (max-width: 576px) {
-  .profile-box {
-    padding: 20px;
-  }
-  
-  .location-inputs {
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .button-group {
-    flex-direction: column;
-  }
-}
+@import '../styles/UserProfile.css';
 </style>

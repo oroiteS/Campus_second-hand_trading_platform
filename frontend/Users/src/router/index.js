@@ -5,7 +5,6 @@ import Register from '../views/Register.vue'
 import Profile from '../views/Profile.vue'
 import UserProfile from '../views/UserProfile.vue'
 import Favorites from '../views/Favorites.vue'
-import AdminDashboard from '../views/AdminDashboard.vue'
 import NearbyUsers from '../views/NearbyUsers.vue'
 
 const routes = [
@@ -38,11 +37,6 @@ const routes = [
     path: '/favorites',
     name: 'Favorites',
     component: Favorites
-  },
-  {
-    path: '/AdminDashboard',
-    name: 'AdminDashboard',
-    component: AdminDashboard
   },
   {
     path: '/nearbyusers',
