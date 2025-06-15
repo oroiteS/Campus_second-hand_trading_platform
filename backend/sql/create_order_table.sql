@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS `orders` (
     `commodity_id` CHAR(36) NOT NULL COMMENT '外键，与商品表关联',
     `Buyer_id` CHAR(9) NOT NULL COMMENT '买家id',
     `Seller_id` CHAR(9) NOT NULL COMMENT '卖家id',
+    `order_status` ENUM('pending_payment', 'pending_transaction', 'completed') NOT NULL DEFAULT 'pending_payment' COMMENT '订单状态：pending_payment=代付款，pending_transaction=代交易，completed=已完成',
     `Sale_time` DATETIME DEFAULT NULL COMMENT '交易时间',
     `Money` DECIMAL(12,2) DEFAULT NULL COMMENT '交易金额',
     `Sale_loc` VARCHAR(250) DEFAULT NULL COMMENT '交易地址',
@@ -16,20 +17,21 @@ CREATE TABLE IF NOT EXISTS `orders` (
     INDEX `idx_commodity_id` (`commodity_id`),
     INDEX `idx_buyer_id` (`Buyer_id`),
     INDEX `idx_seller_id` (`Seller_id`),
+    INDEX `idx_order_status` (`order_status`),
     INDEX `idx_sale_time` (`Sale_time`),
     INDEX `idx_money` (`Money`),
+    INDEX `idx_buyer_time` (`Buyer_id`, `Sale_time`),
+    INDEX `idx_seller_time` (`Seller_id`, `Sale_time`),
+    INDEX `idx_commodity_time` (`commodity_id`, `Sale_time`),
+    INDEX `idx_buyer_status` (`Buyer_id`, `order_status`),
+    INDEX `idx_seller_status` (`Seller_id`, `order_status`),
     
-    -- 外键约束（假设商品表和用户表已存在）
+    -- 外键约束
     CONSTRAINT `fk_orders_commodity` FOREIGN KEY (`commodity_id`) REFERENCES `commodities` (`commodity_id`) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT `fk_orders_buyer` FOREIGN KEY (`Buyer_id`) REFERENCES `users` (`User_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT `fk_orders_seller` FOREIGN KEY (`Seller_id`) REFERENCES `users` (`User_ID`) ON DELETE CASCADE ON UPDATE CASCADE
     
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='订单表';
-
--- 创建复合索引（优化查询性能）
-CREATE INDEX `idx_buyer_time` ON `orders` (`Buyer_id`, `Sale_time`);
-CREATE INDEX `idx_seller_time` ON `orders` (`Seller_id`, `Sale_time`);
-CREATE INDEX `idx_commodity_time` ON `orders` (`commodity_id`, `Sale_time`);
 
 -- 显示表结构
 DESCRIBE orders;
