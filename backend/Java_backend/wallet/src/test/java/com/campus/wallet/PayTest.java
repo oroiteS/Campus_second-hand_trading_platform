@@ -18,9 +18,9 @@ public class PayTest {
     private MockMvc mockMvc;
 
     @Test
-    @WithMockUser(username = "U12345678", roles = {"USER"})
+    @WithMockUser(username = "U12345680", roles = {"USER"})
     void testRecharge() throws Exception {
-        String requestBody = "{\"orderID\": \"0188e00d-5c3c-7f4b-8e0d-5c3c7f4b8e0d\"}";
+        String requestBody = "{\"orderID\": \"0188e00d-5c3c-7f4b-8e0d-5c3c7f4b8e10\"}";
 
         mockMvc.perform(post("/user/account/pay")
                         .contentType(MediaType.APPLICATION_JSON)

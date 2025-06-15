@@ -100,8 +100,9 @@ public class UserAccountService implements IUserAccountService{
     public void Pay(String userID,String orderID) {
         UserAccount userAccount=userAccountRepository.selectByUserId(userID);
         Order order=orderRepository.selectByOrderId(orderID);
-
-
+        if (order.getOrderStatus() != OrderStatus.pending_payment) {
+            throw new IllegalStateException("订单状态错误：当前状态为" + order.getOrderStatus());
+        }
         if(order == null){
             throw new RuntimeException("订单不存在");
         }
@@ -110,10 +111,14 @@ public class UserAccountService implements IUserAccountService{
         if (userAccount != null) {
             if(amount.compareTo(balance) < 0){
                 userAccount.setMoney(userAccount.getMoney().subtract(amount));
+                order.setOrderStatus(OrderStatus.pending_transaction);
                 int updateResult = userAccountRepository.updateById(userAccount);
-
+                int updateOrderResult = orderRepository.updateById(order);
                 if (updateResult != 1) {
                     throw new RuntimeException("更新账户余额失败");
+                }
+                if (updateOrderResult != 1) {
+                    throw new RuntimeException("更新订单状态失败");
                 }
             }else{
                 throw new IllegalArgumentException("余额不足");
