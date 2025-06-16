@@ -30,8 +30,8 @@ public interface UserMapper extends BaseMapper<User> {
     User findByIdCard(String idCard);
     
     /**
-     * 根据用户名或电话号码查询用户（用于登录）
+     * 根据用户ID查询用户（用于登录）
      */
-    @Select("SELECT * FROM users WHERE User_name = #{username} OR telephone = #{username}")
-    User findByUsernameOrTelephone(String username);
+    @Select("SELECT * FROM users WHERE User_id = #{userId}")
+    User findByUserId(String userId);
 }

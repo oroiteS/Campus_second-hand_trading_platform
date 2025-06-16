@@ -48,7 +48,7 @@ public class UserController {
      */
     @PostMapping("/login")
     public Result<Map<String, Object>> login(@Valid @RequestBody LoginRequest loginRequest) {
-        log.info("用户登录请求，用户名: {}", loginRequest.getUsername());
+        log.info("用户登录请求，用户ID: {}", loginRequest.getUserId());
         
         Map<String, Object> result = userService.login(loginRequest);
         

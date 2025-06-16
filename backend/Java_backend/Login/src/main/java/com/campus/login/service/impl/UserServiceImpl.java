@@ -101,8 +101,8 @@ public class UserServiceImpl implements UserService {
         Map<String, Object> result = new HashMap<>();
         
         try {
-            // 根据用户名或电话号码查询用户
-            User user = userMapper.findByUsernameOrTelephone(loginRequest.getUsername());
+            // 根据用户ID查询用户
+            User user = userMapper.findByUserId(loginRequest.getUserId());
             
             if (user == null) {
                 result.put("success", false);
