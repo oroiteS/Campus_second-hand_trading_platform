@@ -319,12 +319,12 @@ public class UserController {
         @ApiResponse(responseCode = "404", description = "用户不存在"),
         @ApiResponse(responseCode = "500", description = "服务器内部错误")
     })
-    @PostMapping("/avatar/upload")
+    @PostMapping(value = "/avatar/upload", consumes = "multipart/form-data")
     public ResponseEntity<Map<String, Object>> uploadAvatar(
             @Parameter(description = "头像文件，支持JPG、PNG、GIF、WEBP格式，最大5MB", required = true)
-            @RequestParam("file") MultipartFile file,
+            @RequestPart("file") MultipartFile file,
             @Parameter(description = "用户ID", required = true)
-            @RequestParam("userId") String userId) {
+            @RequestPart("userId") String userId) {
         try {
             // 参数验证
             if (userId == null || userId.trim().isEmpty()) {
