@@ -25,11 +25,11 @@ CREATE TABLE IF NOT EXISTS `users` (
     `telephone` CHAR(11) NOT NULL COMMENT '用户电话号',
     `real_name` VARCHAR(50) NOT NULL COMMENT '真实姓名',
     `avatar_url` VARCHAR(255) DEFAULT NULL COMMENT '头像url（默认地址：）',
-    `User_Loc_longitude` DECIMAL(9,6) NOT NULL COMMENT '存储经度',
+    `User_Loc_longitude` DECIMAL(9,6) NOT NULL DEFAULT 121.891585 COMMENT '存储经度',
     `User_sta` BOOLEAN NOT NULL DEFAULT FALSE COMMENT '是否封号（默认否）',
     `Create_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `ID` CHAR(18) NOT NULL COMMENT '身份证号',
-    `User_Loc_latitude` DECIMAL(9,6) NOT NULL COMMENT '存储纬度',
+    `User_Loc_latitude` DECIMAL(9,6) NOT NULL DEFAULT 30.901871 COMMENT '存储纬度',
 
     -- 创建索引
     INDEX `idx_user_name` (`User_name`),

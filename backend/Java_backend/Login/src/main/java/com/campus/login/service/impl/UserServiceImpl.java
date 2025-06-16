@@ -55,23 +55,22 @@ public class UserServiceImpl implements UserService {
                 return result;
             }
             
-            // 生成用户ID（确保唯一性）
-            String userId;
-            do {
-                userId = UserIdGenerator.generateUserId();
-            } while (getUserById(userId) != null);
+            // 检查用户ID是否已存在
+            if (getUserById(registerRequest.getUserId()) != null) {
+                result.put("success", false);
+                result.put("message", "用户ID已存在");
+                return result;
+            }
             
             // 创建用户对象
             User user = new User();
-            user.setUserId(userId);
+            user.setUserId(registerRequest.getUserId());
             user.setUserName(registerRequest.getUserName());
             user.setPassword(PasswordUtil.encryptPassword(registerRequest.getPassword()));
             user.setTelephone(registerRequest.getTelephone());
             user.setRealName(registerRequest.getRealName());
             user.setIdCard(registerRequest.getIdCard());
-            user.setUserLocLongitude(registerRequest.getLongitude());
-            user.setUserLocLatitude(registerRequest.getLatitude());
-            user.setAvatarUrl(registerRequest.getAvatarUrl());
+
             user.setUserSta(false); // 默认未封号
             user.setCreateAt(LocalDateTime.now());
             
@@ -81,8 +80,8 @@ public class UserServiceImpl implements UserService {
             if (insertResult > 0) {
                 result.put("success", true);
                 result.put("message", "注册成功");
-                result.put("userId", userId);
-                log.info("用户注册成功，用户ID: {}, 用户名: {}", userId, registerRequest.getUserName());
+                result.put("userId", registerRequest.getUserId());
+                log.info("用户注册成功，用户ID: {}, 用户名: {}", registerRequest.getUserId(), registerRequest.getUserName());
             } else {
                 result.put("success", false);
                 result.put("message", "注册失败，请重试");

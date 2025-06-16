@@ -5,14 +5,19 @@ import lombok.Data;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import jakarta.validation.constraints.NotNull;
-import java.math.BigDecimal;
 
 /**
  * 用户注册请求DTO
  */
 @Data
 public class RegisterRequest {
+    
+    /**
+     * 用户ID
+     */
+    @NotBlank(message = "用户ID不能为空")
+    @Pattern(regexp = "^\\d{9}$", message = "用户ID必须为9位数字")
+    private String userId;
     
     /**
      * 用户名
@@ -49,21 +54,5 @@ public class RegisterRequest {
     @Pattern(regexp = "^[1-9]\\d{5}(18|19|20)\\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\\d{3}[0-9Xx]$", 
              message = "身份证号格式不正确")
     private String idCard;
-    
-    /**
-     * 用户位置经度
-     */
-    @NotNull(message = "经度不能为空")
-    private BigDecimal longitude;
-    
-    /**
-     * 用户位置纬度
-     */
-    @NotNull(message = "纬度不能为空")
-    private BigDecimal latitude;
-    
-    /**
-     * 头像URL（可选）
-     */
-    private String avatarUrl;
+
 }
