@@ -175,6 +175,12 @@ export default {
       return this.products[this.activeTab] || []
     }
   },
+  created() {
+    // 从路由参数中获取userId
+    if (this.$route.query.userId) {
+      console.log('Profile页面获取到的userId:', this.$route.query.userId);
+    }
+  },
   methods: {
     goBack() {
       this.$router.go(-1)
@@ -208,7 +214,12 @@ export default {
         case 'help':
           // 可以添加帮助中心页面
           console.log('跳转到附近的人')
-          this.$router.push('/nearbyusers')
+          this.$router.push({
+            path: '/nearbyusers',
+            query: {
+              userId: this.$route.query.userId
+            }
+          })
           break
         default:
           console.log('未知操作:', action)

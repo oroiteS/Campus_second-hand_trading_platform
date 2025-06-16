@@ -68,8 +68,10 @@
           type="text" 
           id="realName" 
           v-model="realName" 
-          placeholder="请输入真实姓名"
+          placeholder="真实姓名" 
+          disabled
         />
+        <div class="user-profile-input-tip">真实姓名不可修改</div>
       </div>
       
       <div class="user-profile-form-group" v-if="idCard !== undefined">
@@ -78,33 +80,10 @@
           type="text" 
           id="idCard" 
           v-model="idCard" 
-          placeholder="请输入身份证号"
+          placeholder="身份证号" 
+          disabled
         />
-        <div class="user-profile-input-error" v-if="validationErrors.idCard">{{ validationErrors.idCard }}</div>
-      </div>
-      
-      <div class="user-profile-form-group user-profile-location-group" v-if="longitude !== undefined || latitude !== undefined">
-        <label>用户位置</label>
-        <div class="user-profile-location-inputs">
-          <div class="user-profile-location-input" v-if="longitude !== undefined">
-            <label for="longitude">经度</label>
-            <input 
-              type="text" 
-              id="longitude" 
-              v-model="longitude" 
-              placeholder="经度"
-            />
-          </div>
-          <div class="user-profile-location-input" v-if="latitude !== undefined">
-            <label for="latitude">纬度</label>
-            <input 
-              type="text" 
-              id="latitude" 
-              v-model="latitude" 
-              placeholder="纬度"
-            />
-          </div>
-        </div>
+        <div class="user-profile-input-tip">身份证号不可修改</div>
       </div>
       
       <div class="user-profile-error-message" v-if="errorMessage">
@@ -135,15 +114,12 @@ export default {
       realName: '',
       idCard: '',
       avatarUrl: '',
-      longitude: '',
-      latitude: '',
       errorMessage: '',
       isLoading: false,
       validationErrors: {
         username: '',
         password: '',
-        telephone: '',
-        idCard: ''
+        telephone: ''
       }
     }
   },
@@ -216,14 +192,7 @@ export default {
         }
       }
       
-      // 验证身份证号
-      if (this.idCard) {
-        const idCardRegex = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
-        if (!idCardRegex.test(this.idCard)) {
-          this.validationErrors.idCard = '请输入有效的身份证号码';
-          isValid = false;
-        }
-      }
+      // 身份证号不需要验证，因为已设置为不可修改
       
       return isValid;
     },
@@ -242,8 +211,8 @@ export default {
       // 准备要提交的数据
       const profileData = {};
       
-      // 只包含有值的字段
-      ['username', 'password', 'telephone', 'realName', 'idCard', 'avatarUrl', 'longitude', 'latitude'].forEach(field => {
+      // 只包含有值的字段，不包括经度纬度，真实姓名和身份证号不可修改
+      ['username', 'password', 'telephone', 'avatarUrl'].forEach(field => {
         if (this[field]) {
           profileData[field] = this[field];
         }

@@ -107,6 +107,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   name: 'RegisterPage',
   data() {
@@ -176,26 +178,11 @@ export default {
     }
   },
   methods: {
-    // 身份证号验证函数
+    // 身份证号验证函数（宽松验证）
     validateIdCard(idCard) {
-      // 18位身份证号正则表达式
-      const idCardRegex = /^[1-9]\d{5}(18|19|20)\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/
-      
-      if (!idCardRegex.test(idCard)) {
-        return false
-      }
-      
-      // 验证校验码
-      const weights = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2]
-      const checkCodes = ['1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2']
-      
-      let sum = 0
-      for (let i = 0; i < 17; i++) {
-        sum += parseInt(idCard[i]) * weights[i]
-      }
-      
-      const checkCode = checkCodes[sum % 11]
-      return checkCode === idCard[17].toUpperCase()
+      // 简化的身份证号验证：只检查是否为18位数字和字母X的组合
+      const idCardRegex = /^\d{17}[\dXx]$/
+      return idCardRegex.test(idCard)
     },
     
     // 切换爱好选择
@@ -216,16 +203,7 @@ export default {
       }
     },
     
-    async checkUserIdExists(userId) {
-      // 这里应该调用后端API检查用户ID是否已存在
-      // 模拟API调用
-      return new Promise(resolve => {
-        setTimeout(() => {
-          // 假设S123456789已经存在
-          resolve(userId === 'S123456789')
-        }, 500)
-      })
-    },
+
     async register() {
       // 表单验证
       if (!this.userId || !this.nickname || !this.realName || !this.idCard || !this.phone || !this.password || !this.confirmPassword) {
@@ -241,7 +219,7 @@ export default {
       
       // 验证身份证号格式
       if (!this.validateIdCard(this.idCard)) {
-        this.errorMessage = '请输入有效的18位身份证号'
+        this.errorMessage = '请输入18位身份证号（最后一位可以是数字或X）'
         return
       }
       
@@ -272,55 +250,33 @@ export default {
       this.isLoading = true
       this.errorMessage = ''
       
-      // 检查用户ID是否已存在
-      const userExists = await this.checkUserIdExists(this.userId)
-      if (userExists) {
-        this.errorMessage = '该用户ID已被注册'
-        this.isLoading = false
-        return
-      }
-      
-      // 模拟API调用
-      setTimeout(() => {
-        // 这里是静态数据测试，实际项目中应该调用后端API
-        alert('注册成功!')
-        // 跳转到登录页
-        this.$router.push('/login')
-        this.isLoading = false
-      }, 1000)
-      
-      /* 实际项目中的API调用示例
-      // 使用axios或fetch调用后端API
-      fetch('/api/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
+      // 调用后端注册API
+      try {
+        const response = await axios.post('http://localhost:8080/api/user/register', {
           userId: this.userId,
-          nickname: this.nickname,
-          phone: this.phone,
+          userName: this.nickname,
+          realName: this.realName,
+          idCard: this.idCard,
+          telephone: this.phone,
           password: this.password
         })
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          // 注册成功
+        
+        if (response.data.code === 200 && response.data.data && response.data.data.success) {
           alert('注册成功!')
           this.$router.push('/login')
         } else {
-          // 注册失败
-          this.errorMessage = data.message || '注册失败'
+          this.errorMessage = (response.data.data && response.data.data.message) || response.data.message || '注册失败'
         }
+      } catch (error) {
+        console.error('注册失败:', error)
+        if (error.response && error.response.data && error.response.data.message) {
+          this.errorMessage = error.response.data.message
+        } else {
+          this.errorMessage = '网络错误，请稍后再试'
+        }
+      } finally {
         this.isLoading = false
-      })
-      .catch(error => {
-        this.errorMessage = '网络错误，请稍后再试'
-        this.isLoading = false
-        console.error('Register error:', error)
-      })
-      */
+      }
     }
   }
 }

@@ -66,6 +66,11 @@ const routes = [
     path: '/notice/:id',
     name: 'NoticeDetail',
     component: NoticeDetail
+  },
+  {
+    path: '/chat-list/:userId',
+    name: 'ChatList',
+    component: () => import('../views/ChatList.vue')
   }
 ]
 

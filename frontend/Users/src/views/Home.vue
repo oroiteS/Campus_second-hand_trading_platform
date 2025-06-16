@@ -194,12 +194,6 @@ export default {
         { id: 2, text: '期末教材回收活动', date: '12-18' },
         { id: 3, text: '诚信交易倡议书', date: '12-15' }
       ],
-      quickCategories: [
-        { id: 1, name: '教材', icon: '📖', count: 156, color: '#4CAF50' },
-        { id: 2, name: '手机', icon: '📱', count: 89, color: '#2196F3' },
-        { id: 3, name: '电脑', icon: '💻', count: 67, color: '#FF9800' },
-        { id: 4, name: '服装', icon: '👔', count: 234, color: '#E91E63' }
-      ],
       hotProducts: [
         {
           id: 1,
@@ -340,7 +334,7 @@ export default {
             console.error('解析用户信息失败:', e);
             // 使用默认用户信息
             this.userInfo = {
-              name: localStorage.getItem('username') || 'xy21675070351',
+              name: localStorage.getItem('username') || '默认用户名',
               avatar: '/测试图片.jpg',
               status: '在线'
             };
@@ -363,7 +357,12 @@ export default {
     },
     // 跳转到个人资料页面
     goToProfile() {
-      this.$router.push('/profile');
+      this.$router.push({
+        path: '/profile',
+        query: {
+          userId: this.userInfo.userId
+        }
+      });
     },
     // 手动更新登录状态
     updateLoginStatus() {
