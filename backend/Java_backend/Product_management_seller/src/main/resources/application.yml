@@ -24,7 +24,7 @@ spring:
 
 logging:
   level:
-    com.example.product_management_seller: DEBUG
+    com.campus.product_management_seller: DEBUG
     org.springframework.web: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE

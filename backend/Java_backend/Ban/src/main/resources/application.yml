@@ -6,7 +6,7 @@ spring:
     name: ban-service
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/campus?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://localhost:3306/campus?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
     username: campus_test
     password: campus_suep
   
@@ -24,7 +24,7 @@ mybatis-plus:
 # 日志配置
 logging:
   level:
-    com.example.ban: debug
+    com.campus.ban: debug
     org.springframework.web: debug
 
 springdoc:

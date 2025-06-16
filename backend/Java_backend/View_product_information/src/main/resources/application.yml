@@ -31,5 +31,5 @@ springdoc:
 
 logging:
   level:
-    com.example.view_product_information: debug
+    com.campus.view_product_information: debug
     org.springframework.web: debug

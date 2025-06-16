@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.example.view_product_information.mapper.CommodityMapper">
+<mapper namespace="com.campus.view_product_information.mapper.CommodityMapper">
 
     <!-- 商品详情结果映射 -->
-    <resultMap id="CommodityDetailMap" type="com.example.view_product_information.dto.CommodityDetailDTO">
+    <resultMap id="CommodityDetailMap" type="com.campus.view_product_information.dto.CommodityDetailDTO">
         <id column="commodity_id" property="commodityId"/>
         <result column="commodity_name" property="commodityName"/>
         <result column="commodity_description" property="commodityDescription"/>
