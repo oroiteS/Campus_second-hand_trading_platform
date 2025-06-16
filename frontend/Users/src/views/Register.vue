@@ -1,64 +1,69 @@
 <template>
   <div class="register-container">
     <div class="register-box">
-      <h2>用户注册</h2>
-      <div class="form-group">
-        <label for="userId">用户ID</label>
+      <h2 class="register-title">用户注册</h2>
+      <div class="register-form-group">
+        <label for="userId" class="register-label">用户ID</label>
         <input 
           type="text" 
           id="userId" 
           v-model="userId" 
           placeholder="请输入9位用户ID（以S或T开头）"
+          class="register-input"
         />
-        <div class="input-tip" v-if="userIdTip">{{ userIdTip }}</div>
+        <div class="register-input-tip" v-if="userIdTip">{{ userIdTip }}</div>
       </div>
-      <div class="form-group">
-        <label for="nickname">昵称</label>
+      <div class="register-form-group">
+        <label for="nickname" class="register-label">昵称</label>
         <input 
           type="text" 
           id="nickname" 
           v-model="nickname" 
           placeholder="请输入昵称"
+          class="register-input"
         />
       </div>
-      <div class="form-group">
-        <label for="phone">手机号</label>
+      <div class="register-form-group">
+        <label for="phone" class="register-label">手机号</label>
         <input 
           type="text" 
           id="phone" 
           v-model="phone" 
           placeholder="请输入手机号"
+          class="register-input"
         />
-        <div class="input-tip" v-if="phoneTip">{{ phoneTip }}</div>
+        <div class="register-input-tip" v-if="phoneTip">{{ phoneTip }}</div>
       </div>
-      <div class="form-group">
-        <label for="password">密码</label>
+      <div class="register-form-group">
+        <label for="password" class="register-label">密码</label>
         <input 
           type="password" 
           id="password" 
           v-model="password" 
           placeholder="请输入密码（至少6位）"
+          class="register-input"
         />
-        <div class="input-tip" v-if="passwordTip">{{ passwordTip }}</div>
+        <div class="register-input-tip" v-if="passwordTip">{{ passwordTip }}</div>
       </div>
-      <div class="form-group">
-        <label for="confirmPassword">确认密码</label>
+      <div class="register-form-group">
+        <label for="confirmPassword" class="register-label">确认密码</label>
         <input 
           type="password" 
           id="confirmPassword" 
           v-model="confirmPassword" 
           placeholder="请再次输入密码"
+          class="register-input"
         />
       </div>
-      <div class="error-message" v-if="errorMessage">
+      <div class="register-error-message" v-if="errorMessage">
         {{ errorMessage }}
       </div>
       <button @click="register" class="register-btn" :disabled="isLoading">
         {{ isLoading ? '注册中...' : '注册' }}
       </button>
-      <div class="links">
-        <router-link to="/login" class="login-link">已有账号？去登录</router-link>
-        <router-link to="/" class="back-link">返回首页</router-link>
+      <div class="register-links">
+        <router-link to="/login" class="register-login-link">已有账号？去登录</router-link>
+        <router-link to="/" class="register-back-link">返回首页</router-link>
       </div>
     </div>
   </div>
@@ -207,96 +212,5 @@ export default {
 </script>
 
 <style scoped>
-.register-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background-color: #f5f5f5;
-  background-image: url('../assets/background.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
-.register-box {
-  width: 400px;
-  padding: 30px;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-h2 {
-  text-align: center;
-  margin-bottom: 30px;
-  color: #2c3e50;
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: bold;
-  color: #333;
-}
-
-input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 16px;
-}
-
-.input-tip {
-  font-size: 12px;
-  color: #ff9800;
-  margin-top: 5px;
-}
-
-.error-message {
-  color: #e53935;
-  margin-bottom: 15px;
-}
-
-.register-btn {
-  width: 100%;
-  padding: 12px;
-  background-color: #42b983;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.register-btn:hover {
-  background-color: #3aa876;
-}
-
-.register-btn:disabled {
-  background-color: #a8d5c3;
-  cursor: not-allowed;
-}
-
-.links {
-  margin-top: 20px;
-  text-align: center;
-  display: flex;
-  justify-content: space-between;
-}
-
-.login-link, .back-link {
-  color: #42b983;
-  text-decoration: none;
-}
-
-.login-link:hover, .back-link:hover {
-  text-decoration: underline;
-}
+@import '../styles/Register.css';
 </style>

@@ -1,13 +1,12 @@
 <template>
-  <div class="user-profile-page">
-    <div class="profile-container">
-    <div class="profile-box">
+  <div class="user-profile-container">
+    <div class="user-profile-box">
       <h2>修改个人信息</h2>
       
       <!-- 头像放在最上方 -->
-      <div class="avatar-section">
-        <img :src="avatarUrl || 'https://via.placeholder.com/100x100'" class="avatar-preview-large" />
-        <div class="form-group avatar-url-group">
+      <div class="user-profile-avatar-section">
+        <img :src="avatarUrl || 'https://via.placeholder.com/100x100'" class="user-profile-avatar-preview-large" />
+        <div class="user-profile-form-group user-profile-avatar-url-group">
           <label for="avatarUrl">头像地址</label>
           <input 
             type="text" 
@@ -18,7 +17,7 @@
         </div>
       </div>
       
-      <div class="form-group" v-if="userId">
+      <div class="user-profile-form-group" v-if="userId">
         <label for="userId">用户ID</label>
         <input 
           type="text" 
@@ -27,10 +26,10 @@
           placeholder="用户ID" 
           disabled
         />
-        <div class="input-tip">用户ID不可修改</div>
+        <div class="user-profile-input-tip">用户ID不可修改</div>
       </div>
       
-      <div class="form-group" v-if="username !== undefined">
+      <div class="user-profile-form-group" v-if="username !== undefined">
         <label for="username">昵称</label>
         <input 
           type="text" 
@@ -38,10 +37,10 @@
           v-model="username" 
           placeholder="请输入昵称"
         />
-        <div class="input-error" v-if="validationErrors.username">{{ validationErrors.username }}</div>
+        <div class="user-profile-input-error" v-if="validationErrors.username">{{ validationErrors.username }}</div>
       </div>
       
-      <div class="form-group">
+      <div class="user-profile-form-group">
         <label for="password">密码</label>
         <input 
           type="password" 
@@ -49,10 +48,10 @@
           v-model="password" 
           placeholder="请输入密码（不少于6位）"
         />
-        <div class="input-error" v-if="validationErrors.password">{{ validationErrors.password }}</div>
+        <div class="user-profile-input-error" v-if="validationErrors.password">{{ validationErrors.password }}</div>
       </div>
       
-      <div class="form-group" v-if="telephone !== undefined">
+      <div class="user-profile-form-group" v-if="telephone !== undefined">
         <label for="telephone">电话信息</label>
         <input 
           type="text" 
@@ -60,10 +59,10 @@
           v-model="telephone" 
           placeholder="请输入电话号码"
         />
-        <div class="input-error" v-if="validationErrors.telephone">{{ validationErrors.telephone }}</div>
+        <div class="user-profile-input-error" v-if="validationErrors.telephone">{{ validationErrors.telephone }}</div>
       </div>
       
-      <div class="form-group" v-if="realName !== undefined">
+      <div class="user-profile-form-group" v-if="realName !== undefined">
         <label for="realName">真实姓名</label>
         <input 
           type="text" 
@@ -73,7 +72,7 @@
         />
       </div>
       
-      <div class="form-group" v-if="idCard !== undefined">
+      <div class="user-profile-form-group" v-if="idCard !== undefined">
         <label for="idCard">身份证号</label>
         <input 
           type="text" 
@@ -81,13 +80,13 @@
           v-model="idCard" 
           placeholder="请输入身份证号"
         />
-        <div class="input-error" v-if="validationErrors.idCard">{{ validationErrors.idCard }}</div>
+        <div class="user-profile-input-error" v-if="validationErrors.idCard">{{ validationErrors.idCard }}</div>
       </div>
       
-      <div class="form-group location-group" v-if="longitude !== undefined || latitude !== undefined">
+      <div class="user-profile-form-group user-profile-location-group" v-if="longitude !== undefined || latitude !== undefined">
         <label>用户位置</label>
-        <div class="location-inputs">
-          <div class="location-input" v-if="longitude !== undefined">
+        <div class="user-profile-location-inputs">
+          <div class="user-profile-location-input" v-if="longitude !== undefined">
             <label for="longitude">经度</label>
             <input 
               type="text" 
@@ -96,7 +95,7 @@
               placeholder="经度"
             />
           </div>
-          <div class="location-input" v-if="latitude !== undefined">
+          <div class="user-profile-location-input" v-if="latitude !== undefined">
             <label for="latitude">纬度</label>
             <input 
               type="text" 
@@ -108,20 +107,19 @@
         </div>
       </div>
       
-      <div class="error-message" v-if="errorMessage">
+      <div class="user-profile-error-message" v-if="errorMessage">
         {{ errorMessage }}
       </div>
       
-      <div class="button-group">
-        <button @click="saveProfile" class="save-btn" :disabled="isLoading">
+      <div class="user-profile-button-group">
+        <button @click="saveProfile" class="user-profile-save-btn" :disabled="isLoading">
           {{ isLoading ? '保存中...' : '保存' }}
         </button>
-        <button @click="cancel" class="cancel-btn">
+        <button @click="cancel" class="user-profile-cancel-btn">
           取消
         </button>
       </div>
     </div>
-  </div>
   </div>
 </template>
 
