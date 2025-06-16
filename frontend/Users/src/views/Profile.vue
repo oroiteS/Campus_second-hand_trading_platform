@@ -119,41 +119,11 @@
       </div>
     </div>
   </div>
-  <!-- 其他部分保持不变 -->
-  <div class="profile-menu-item" 
-       v-for="item in menuItems" 
-       :key="item.id" 
-       @click="handleMenuClick(item.action)">
-    <div class="profile-menu-icon" :style="{backgroundColor: item.color}">
-      {{ item.icon }}
-    </div>
-    <span class="profile-menu-name">{{ item.name }}</span>
-    <span class="profile-menu-arrow">→</span>
-  </div>
-
-  <!-- 定位加载状态提示 -->
-  <div v-if="isLocating" class="location-loading">
-    <div class="loading-spinner"></div>
-    <p>正在获取您的位置...</p>
-  </div>
-
-  <!-- 定位错误提示 -->
-  <div v-if="locationError" class="location-error">
-    <p>⚠️ {{ locationError }}</p>
-    <button @click="retryLocation">重试</button>
-  </div>
 </template>
 
 <script>
-
-import { useRouter } from 'vue-router'
-import AMapLoader from '@amap/amap-jsapi-loader'
 export default {
   name: 'ProfilePage',
-  setup() {
-    const router = useRouter()
-    return { router }
-  },
   data() {
     return {
       activeTab: 'selling',
@@ -170,10 +140,8 @@ export default {
         { id: 1, name: '我的收藏', icon: '❤️', color: '#FF6B6B', action: 'favorites' },
         { id: 2, name: '订单管理', icon: '📋', color: '#4ECDC4', action: 'orders' },
         { id: 3, name: '个人信息', icon: '⚙️', color: '#45B7D1', action: 'settings' },
-        { id: 5, name: '附近的人', icon: '❓', color: '#FFEAA7', action: 'nearby' }
+        { id: 5, name: '附近的人', icon: '❓', color: '#FFEAA7', action: 'help' }
       ],
-      isLocating: false,
-      locationError: null,
       productTabs: [
         { id: 'selling', name: '在售' },
         { id: 'sold', name: '已售' },
@@ -221,7 +189,7 @@ export default {
         }
       })
     },
-    async handleMenuClick(action) {
+    handleMenuClick(action) {
       console.log('点击菜单:', action)
       // 根据不同的action跳转到不同的页面
       switch(action) {
@@ -237,9 +205,8 @@ export default {
           console.log('跳转到个人信息')
           this.$router.push('/userprofile')
           break
-        case 'nearby':
+        case 'help':
           // 可以添加帮助中心页面
-          await this.handleNearbyClick()
           console.log('跳转到附近的人')
           this.$router.push('/nearbyusers')
           break
@@ -285,69 +252,6 @@ export default {
         this.removeProductFromAllArrays(product.id)
         this.$message?.success('商品已删除')
       }
-    },
-    async handleNearbyClick() {
-      this.isLocating = true
-      this.locationError = null
-      
-      try {
-        // 1. 初始化高德地图
-        window._AMapSecurityConfig = {
-          securityJsCode: "cde9e988223d78ba64124400dbef252a",
-        }
-        
-        const AMap = await AMapLoader.load({
-          key: "514d185bcae5fedf73ec30184c598996",
-          version: "2.0",
-          plugins: ["AMap.Geolocation"],
-        })
-        
-        // 2. 获取当前位置
-        const position = await new Promise((resolve, reject) => {
-          const geolocation = new AMap.Geolocation({
-            enableHighAccuracy: true,
-            timeout: 10000,
-            showButton: false,
-          })
-          
-          geolocation.getCurrentPosition((status, result) => {
-            if (status === 'complete') {
-              console.log('定位成功，位置信息:', result) // 详细定位信息
-              console.log('经度:', result.position.lng.toFixed(6)) // 经度
-              console.log('纬度:', result.position.lat.toFixed(6)) // 纬度
-              
-          
-              resolve({
-                longitude: result.position.lng.toFixed(6),
-                latitude: result.position.lat.toFixed(6),
-              })
-            } else {
-              reject(new Error(result.message || '定位失败'))
-            }
-          }, { showMarker: false })
-        })
-        
-        // 3. 跳转并传递所有信息
-        this.router.push({
-          path: '/nearbyusers',
-          query: {
-            userId: this.userInfo.username, // 用户ID
-            lon: position.longitude,      // 经度
-            lat: position.latitude,       // 纬度
-            
-          }
-        })
-        
-      } catch (error) {
-        console.error('定位失败:', error)
-        this.locationError = error.message || '获取位置信息失败'
-      } finally {
-        this.isLocating = false
-      }
-    },
-    retryLocation() {
-      this.locationError = null
-      this.handleNearbyClick()
     }
   }
 }
@@ -355,43 +259,4 @@ export default {
 
 <style scoped>
 @import '../styles/Profile.css';
-/* 新增的定位相关样式 */
-.location-loading,
-.location-error {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  color: white;
-}
-
-.loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  border-top-color: white;
-  animation: spin 1s ease-in-out infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.location-error button {
-  margin-top: 15px;
-  padding: 8px 16px;
-  background: #ff4d4f;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
 </style>

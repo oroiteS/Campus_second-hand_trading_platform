@@ -1,28 +1,5 @@
 <template>
   <div class="nearby-users-container">
-    <!-- 定位信息弹窗 -->
-    <div v-if="showLocationInfo" class="location-modal">
-      <div class="modal-content">
-        <h3>定位信息</h3>
-        <div class="info-row">
-          <span class="label">用户ID:</span>
-          <span class="value">{{ locationInfo.userId }}</span>
-        </div>
-        <div class="info-row">
-          <span class="label">经度:</span>
-          <span class="value">{{ locationInfo.longitude }}</span>
-        </div>
-        <div class="info-row">
-          <span class="label">纬度:</span>
-          <span class="value">{{ locationInfo.latitude }}</span>
-        </div>
-        <div class="info-row">
-          <span class="label">地址:</span>
-          <span class="value">{{ locationInfo.address }}</span>
-        </div>
-        <button @click="showLocationInfo = false" class="close-btn">关闭</button>
-      </div>
-    </div>
     <div class="nearby-users-card">
       <h2 class="nearby-title">附近的人</h2>
       
@@ -54,7 +31,6 @@
             </tr>
           </tbody>
         </table>
-        
       </div>
       
       <!-- 分页控件 -->
@@ -80,39 +56,8 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
-
 export default {
   name: 'NearbyUsers',
-  setup() {
-    const route = useRoute()
-    const showLocationInfo = ref(true)
-    const locationInfo = ref({
-      userId: '',
-      longitude: '',
-      latitude: '',
-      address: ''
-    })
-
-    onMounted(() => {
-      // 从路由参数中获取定位信息
-      locationInfo.value = {
-        userId: route.query.userId || '未知用户',
-        longitude: route.query.lon || '未知',
-        latitude: route.query.lat || '未知',
-        address: route.query.address || '未知地址'
-      }
-      
-      // 这里可以调用API获取附近用户，使用获取到的位置信息
-      // fetchNearbyUsers(locationInfo.value.longitude, locationInfo.value.latitude)
-    })
-
-    return {
-      showLocationInfo,
-      locationInfo
-    }
-  },
   data() {
     return {
       currentPage: 1,
@@ -171,49 +116,4 @@ export default {
 
 <style scoped>
 @import '../styles/NearbyUsers.css';
-.location-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  width: 80%;
-  max-width: 400px;
-}
-
-.info-row {
-  margin: 10px 0;
-  display: flex;
-}
-
-.label {
-  font-weight: bold;
-  width: 80px;
-}
-
-.value {
-  flex: 1;
-  word-break: break-all;
-}
-
-.close-btn {
-  margin-top: 15px;
-  padding: 8px 16px;
-  background: #1890ff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
 </style>

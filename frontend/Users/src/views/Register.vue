@@ -24,6 +24,28 @@
         />
       </div>
       <div class="register-form-group">
+        <label for="realName" class="register-label">真实姓名</label>
+        <input 
+          type="text" 
+          id="realName" 
+          v-model="realName" 
+          placeholder="请输入真实姓名"
+          class="register-input"
+        />
+        <div class="register-input-tip" v-if="realNameTip">{{ realNameTip }}</div>
+      </div>
+      <div class="register-form-group">
+        <label for="idCard" class="register-label">身份证号</label>
+        <input 
+          type="text" 
+          id="idCard" 
+          v-model="idCard" 
+          placeholder="请输入18位身份证号"
+          class="register-input"
+        />
+        <div class="register-input-tip" v-if="idCardTip">{{ idCardTip }}</div>
+      </div>
+      <div class="register-form-group">
         <label for="phone" class="register-label">手机号</label>
         <input 
           type="text" 
@@ -55,6 +77,21 @@
           class="register-input"
         />
       </div>
+      <div class="register-form-group">
+        <label class="register-label">兴趣爱好（最多选择5个）</label>
+        <div class="hobby-tags">
+          <div 
+            v-for="hobby in hobbies" 
+            :key="hobby"
+            class="hobby-tag"
+            :class="{ 'selected': selectedHobbies.includes(hobby) }"
+            @click="toggleHobby(hobby)"
+          >
+            {{ hobby }}
+          </div>
+        </div>
+        <div class="register-input-tip" v-if="hobbyTip">{{ hobbyTip }}</div>
+      </div>
       <div class="register-error-message" v-if="errorMessage">
         {{ errorMessage }}
       </div>
@@ -76,14 +113,24 @@ export default {
     return {
       userId: '',
       nickname: '小红',  // 默认昵称
+      realName: '',
+      idCard: '',
       phone: '',
       password: '',
       confirmPassword: '',
       errorMessage: '',
       userIdTip: '',
+      realNameTip: '',
+      idCardTip: '',
       phoneTip: '',
       passwordTip: '',
-      isLoading: false
+      hobbyTip: '',
+      isLoading: false,
+      hobbies: [
+        '阅读', '运动', '音乐', '电影', '旅行', '摄影', '绘画', '编程',
+        '游戏', '美食', '购物', '健身', '瑜伽', '舞蹈', '唱歌', '书法',
+      ],
+      selectedHobbies: []
     }
   },
   watch: {
@@ -93,6 +140,22 @@ export default {
         this.userIdTip = '用户ID必须为9位且以S或T开头'
       } else {
         this.userIdTip = ''
+      }
+    },
+    realName(newVal) {
+      // 验证真实姓名格式（中文姓名2-4个字符）
+      if (newVal && !/^[\u4e00-\u9fa5]{2,4}$/.test(newVal)) {
+        this.realNameTip = '请输入2-4个中文字符的真实姓名'
+      } else {
+        this.realNameTip = ''
+      }
+    },
+    idCard(newVal) {
+      // 验证身份证号格式
+      if (newVal && !this.validateIdCard(newVal)) {
+        this.idCardTip = '请输入有效的18位身份证号'
+      } else {
+        this.idCardTip = ''
       }
     },
     phone(newVal) {
@@ -113,6 +176,46 @@ export default {
     }
   },
   methods: {
+    // 身份证号验证函数
+    validateIdCard(idCard) {
+      // 18位身份证号正则表达式
+      const idCardRegex = /^[1-9]\d{5}(18|19|20)\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/
+      
+      if (!idCardRegex.test(idCard)) {
+        return false
+      }
+      
+      // 验证校验码
+      const weights = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2]
+      const checkCodes = ['1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2']
+      
+      let sum = 0
+      for (let i = 0; i < 17; i++) {
+        sum += parseInt(idCard[i]) * weights[i]
+      }
+      
+      const checkCode = checkCodes[sum % 11]
+      return checkCode === idCard[17].toUpperCase()
+    },
+    
+    // 切换爱好选择
+    toggleHobby(hobby) {
+      const index = this.selectedHobbies.indexOf(hobby)
+      if (index > -1) {
+        // 如果已选择，则取消选择
+        this.selectedHobbies.splice(index, 1)
+        this.hobbyTip = ''
+      } else {
+        // 如果未选择，检查是否超过5个
+        if (this.selectedHobbies.length >= 5) {
+          this.hobbyTip = '最多只能选择5个爱好'
+          return
+        }
+        this.selectedHobbies.push(hobby)
+        this.hobbyTip = ''
+      }
+    },
+    
     async checkUserIdExists(userId) {
       // 这里应该调用后端API检查用户ID是否已存在
       // 模拟API调用
@@ -125,8 +228,20 @@ export default {
     },
     async register() {
       // 表单验证
-      if (!this.userId || !this.nickname || !this.phone || !this.password || !this.confirmPassword) {
+      if (!this.userId || !this.nickname || !this.realName || !this.idCard || !this.phone || !this.password || !this.confirmPassword) {
         this.errorMessage = '所有字段都必须填写'
+        return
+      }
+      
+      // 验证真实姓名格式
+      if (!/^[\u4e00-\u9fa5]{2,4}$/.test(this.realName)) {
+        this.errorMessage = '请输入2-4个中文字符的真实姓名'
+        return
+      }
+      
+      // 验证身份证号格式
+      if (!this.validateIdCard(this.idCard)) {
+        this.errorMessage = '请输入有效的18位身份证号'
         return
       }
       

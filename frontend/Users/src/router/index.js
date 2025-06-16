@@ -5,7 +5,6 @@ import Register from '../views/Register.vue'
 import Profile from '../views/Profile.vue'
 import UserProfile from '../views/UserProfile.vue'
 import Favorites from '../views/Favorites.vue'
-// 删除这行：import AdminDashboard from '../views/AdminDashboard.vue'
 import NearbyUsers from '../views/NearbyUsers.vue'
 import ProductDetail from '../views/ProductDetail.vue'
 import OrderManagement from '../views/OrderManagement.vue'
@@ -43,12 +42,6 @@ const routes = [
     name: 'Favorites',
     component: Favorites
   },
-  // 删除AdminDashboard路由配置
-  // {
-  //   path: '/AdminDashboard',
-  //   name: 'AdminDashboard',
-  //   component: AdminDashboard
-  // },
   {
     path: '/nearbyusers',
     name: 'NearbyUsers',
