@@ -149,4 +149,37 @@ public class UserController {
             return Result.success(false);
         }
     }
+    
+    /**
+     * 获取当前用户头像URL
+     */
+    @GetMapping("/avatar")
+    public Result<String> getUserAvatar(@RequestHeader("Authorization") String token) {
+        try {
+            // 移除Bearer前缀
+            if (token.startsWith("Bearer ")) {
+                token = token.substring(7);
+            }
+            
+            // 验证token
+            if (!jwtUtil.isValidToken(token)) {
+                return Result.unauthorized("无效的令牌");
+            }
+            
+            // 获取用户ID
+            String userId = jwtUtil.getUserIdFromToken(token);
+            User user = userService.getUserById(userId);
+            
+            if (user == null) {
+                return Result.error("用户不存在");
+            }
+            
+            // 返回用户头像URL
+            return Result.success(user.getAvatarUrl());
+            
+        } catch (Exception e) {
+            log.error("获取用户头像失败", e);
+            return Result.error("获取用户头像失败");
+        }
+    }
 }
