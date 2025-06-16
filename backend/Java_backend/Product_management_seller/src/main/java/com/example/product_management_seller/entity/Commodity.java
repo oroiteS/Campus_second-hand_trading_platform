@@ -37,7 +37,7 @@ public class Commodity {
     @Column(name = "current_price", precision = 10, scale = 2, nullable = false)
     private BigDecimal currentPrice;
     
-    @Enumerated(EnumType.STRING)
+    @Convert(converter = com.example.product_management_seller.converter.CommodityStatusConverter.class)
     @Column(name = "commodity_status", nullable = false)
     private CommodityStatus commodityStatus = CommodityStatus.ON_SALE;
     
@@ -73,6 +73,16 @@ public class Commodity {
         
         public String getValue() {
             return value;
+        }
+        
+        // 根据字符串值查找枚举
+        public static CommodityStatus fromValue(String value) {
+            for (CommodityStatus status : CommodityStatus.values()) {
+                if (status.getValue().equals(value)) {
+                    return status;
+                }
+            }
+            throw new IllegalArgumentException("Unknown CommodityStatus value: " + value);
         }
     }
     

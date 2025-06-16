@@ -19,7 +19,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/commodity")
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(originPatterns = "*", maxAge = 3600, allowCredentials = "true")
 public class CommodityController {
     
     private static final Logger logger = LoggerFactory.getLogger(CommodityController.class);
