@@ -16,7 +16,7 @@ public class RegisterRequest {
      * 用户ID
      */
     @NotBlank(message = "用户ID不能为空")
-    @Pattern(regexp = "^\\d{9}$", message = "用户ID必须为9位数字")
+    @Pattern(regexp = "^[ST]\\d{8}$", message = "用户ID必须为9位（首位为S或者T）")
     private String userId;
     
     /**
