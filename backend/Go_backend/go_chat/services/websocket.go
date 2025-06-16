@@ -9,7 +9,7 @@ import (
 
 	"github.com/gorilla/websocket"
 
-	"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/go_chat/models"
+	"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/go_chat/models"
 )
 
 // WebSocketHub WebSocket连接管理中心

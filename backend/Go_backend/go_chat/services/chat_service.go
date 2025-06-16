@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 
-	"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/go_chat/models"
+	"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/go_chat/models"
 )
 
 // ChatService 聊天服务
