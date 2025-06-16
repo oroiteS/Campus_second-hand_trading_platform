@@ -1,0 +1,85 @@
+# MyBatis Plus 配置
+mybatis-plus:
+  # 配置 Mapper XML 文件位置
+  mapper-locations: classpath*:/mapper/**/*.xml
+  # 配置实体类别名包路径
+  type-aliases-package: com.campus.profile.pojo
+  # 全局配置
+  global-config:
+    # 数据库配置
+    db-config:
+      # 主键类型（AUTO 为数据库自增）
+      id-type: AUTO
+      # 逻辑删除字段名
+      logic-delete-field: deleted
+      # 逻辑删除值（删除时设置的值）
+      logic-delete-value: 1
+      # 逻辑未删除值（正常时的值）
+      logic-not-delete-value: 0
+  # 配置
+  configuration:
+    # 开启驼峰命名转换
+    map-underscore-to-camel-case: true
+    # 开启缓存
+    cache-enabled: true
+    # 日志实现
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# 数据源配置（示例）
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/campus_trading?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: campus_test
+    password: campus_suep
+  
+  # JPA 配置（如果需要混合使用）
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+  servlet:
+    multipart:
+          enabled: true
+          max-file-size: 5MB
+          max-request-size: 10MB
+          file-size-threshold: 2KB
+
+# Swagger 配置
+springdoc:
+  api-docs:
+    # 启用 API 文档
+    enabled: true
+    # API 文档路径
+    path: /v3/api-docs
+  swagger-ui:
+    # 启用 Swagger UI
+    enabled: true
+    # Swagger UI 路径
+    path: /swagger-ui.html
+    # 操作排序
+    operations-sorter: alpha
+    # 标签排序
+    tags-sorter: alpha
+    # 尝试请求
+    try-it-out-enabled: true
+
+# 文件上传配置
+# 自定义文件上传配置
+file:
+  upload:
+    avatar-path: e:/Compus_Sencond_Hand/Campus/Campus_second-hand_trading_platform/backend/Java_backend/uploads/avatars/
+
+# 服务器配置
+server:
+  base-url: http://localhost:8080
+
+# 日志配置
+logging:
+  level:
+    com.campus.profile.dao: debug
+    org.apache.ibatis: debug
