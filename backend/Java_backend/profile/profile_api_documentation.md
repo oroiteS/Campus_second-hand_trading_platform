@@ -7,6 +7,7 @@ Profile模块提供用户信息管理相关的API接口，包括用户信息查�
 ## 基础信息
 - **模块名称**: Profile用户信息管理模块
 - **基础路径**: `/api/user`
+- **运行端口**: `8089
 - **技术栈**: Spring Boot + MyBatis Plus
 - **文档标准**: OpenAPI 3.0 (Swagger)
 
