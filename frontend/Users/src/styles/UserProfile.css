@@ -1,5 +1,4 @@
-/* UserProfile 专用样式 - 使用更具体的选择器避免冲突 */
-.user-profile-page .profile-container {
+.user-profile-container {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -8,7 +7,7 @@
   padding: 20px;
 }
 
-.user-profile-page .profile-box {
+.user-profile-box {
   width: 100%;
   max-width: 500px;
   background: white;
@@ -17,25 +16,25 @@
   box-shadow: 0 5px 20px rgba(0,0,0,0.1);
 }
 
-.user-profile-page .profile-container h2 {
+.user-profile-box h2 {
   text-align: center;
   margin-bottom: 30px;
   color: #333;
   font-weight: bold;
 }
 
-.user-profile-page .profile-container .form-group {
+.user-profile-form-group {
   margin-bottom: 20px;
 }
 
-.user-profile-page .profile-container label {
+.user-profile-form-group label {
   display: block;
   margin-bottom: 8px;
   font-weight: 500;
   color: #555;
 }
 
-.user-profile-page .profile-container input {
+.user-profile-form-group input {
   width: 100%;
   padding: 12px 15px;
   border: 1px solid #ddd;
@@ -44,34 +43,34 @@
   transition: border 0.3s;
 }
 
-.user-profile-page .profile-container input:focus {
+.user-profile-form-group input:focus {
   border-color: #667eea;
   outline: none;
 }
 
-.user-profile-page .profile-container input:disabled {
+.user-profile-form-group input:disabled {
   background-color: #f5f5f5;
   cursor: not-allowed;
 }
 
-.user-profile-page .input-tip {
+.user-profile-input-tip {
   font-size: 12px;
   color: #888;
   margin-top: 5px;
 }
 
-.user-profile-page .error-message {
+.user-profile-error-message {
   color: #e74c3c;
   margin-bottom: 15px;
   font-size: 14px;
 }
 
-.user-profile-page .button-group {
+.user-profile-button-group {
   display: flex;
   gap: 15px;
 }
 
-.user-profile-page .save-btn, .user-profile-page .cancel-btn {
+.user-profile-save-btn, .user-profile-cancel-btn {
   flex: 1;
   padding: 12px 0;
   border: none;
@@ -81,37 +80,37 @@
   transition: all 0.3s;
 }
 
-.user-profile-page .save-btn {
+.user-profile-save-btn {
   background: #667eea;
   color: white;
 }
 
-.user-profile-page .save-btn:hover {
+.user-profile-save-btn:hover {
   background: #5a6fd8;
 }
 
-.user-profile-page .save-btn:disabled {
+.user-profile-save-btn:disabled {
   background: #a5afd7;
   cursor: not-allowed;
 }
 
-.user-profile-page .cancel-btn {
+.user-profile-cancel-btn {
   background: #f0f0f0;
   color: #666;
 }
 
-.user-profile-page .cancel-btn:hover {
+.user-profile-cancel-btn:hover {
   background: #e0e0e0;
 }
 
-.user-profile-page .avatar-section {
+.user-profile-avatar-section {
   display: flex;
   flex-direction: column;
   align-items: center;
   margin-bottom: 30px;
 }
 
-.user-profile-page .avatar-preview-large {
+.user-profile-avatar-preview-large {
   width: 120px;
   height: 120px;
   border-radius: 50%;
@@ -121,17 +120,17 @@
   box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
-.user-profile-page .avatar-url-group {
+.user-profile-avatar-url-group {
   width: 100%;
 }
 
-.user-profile-page .avatar-container {
+.user-profile-avatar-container {
   display: flex;
   align-items: center;
   gap: 15px;
 }
 
-.user-profile-page .avatar-preview {
+.user-profile-avatar-preview {
   width: 80px;
   height: 80px;
   border-radius: 50%;
@@ -139,41 +138,41 @@
   border: 2px solid #ddd;
 }
 
-.user-profile-page .input-error {
+.user-profile-input-error {
   color: #e74c3c;
   font-size: 12px;
   margin-top: 5px;
 }
 
-.user-profile-page .location-group {
+.user-profile-location-group {
   margin-bottom: 25px;
 }
 
-.user-profile-page .location-inputs {
+.user-profile-location-inputs {
   display: flex;
   gap: 15px;
 }
 
-.user-profile-page .location-input {
+.user-profile-location-input {
   flex: 1;
 }
 
-.user-profile-page .location-input label {
+.user-profile-location-input label {
   font-size: 12px;
   margin-bottom: 5px;
 }
 
 @media (max-width: 576px) {
-  .user-profile-page .profile-box {
+  .user-profile-box {
     padding: 20px;
   }
   
-  .user-profile-page .location-inputs {
+  .user-profile-location-inputs {
     flex-direction: column;
     gap: 10px;
   }
   
-  .user-profile-page .button-group {
+  .user-profile-button-group {
     flex-direction: column;
   }
 }

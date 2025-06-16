@@ -1,0 +1,288 @@
+/* PublishProduct页面样式 - 所有类名添加publish-前缀防止全局冲突 */
+.publish-page {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+}
+
+/* 顶部导航 */
+.publish-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.publish-header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 20px;
+}
+
+.publish-back-btn {
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 10px 20px;
+  border-radius: 20px;
+  transition: all 0.3s;
+}
+
+.publish-back-btn:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+.publish-page-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+  margin: 0;
+}
+
+.publish-placeholder {
+  width: 80px;
+}
+
+/* 主要内容 */
+.publish-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 30px 20px;
+}
+
+.publish-form {
+  background: white;
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+}
+
+.publish-form-section {
+  margin-bottom: 25px;
+}
+
+.publish-form-section.half {
+  width: 48%;
+  display: inline-block;
+  margin-right: 4%;
+}
+
+.publish-form-section.half:last-child {
+  margin-right: 0;
+}
+
+.publish-form-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 25px;
+}
+
+.publish-section-title {
+  display: block;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.publish-form-input, .publish-form-select, .publish-form-textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+  box-sizing: border-box;
+}
+
+.publish-form-input:focus, .publish-form-select:focus, .publish-form-textarea:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.publish-price-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.publish-currency {
+  position: absolute;
+  left: 16px;
+  color: #666;
+  font-weight: bold;
+  z-index: 1;
+}
+
+.publish-form-input.price {
+  padding-left: 35px;
+}
+
+.publish-char-count {
+  text-align: right;
+  font-size: 12px;
+  color: #999;
+  margin-top: 5px;
+}
+
+/* 图片上传 */
+.publish-image-upload {
+  margin-bottom: 10px;
+}
+
+.publish-upload-area {
+  border: 2px dashed #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+.publish-upload-area:hover {
+  border-color: #667eea;
+}
+
+.publish-upload-placeholder {
+  color: #666;
+}
+
+.publish-upload-icon {
+  font-size: 48px;
+  margin-bottom: 10px;
+}
+
+.publish-upload-tip {
+  font-size: 12px;
+  color: #999;
+  margin: 5px 0 0 0;
+}
+
+.publish-image-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.publish-preview-item {
+  position: relative;
+  width: 100px;
+  height: 100px;
+}
+
+.publish-preview-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.publish-remove-btn {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 20px;
+  height: 20px;
+  background: #ff4757;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.publish-add-more {
+  width: 100px;
+  height: 100px;
+  border: 2px dashed #e0e0e0;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 24px;
+  color: #999;
+}
+
+.publish-add-more:hover {
+  border-color: #667eea;
+  color: #667eea;
+}
+
+/* 提交按钮 */
+.publish-submit-section {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.publish-draft-btn, .publish-submit-btn {
+  flex: 1;
+  padding: 15px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.publish-draft-btn {
+  background: #f8f9fa;
+  color: #666;
+  border: 2px solid #e0e0e0;
+}
+
+.publish-draft-btn:hover {
+  background: #e9ecef;
+}
+
+.publish-submit-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.publish-submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.publish-submit-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .publish-container {
+    padding: 20px 15px;
+  }
+  
+  .publish-form {
+    padding: 20px;
+  }
+  
+  .publish-form-row {
+    flex-direction: column;
+  }
+  
+  .publish-form-section.half {
+    width: 100%;
+    margin-right: 0;
+    margin-bottom: 25px;
+  }
+  
+  .publish-submit-section {
+    flex-direction: column;
+  }
+}

@@ -1,131 +1,132 @@
+
 <template>
-  <div class="home">
+  <div class="home-container">
     <!-- 顶部导航栏 -->
-    <header class="header">
-      <div class="header-content">
-        <div class="logo">
-          <span class="logo-text">校园二手交易</span>
-          <span class="logo-subtitle">Campus Market</span>
+    <header class="home-header">
+      <div class="home-header-content">
+        <div class="home-logo">
+          <span class="home-logo-text">校园二手交易</span>
+          <span class="home-logo-subtitle">Campus Market</span>
         </div>
-        <div class="search-container">
-          <div class="search-bar">
+        <div class="home-search-container">
+          <div class="home-search-bar">
             <input 
               type="text" 
               placeholder="搜索校园好物..." 
               v-model="searchQuery" 
-              class="search-input"
+              class="home-search-input"
             />
-            <button @click="searchProducts" class="search-btn">
-              <i class="search-icon">🔍</i>
+            <button @click="searchProducts" class="home-search-btn">
+              <i class="home-search-icon">🔍</i>
             </button>
           </div>
         </div>
-        <div class="nav-actions">
-          <a href="#" class="publish-btn">+ 发布闲置</a>
+        <div class="home-nav-actions">
+          <a @click="goToPublish" class="home-publish-btn">+ 发布闲置</a>
           <!-- 根据登录状态显示不同内容 -->
-          <div v-if="isLoggedIn" class="user-info">
-            <img :src="userInfo.avatar" :alt="userInfo.name + '的头像'" class="user-avatar" @click="goToProfile" />
-            <div class="user-details" @click="goToProfile">
-              <span class="user-name">{{ userInfo.name }}</span>
-              <span class="user-status">{{ userInfo.status }}</span>
+          <div v-if="isLoggedIn" class="home-user-info">
+            <img :src="userInfo.avatar" :alt="userInfo.name + '的头像'" class="home-user-avatar" @click="goToProfile" />
+            <div class="home-user-details" @click="goToProfile">
+              <span class="home-user-name">{{ userInfo.name }}</span>
+              <span class="home-user-status">{{ userInfo.status }}</span>
             </div>
             <!-- 悬浮菜单 -->
-            <div class="user-dropdown">
-              <button @click.stop="logout" class="logout-btn">退出登录</button>
+            <div class="home-user-dropdown">
+              <button @click.stop="logout" class="home-logout-btn">退出登录</button>
             </div>
           </div>
-          <div v-else class="auth-buttons">
-            <router-link to="/login" class="login-link">登录</router-link>
-            <router-link to="/register" class="register-link">注册</router-link>
+          <div v-else class="home-auth-buttons">
+            <router-link to="/login" class="home-login-link">登录</router-link>
+            <router-link to="/register" class="home-register-link">注册</router-link>
           </div>
         </div>
       </div>
     </header>
 
     <!-- 内容区域 -->
-    <div class="content-wrapper">
+    <div class="home-content-wrapper">
       <!-- 侧边分类菜单 -->
-      <aside class="sidebar">
-        <div class="category-menu">
-          <h3 class="category-title">商品分类</h3>
-          <div class="category-item" v-for="category in categories" :key="category.id">
-            <span class="category-icon">{{ category.icon }}</span>
-            <span class="category-name">{{ category.name }}</span>
+      <aside class="home-sidebar">
+        <div class="home-category-menu">
+          <h3 class="home-category-title">商品分类</h3>
+          <div class="home-category-item" v-for="category in categories" :key="category.id">
+            <span class="home-category-icon">{{ category.icon }}</span>
+            <span class="home-category-name">{{ category.name }}</span>
           </div>
         </div>
         
         <!-- 校园公告 -->
-        <div class="notice-board">
-          <h3 class="notice-title">📢 校园公告</h3>
-          <div class="notice-item" v-for="notice in notices" :key="notice.id">
-            <span class="notice-text">{{ notice.text }}</span>
-            <span class="notice-date">{{ notice.date }}</span>
+        <div class="home-notice-board">
+          <h3 class="home-notice-title">📢 校园公告</h3>
+          <div class="home-notice-item" v-for="notice in notices" :key="notice.id" @click="goToNoticeDetail(notice.id)">
+            <span class="home-notice-text">{{ notice.text }}</span>
+            <span class="home-notice-date">{{ notice.date }}</span>
           </div>
         </div>
       </aside>
 
       <!-- 主内容区域 -->
-      <main class="main-content">
+      <main class="home-main-content">
         <!-- 推荐区域 -->
-        <div class="featured-section">
-          <div class="welcome-banner">
-            <div class="banner-content">
+        <div class="home-featured-section">
+          <div class="home-welcome-banner">
+            <div class="home-banner-content">
               <h2>🎓 欢迎来到校园二手市场</h2>
               <p>让闲置物品重新焕发价值，让校园生活更加便利</p>
-              <div class="stats">
-                <div class="stat-item">
-                  <span class="stat-number">1,234</span>
-                  <span class="stat-label">在售商品</span>
+              <div class="home-stats">
+                <div class="home-stat-item">
+                  <span class="home-stat-number">1,234</span>
+                  <span class="home-stat-label">在售商品</span>
                 </div>
-                <div class="stat-item">
-                  <span class="stat-number">567</span>
-                  <span class="stat-label">活跃用户</span>
+                <div class="home-stat-item">
+                  <span class="home-stat-number">567</span>
+                  <span class="home-stat-label">活跃用户</span>
                 </div>
-                <div class="stat-item">
-                  <span class="stat-number">890</span>
-                  <span class="stat-label">成功交易</span>
+                <div class="home-stat-item">
+                  <span class="home-stat-number">890</span>
+                  <span class="home-stat-label">成功交易</span>
                 </div>
               </div>
             </div>
           </div>
           
-          <div class="quick-categories">
-            <div class="quick-category" v-for="quickCat in quickCategories" :key="quickCat.id">
-              <div class="quick-icon" :style="{backgroundColor: quickCat.color}">
+          <div class="home-quick-categories">
+            <div class="home-quick-category" v-for="quickCat in quickCategories" :key="quickCat.id">
+              <div class="home-quick-icon" :style="{backgroundColor: quickCat.color}">
                 {{ quickCat.icon }}
               </div>
-              <span class="quick-name">{{ quickCat.name }}</span>
-              <span class="quick-count">{{ quickCat.count }}件</span>
+              <span class="home-quick-name">{{ quickCat.name }}</span>
+              <span class="home-quick-count">{{ quickCat.count }}件</span>
             </div>
           </div>
         </div>
 
         <!-- 热门推荐 -->
-        <section class="section">
-          <div class="section-header">
-            <h3 class="section-title">🔥 热门推荐</h3>
-            <a href="#" class="more-link">查看更多 →</a>
+        <section class="home-section">
+          <div class="home-section-header">
+            <h3 class="home-section-title">🔥 热门推荐</h3>
+            <a href="#" class="home-more-link">查看更多 →</a>
           </div>
-          <div class="products-grid">
-            <div class="product-card" v-for="product in hotProducts" :key="product.id">
-              <div class="product-image-container">
-                <img :src="product.image" :alt="product.name" class="product-image" />
-                <div class="product-badge" v-if="product.badge">{{ product.badge }}</div>
+          <div class="home-products-grid">
+            <div class="home-product-card" v-for="product in hotProducts" :key="product.id" @click="goToProductDetail(product.id)">
+              <div class="home-product-image-container">
+                <img :src="product.image" :alt="product.name" class="home-product-image" />
+                <div class="home-product-badge" v-if="product.badge">{{ product.badge }}</div>
               </div>
-              <div class="product-info">
-                <h4 class="product-title">{{ product.name }}</h4>
-                <div class="product-meta">
-                  <span class="product-price">¥{{ product.price }}</span>
-                  <span class="product-original-price" v-if="product.originalPrice">¥{{ product.originalPrice }}</span>
+              <div class="home-product-info">
+                <h4 class="home-product-title">{{ product.name }}</h4>
+                <div class="home-product-meta">
+                  <span class="home-product-price">¥{{ product.price }}</span>
+                  <span class="home-product-original-price" v-if="product.originalPrice">¥{{ product.originalPrice }}</span>
                 </div>
-                <div class="product-details">
-                  <span class="product-condition">{{ product.condition }}</span>
-                  <span class="product-location">📍 {{ product.location }}</span>
+                <div class="home-product-details">
+                  <span class="home-product-condition">{{ product.condition }}</span>
+                  <span class="home-product-location">📍 {{ product.location }}</span>
                 </div>
-                <div class="seller-info">
-                  <img :src="product.sellerAvatar" class="seller-avatar" />
-                  <span class="seller-name">{{ product.sellerName }}</span>
-                  <span class="seller-school">{{ product.sellerSchool }}</span>
+                <div class="home-seller-info">
+                  <img :src="product.sellerAvatar" class="home-seller-avatar" />
+                  <span class="home-seller-name">{{ product.sellerName }}</span>
+                  <span class="home-seller-school">{{ product.sellerSchool }}</span>
                 </div>
               </div>
             </div>
@@ -133,30 +134,30 @@
         </section>
 
         <!-- 最新发布 -->
-        <section class="section">
-          <div class="section-header">
-            <h3 class="section-title">🆕 最新发布</h3>
-            <a href="#" class="more-link">查看更多 →</a>
+        <section class="home-section">
+          <div class="home-section-header">
+            <h3 class="home-section-title">🆕 最新发布</h3>
+            <a href="#" class="home-more-link">查看更多 →</a>
           </div>
-          <div class="products-grid">
-            <div class="product-card" v-for="product in newProducts" :key="product.id">
-              <div class="product-image-container">
-                <img :src="product.image" :alt="product.name" class="product-image" />
-                <div class="time-badge">{{ product.timeAgo }}</div>
+          <div class="home-products-grid">
+            <div class="home-product-card" v-for="product in newProducts" :key="product.id" @click="goToProductDetail(product.id)">
+              <div class="home-product-image-container">
+                <img :src="product.image" :alt="product.name" class="home-product-image" />
+                <div class="home-time-badge">{{ product.timeAgo }}</div>
               </div>
-              <div class="product-info">
-                <h4 class="product-title">{{ product.name }}</h4>
-                <div class="product-meta">
-                  <span class="product-price">¥{{ product.price }}</span>
+              <div class="home-product-info">
+                <h4 class="home-product-title">{{ product.name }}</h4>
+                <div class="home-product-meta">
+                  <span class="home-product-price">¥{{ product.price }}</span>
                 </div>
-                <div class="product-details">
-                  <span class="product-condition">{{ product.condition }}</span>
-                  <span class="product-location">📍 {{ product.location }}</span>
+                <div class="home-product-details">
+                  <span class="home-product-condition">{{ product.condition }}</span>
+                  <span class="home-product-location">📍 {{ product.location }}</span>
                 </div>
-                <div class="seller-info">
-                  <img :src="product.sellerAvatar" class="seller-avatar" />
-                  <span class="seller-name">{{ product.sellerName }}</span>
-                  <span class="seller-school">{{ product.sellerSchool }}</span>
+                <div class="home-seller-info">
+                  <img :src="product.sellerAvatar" class="home-seller-avatar" />
+                  <span class="home-seller-name">{{ product.sellerName }}</span>
+                  <span class="home-seller-school">{{ product.sellerSchool }}</span>
                 </div>
               </div>
             </div>
@@ -166,7 +167,6 @@
     </div>
   </div>
 </template>
-
 <script>
 export default {
   name: 'HomePage',
@@ -369,6 +369,10 @@ export default {
     updateLoginStatus() {
       this.checkLoginStatus();
     },
+    // 跳转到商品详情页
+    goToProductDetail(productId) {
+      this.$router.push(`/product/${productId}`);
+    },
     // 退出登录
     logout() {
       // 清除本地存储的用户信息
@@ -387,6 +391,20 @@ export default {
       
       // 跳转到首页
       this.$router.push('/');
+    },
+    // 跳转到发布页面
+    goToPublish() {
+      // 检查是否已登录
+      if (!this.isLoggedIn) {
+        alert('请先登录后再发布商品');
+        this.$router.push('/login');
+        return;
+      }
+      this.$router.push('/publish');
+    },
+    // 跳转到公告详情页面
+    goToNoticeDetail(noticeId) {
+      this.$router.push(`/notice/${noticeId}`);
     }
   }
 }

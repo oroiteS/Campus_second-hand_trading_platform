@@ -1,322 +1,382 @@
-/* Profile页面专用样式 - 使用特定前缀避免冲突 */
+/* Profile页面样式 - 所有类名添加profile-前缀防止全局冲突 */
 .profile-page {
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    min-height: 100vh;
-  }
-  
-  /* 顶部导航 */
-  .profile-page .profile-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  }
-  
-  .profile-page .header-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 15px 20px;
-  }
-  
-  .profile-page .header-btn {
-    background: rgba(255,255,255,0.2);
-    border: 1px solid rgba(255,255,255,0.3);
-    color: white;
-    font-size: 14px;
-    cursor: pointer;
-    padding: 10px 20px;
-    border-radius: 20px;
-    transition: all 0.3s;
-    font-weight: 500;
-  }
-  
-  .profile-page .header-btn:hover {
-    background: rgba(255,255,255,0.3);
-    transform: translateY(-1px);
-  }
-  
-  .profile-page .page-title {
-    font-size: 18px;
-    font-weight: bold;
-    color: white;
-    margin: 0;
-  }
-  
-  /* 主要内容 */
-  .profile-page .profile-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 30px 20px;
-  }
-  
-  /* 用户卡片 */
-  .profile-page .user-card {
-    background: white;
-    border-radius: 16px;
-    padding: 30px;
-    margin-bottom: 30px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-    display: flex;
-    align-items: center;
-    gap: 30px;
-  }
-  
-  .profile-page .user-avatar-section {
-    position: relative;
-  }
-  
-  .profile-page .large-avatar {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 4px solid #e0e0e0;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-  }
-  
-  .profile-page .avatar-badge {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    background: #4CAF50;
-    color: white;
-    padding: 4px 12px;
-    border-radius: 15px;
-    font-size: 12px;
-    font-weight: bold;
-    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
-  }
-  
-  .profile-page .user-basic-info {
-    flex: 1;
-  }
-  
-  .profile-page .username {
-    font-size: 28px;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 8px;
-  }
-  
-  .profile-page .user-school {
-    font-size: 16px;
-    color: #666;
-    margin-bottom: 20px;
-  }
-  
-  .profile-page .user-stats {
-    display: flex;
-    gap: 40px;
-  }
-  
-  .profile-page .stat-item {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+}
+
+/* 顶部导航 */
+.profile-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.profile-header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 20px;
+}
+
+.profile-header-btn {
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 10px 20px;
+  border-radius: 20px;
+  transition: all 0.3s;
+  font-weight: 500;
+}
+
+.profile-header-btn:hover {
+  background: rgba(255,255,255,0.3);
+  transform: translateY(-1px);
+}
+
+.profile-page-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+  margin: 0;
+}
+
+/* 主要内容 */
+.profile-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 30px 20px;
+}
+
+/* 用户卡片 */
+.profile-user-card {
+  background: white;
+  border-radius: 16px;
+  padding: 30px;
+  margin-bottom: 30px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.profile-user-avatar-section {
+  position: relative;
+}
+
+.profile-large-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #e0e0e0;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.profile-avatar-badge {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: #4CAF50;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+.profile-user-basic-info {
+  flex: 1;
+}
+
+.profile-username {
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.profile-user-school {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.profile-user-stats {
+  display: flex;
+  gap: 40px;
+}
+
+.profile-stat-item {
+  text-align: center;
+}
+
+.profile-stat-number {
+  display: block;
+  font-size: 24px;
+  font-weight: bold;
+  color: #667eea;
+  margin-bottom: 5px;
+}
+
+.profile-stat-label {
+  font-size: 14px;
+  color: #999;
+}
+
+/* 功能菜单 */
+.profile-menu-section {
+  margin-bottom: 30px;
+}
+
+.profile-section-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 3px solid #667eea;
+}
+
+.profile-menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 15px;
+}
+
+.profile-menu-item {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.profile-menu-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+.profile-menu-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: white;
+}
+
+.profile-menu-name {
+  flex: 1;
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.profile-menu-arrow {
+  color: #999;
+  font-size: 18px;
+}
+
+/* 商品区域 */
+.profile-products-section {
+  background: white;
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+}
+
+.profile-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.profile-tab-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.profile-tab-btn {
+  padding: 8px 20px;
+  border: 1px solid #e0e0e0;
+  background: white;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 14px;
+}
+
+.profile-tab-btn.active {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
+
+.profile-tab-btn:hover {
+  border-color: #667eea;
+}
+
+.profile-products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+/* 商品卡片样式 */
+.profile-product-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.profile-product-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+.profile-product-image {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+.profile-product-info {
+  padding: 12px;
+  cursor: pointer;
+}
+
+.profile-product-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-product-price {
+  font-size: 16px;
+  font-weight: bold;
+  color: #ff6b35;
+  margin: 0 0 4px 0;
+}
+
+.profile-product-status {
+  font-size: 12px;
+  color: #666;
+  margin: 0;
+}
+
+/* 商品操作按钮样式 */
+.profile-product-actions {
+  padding: 8px 12px;
+  border-top: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fafafa;
+}
+
+.profile-status-buttons {
+  display: flex;
+  gap: 4px;
+}
+
+.profile-status-btn {
+  padding: 4px 8px;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #666;
+}
+
+.profile-status-btn:hover {
+  background: #f0f0f0;
+  border-color: #999;
+}
+
+.profile-status-btn.active {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
+
+.profile-delete-btn {
+  padding: 4px 6px;
+  border: 1px solid #ff4757;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 12px;
+}
+
+.profile-delete-btn:hover {
+  background: #ff4757;
+  color: white;
+}
+
+.profile-empty-state {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.profile-empty-icon {
+  font-size: 48px;
+  margin-bottom: 15px;
+}
+
+.profile-empty-text {
+  font-size: 16px;
+  color: #999;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .profile-user-card {
+    flex-direction: column;
     text-align: center;
-  }
-  
-  .profile-page .stat-number {
-    display: block;
-    font-size: 24px;
-    font-weight: bold;
-    color: #667eea;
-    margin-bottom: 5px;
-  }
-  
-  .profile-page .stat-label {
-    font-size: 14px;
-    color: #999;
-  }
-  
-  /* 功能菜单 */
-  .profile-page .menu-section {
-    margin-bottom: 30px;
-  }
-  
-  .profile-page .section-title {
-    font-size: 20px;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 3px solid #667eea;
-  }
-  
-  .profile-page .menu-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 15px;
-  }
-  
-  .profile-page .menu-item {
-    background: white;
-    border-radius: 12px;
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    cursor: pointer;
-    transition: all 0.3s;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-  }
-  
-  .profile-page .menu-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-  }
-  
-  .profile-page .menu-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    color: white;
-  }
-  
-  .profile-page .menu-name {
-    flex: 1;
-    font-size: 16px;
-    font-weight: 500;
-    color: #333;
-  }
-  
-  .profile-page .menu-arrow {
-    color: #999;
-    font-size: 18px;
-  }
-  
-  /* 商品区域 */
-  .profile-page .products-section {
-    background: white;
-    border-radius: 16px;
-    padding: 30px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-  }
-  
-  .profile-page .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-  
-  .profile-page .tab-buttons {
-    display: flex;
-    gap: 10px;
-  }
-  
-  .profile-page .tab-btn {
-    padding: 8px 20px;
-    border: 1px solid #e0e0e0;
-    background: white;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.3s;
-    font-size: 14px;
-  }
-  
-  .profile-page .tab-btn.active {
-    background: #667eea;
-    color: white;
-    border-color: #667eea;
-  }
-  
-  .profile-page .tab-btn:hover {
-    border-color: #667eea;
-  }
-  
-  .profile-page .products-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 20px;
   }
   
-  .profile-page .product-card {
-    border: 1px solid #e0e0e0;
-    border-radius: 12px;
-    overflow: hidden;
-    transition: all 0.3s;
+  .profile-user-stats {
+    justify-content: center;
+    gap: 20px;
   }
   
-  .profile-page .product-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  .profile-menu-grid {
+    grid-template-columns: 1fr;
   }
   
-  .profile-page .product-image {
-    width: 100%;
-    height: 150px;
-    object-fit: cover;
+  .profile-section-header {
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-start;
   }
   
-  .profile-page .product-info {
-    padding: 15px;
+  .profile-products-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
-  
-  .profile-page .product-title {
-    font-size: 14px;
-    color: #333;
-    margin-bottom: 8px;
-    line-height: 1.4;
-  }
-  
-  .profile-page .product-price {
-    font-size: 16px;
-    font-weight: bold;
-    color: #FF6B35;
-    margin-bottom: 5px;
-  }
-  
-  .profile-page .product-status {
-    font-size: 12px;
-    color: #999;
-    margin: 0;
-  }
-  
-  .profile-page .empty-state {
-    text-align: center;
-    padding: 60px 20px;
-  }
-  
-  .profile-page .empty-icon {
-    font-size: 48px;
-    margin-bottom: 15px;
-  }
-  
-  .profile-page .empty-text {
-    font-size: 16px;
-    color: #999;
-  }
-  
-  /* 响应式设计 */
-  @media (max-width: 768px) {
-    .profile-page .user-card {
-      flex-direction: column;
-      text-align: center;
-      gap: 20px;
-    }
-    
-    .profile-page .user-stats {
-      justify-content: center;
-      gap: 20px;
-    }
-    
-    .profile-page .menu-grid {
-      grid-template-columns: 1fr;
-    }
-    
-    .profile-page .section-header {
-      flex-direction: column;
-      gap: 15px;
-      align-items: flex-start;
-    }
-    
-    .profile-page .products-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
+}
