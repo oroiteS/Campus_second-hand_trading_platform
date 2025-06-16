@@ -123,6 +123,15 @@ public class UserController {
     }
     
     /**
+     * 检查用户ID是否可用
+     */
+    @GetMapping("/check-userid")
+    public Result<Boolean> checkUserId(@RequestParam String userId) {
+        User user = userService.getUserById(userId);
+        return Result.success(user == null); // 返回是否可用（不存在即可用）
+    }
+    
+    /**
      * 验证令牌
      */
     @PostMapping("/validate-token")

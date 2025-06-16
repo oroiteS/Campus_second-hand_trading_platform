@@ -65,8 +65,7 @@ class LoginApplicationTests {
         registerRequest.setTelephone("1" + String.format("%010d", System.currentTimeMillis() % 10000000000L));
         registerRequest.setRealName("测试用户");
         registerRequest.setIdCard("110101199001011234");
-        registerRequest.setLongitude(new BigDecimal("116.404"));
-        registerRequest.setLatitude(new BigDecimal("39.915"));
+
         
         Map<String, Object> result = userService.register(registerRequest);
         
@@ -89,8 +88,7 @@ class LoginApplicationTests {
         registerRequest.setTelephone("1" + timestamp.substring(timestamp.length() - 10));
         registerRequest.setRealName("登录测试用户");
         registerRequest.setIdCard("110101199001011235");
-        registerRequest.setLongitude(new BigDecimal("116.404"));
-        registerRequest.setLatitude(new BigDecimal("39.915"));
+
         
         Map<String, Object> registerResult = userService.register(registerRequest);
         assertTrue((Boolean) registerResult.get("success"));
@@ -123,8 +121,7 @@ class LoginApplicationTests {
         registerRequest.setTelephone("1" + timestamp.substring(timestamp.length() - 10));
         registerRequest.setRealName("错误密码测试用户");
         registerRequest.setIdCard("110101199001011236");
-        registerRequest.setLongitude(new BigDecimal("116.404"));
-        registerRequest.setLatitude(new BigDecimal("39.915"));
+
         
         Map<String, Object> registerResult = userService.register(registerRequest);
         assertTrue((Boolean) registerResult.get("success"));
@@ -154,8 +151,7 @@ class LoginApplicationTests {
         registerRequest1.setTelephone("1" + timestamp.substring(timestamp.length() - 10));
         registerRequest1.setRealName("重复测试用户1");
         registerRequest1.setIdCard("110101199001011237");
-        registerRequest1.setLongitude(new BigDecimal("116.404"));
-        registerRequest1.setLatitude(new BigDecimal("39.915"));
+
         
         Map<String, Object> result1 = userService.register(registerRequest1);
         assertTrue((Boolean) result1.get("success"));
@@ -167,8 +163,7 @@ class LoginApplicationTests {
         registerRequest2.setTelephone("13900000002");
         registerRequest2.setRealName("重复测试用户2");
         registerRequest2.setIdCard("110101199001011238");
-        registerRequest2.setLongitude(new BigDecimal("116.404"));
-        registerRequest2.setLatitude(new BigDecimal("39.915"));
+
         
         Map<String, Object> result2 = userService.register(registerRequest2);
         
