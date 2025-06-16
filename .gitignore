@@ -11,3 +11,8 @@ backend/python/.venv
 
 # Ignore Python __pycache__ directories
 backend/python/**/__pycache__/
+
+# Reranker Model
+backend/python/embedding_recommendation/model/Qwen3-Reranker-4B.Q5_K_M.gguf
+backend/python/embedding_recommendation/safe_tensor_model/
+backend/python/embedding_recommendation/model/

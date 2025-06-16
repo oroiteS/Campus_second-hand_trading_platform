@@ -10,95 +10,15 @@ import chromadb
 from dotenv import load_dotenv
 import requests
 import numpy as np
-from sklearn.metrics.pairwise import cosine_similarity
-import jieba
+from sklearn.metrics.pairwise import cosine_similarity as sklearn_cosine_similarity # Renamed to avoid conflict
 from collections import Counter
+from dotenv import load_dotenv
+# LM Studio API Configuration
+LM_STUDIO_API_URL = "http://127.0.0.1:1234/v1/embeddings"
+LM_STUDIO_MODEL_NAME = "text-embedding-qwen3-reranker-4b"
 
 # 加载环境变量
 load_dotenv()
-
-class RerankerModel:
-    """重排模型类，用于对搜索结果进行二次排序"""
-    
-    def __init__(self):
-        # 初始化中文分词器
-        jieba.initialize()
-    
-    def calculate_text_similarity(self, query, document):
-        """计算文本相似度（基于词汇重叠和语义相似度）"""
-        # 分词
-        query_words = set(jieba.cut(query.lower()))
-        doc_words = set(jieba.cut(document.lower()))
-        
-        # 计算词汇重叠度
-        intersection = query_words.intersection(doc_words)
-        union = query_words.union(doc_words)
-        
-        if len(union) == 0:
-            jaccard_similarity = 0
-        else:
-            jaccard_similarity = len(intersection) / len(union)
-        
-        # 计算字符级别相似度
-        query_chars = set(query.lower())
-        doc_chars = set(document.lower())
-        char_intersection = query_chars.intersection(doc_chars)
-        char_union = query_chars.union(doc_chars)
-        
-        if len(char_union) == 0:
-            char_similarity = 0
-        else:
-            char_similarity = len(char_intersection) / len(char_union)
-        
-        # 计算长度相似度
-        len_similarity = 1 - abs(len(query) - len(document)) / max(len(query), len(document), 1)
-        
-        # 综合相似度分数
-        combined_score = 0.4 * jaccard_similarity + 0.3 * char_similarity + 0.3 * len_similarity
-        
-        return combined_score
-    
-    def rerank_results(self, query, results, embedding_similarities):
-        """重排搜索结果"""
-        if not results['documents'] or not results['documents'][0]:
-            return results
-        
-        documents = results['documents'][0]
-        distances = results['distances'][0]
-        
-        # 计算重排分数
-        reranked_items = []
-        for i, (doc, distance) in enumerate(zip(documents, distances)):
-            # 原始嵌入相似度（距离转换为相似度）
-            embedding_sim = 1 - distance
-            
-            # 文本相似度
-            text_sim = self.calculate_text_similarity(query, doc)
-            
-            # 综合分数（可以调整权重）
-            final_score = 0.65 * embedding_sim + 0.35 * text_sim
-            
-            reranked_items.append({
-                'document': doc,
-                'distance': distance,
-                'embedding_similarity': embedding_sim,
-                'text_similarity': text_sim,
-                'final_score': final_score,
-                'original_index': i
-            })
-        
-        # 按最终分数排序
-        reranked_items.sort(key=lambda x: x['final_score'], reverse=True)
-        
-        # 重新构建结果
-        reranked_results = {
-            'documents': [[item['document'] for item in reranked_items]],
-            'distances': [[1 - item['final_score'] for item in reranked_items]],
-            'metadatas': results.get('metadatas', [[]]),
-            'ids': results.get('ids', [[]])
-        }
-        
-        return reranked_results, reranked_items
 
 class OllamaEmbeddingFunction:
     def __init__(self, api_base, model_name):
@@ -151,9 +71,9 @@ def test_search():
     api_base = os.getenv('OPENAI_API_BASE', 'http://localhost:11434/api')
     model_name = os.getenv('OPENAI_EMBEDDING_MODEL_NAME', 'qwen3-embedding-0.6b:latest')
     
-    # 创建嵌入函数和重排模型
+    # 创建嵌入函数
     embedding_func = OllamaEmbeddingFunction(api_base, model_name)
-    reranker = RerankerModel()
+    # LM Studio Reranker (via embeddings) is used directly in the search loop
     
     try:
         # 获取已存在的集合
@@ -187,16 +107,61 @@ def test_search():
                     for i, (doc, distance) in enumerate(zip(results['documents'][0][:3], results['distances'][0][:3])):
                         print(f"  {i+1}. {doc} (嵌入相似度: {1-distance:.3f})")
                     
-                    # 使用重排模型重新排序
-                    reranked_results, reranked_items = reranker.rerank_results(query, results, results['distances'][0])
+                    # 使用 LM Studio Embeddings API 进行重排
+                    docs_to_rerank = results['documents'][0]
+                    query_embedding_for_rerank = get_lm_studio_embedding(query, LM_STUDIO_MODEL_NAME, LM_STUDIO_API_URL)
+                    rerank_scores = []
+                    if query_embedding_for_rerank:
+                        for doc_text in docs_to_rerank:
+                            doc_embedding_for_rerank = get_lm_studio_embedding(doc_text, LM_STUDIO_MODEL_NAME, LM_STUDIO_API_URL)
+                            if doc_embedding_for_rerank:
+                                score = cosine_similarity_local(query_embedding_for_rerank, doc_embedding_for_rerank)
+                                rerank_scores.append(score)
+                            else:
+                                rerank_scores.append(0.0) # Assign low score if embedding fails
+                    else:
+                        print("  无法获取查询的 LM Studio 嵌入，跳过重排。")
+                        rerank_scores = [0.0] * len(docs_to_rerank) # Assign all zero if query embedding fails
                     
-                    print("\n重排后结果:")
-                    for i, item in enumerate(reranked_items[:5]):
-                        print(f"  {i+1}. {item['document']}")
-                        print(f"     嵌入相似度: {item['embedding_similarity']:.3f}")
-                        print(f"     文本相似度: {item['text_similarity']:.3f}")
-                        print(f"     综合分数: {item['final_score']:.3f}")
-                        print()
+                    if rerank_scores:
+                        # 将分数与文档关联并排序
+                        reranked_items = []
+                        for doc, score, original_distance in zip(docs_to_rerank, rerank_scores, results['distances'][0]):
+                            reranked_items.append({
+                                'document': doc,
+                                'original_embedding_similarity': 1 - original_distance, # 原始嵌入相似度 (来自ChromaDB)
+                                'rerank_score': score, # 新的重排分数 (来自LM Studio)
+                                # 'final_score' will be replaced by RRF score later
+                                'doc_id': doc # Keep track of document for RRF
+                            })
+                        
+                        # Calculate RRF scores
+                        # First, get ranks for original similarity
+                        original_ranked_docs = sorted(reranked_items, key=lambda x: x['original_embedding_similarity'], reverse=True)
+                        original_ranks = {item['doc_id']: i + 1 for i, item in enumerate(original_ranked_docs)}
+
+                        # Second, get ranks for rerank scores
+                        rerank_model_ranked_docs = sorted(reranked_items, key=lambda x: x['rerank_score'], reverse=True)
+                        rerank_model_ranks = {item['doc_id']: i + 1 for i, item in enumerate(rerank_model_ranked_docs)}
+
+                        k_rrf = 20 # RRF k parameter
+                        for item in reranked_items:
+                            rank1 = original_ranks.get(item['doc_id'], len(reranked_items) + 1) # Default to a large rank if not found
+                            rank2 = rerank_model_ranks.get(item['doc_id'], len(reranked_items) + 1)
+                            item['rrf_score'] = (1 / (k_rrf + rank1)) + (1 / (k_rrf + rank2))
+                        
+                        # Sort by RRF score
+                        reranked_items.sort(key=lambda x: x['rrf_score'], reverse=True)
+                        
+                        print("\n重排后结果 (使用 RRF 融合):")
+                        for i, item in enumerate(reranked_items[:5]):
+                            print(f"  {i+1}. {item['document']}")
+                            print(f"     原始嵌入相似度: {item['original_embedding_similarity']:.3f} (排名: {original_ranks.get(item['doc_id'], 'N/A')})")
+                            print(f"     重排模型分数: {item['rerank_score']:.3f} (排名: {rerank_model_ranks.get(item['doc_id'], 'N/A')})")
+                            print(f"     RRF 融合得分: {item['rrf_score']:.6f}")
+                            print()
+                    else:
+                        print("  重排失败或没有返回分数。")
                 else:
                     print("  未找到相似标签")
                     
@@ -246,7 +211,15 @@ def compare_search_methods(query):
     
     # 创建嵌入函数和重排模型
     embedding_func = OllamaEmbeddingFunction(api_base, model_name)
-    reranker = RerankerModel()
+    try:
+        reranker = RerankerModel(model_dir='./model/Qwen3-4B-Base')
+    except FileNotFoundError as e:
+        print(f"无法加载重排模型: {e}")
+        print("请检查模型路径是否正确，以及模型文件是否存在。")
+        return
+    except Exception as e:
+        print(f"加载重排模型时发生未知错误: {e}")
+        return
     
     try:
         collection = client.get_collection(name="tags_collection", embedding_function=embedding_func)
@@ -260,14 +233,56 @@ def compare_search_methods(query):
             for i, (doc, distance) in enumerate(zip(results['documents'][0][:5], results['distances'][0][:5])):
                 print(f"  {i+1}. {doc} (相似度: {1-distance:.3f})")
             
-            # 重排结果
-            reranked_results, reranked_items = reranker.rerank_results(query, results, results['distances'][0])
-            
-            print("\n🎯 重排模型优化结果:")
-            for i, item in enumerate(reranked_items[:5]):
-                improvement = "📈" if item['final_score'] > item['embedding_similarity'] else "📉" if item['final_score'] < item['embedding_similarity'] else "➡️"
-                print(f"  {i+1}. {item['document']} {improvement}")
-                print(f"     综合分数: {item['final_score']:.3f} (嵌入: {item['embedding_similarity']:.3f}, 文本: {item['text_similarity']:.3f})")
+            # 使用 LM Studio Embeddings API 进行重排
+            docs_to_rerank = results['documents'][0]
+            query_embedding_for_rerank = get_lm_studio_embedding(query, LM_STUDIO_MODEL_NAME, LM_STUDIO_API_URL)
+            rerank_scores = []
+            if query_embedding_for_rerank:
+                for doc_text in docs_to_rerank:
+                    doc_embedding_for_rerank = get_lm_studio_embedding(doc_text, LM_STUDIO_MODEL_NAME, LM_STUDIO_API_URL)
+                    if doc_embedding_for_rerank:
+                        score = cosine_similarity_local(query_embedding_for_rerank, doc_embedding_for_rerank)
+                        rerank_scores.append(score)
+                    else:
+                        rerank_scores.append(0.0) # Assign low score if embedding fails
+            else:
+                print("  无法获取查询的 LM Studio 嵌入，跳过重排。")
+                rerank_scores = [0.0] * len(docs_to_rerank)
+
+            if rerank_scores:
+                reranked_items = []
+                for doc, score, original_distance in zip(docs_to_rerank, rerank_scores, results['distances'][0]):
+                    original_sim = 1 - original_distance
+                    reranked_items.append({
+                        'document': doc,
+                        'original_embedding_similarity': original_sim, # 原始嵌入相似度 (来自ChromaDB)
+                        'rerank_score': score, # 新的重排分数 (来自LM Studio)
+                        # 'final_score' will be replaced by RRF score later
+                        'doc_id': doc # Keep track of document for RRF
+                    })
+                # Calculate RRF scores
+                original_ranked_docs_comp = sorted(reranked_items, key=lambda x: x['original_embedding_similarity'], reverse=True)
+                original_ranks_comp = {item['doc_id']: i + 1 for i, item in enumerate(original_ranked_docs_comp)}
+
+                rerank_model_ranked_docs_comp = sorted(reranked_items, key=lambda x: x['rerank_score'], reverse=True)
+                rerank_model_ranks_comp = {item['doc_id']: i + 1 for i, item in enumerate(rerank_model_ranked_docs_comp)}
+
+                k_rrf = 20 # RRF k parameter
+                for item in reranked_items:
+                    rank1_comp = original_ranks_comp.get(item['doc_id'], len(reranked_items) + 1)
+                    rank2_comp = rerank_model_ranks_comp.get(item['doc_id'], len(reranked_items) + 1)
+                    item['rrf_score'] = (1 / (k_rrf + rank1_comp)) + (1 / (k_rrf + rank2_comp))
+                
+                reranked_items.sort(key=lambda x: x['rrf_score'], reverse=True)
+
+                print("\n🎯 RRF 融合结果:")
+                for i, item in enumerate(reranked_items[:5]):
+                    print(f"  {i+1}. {item['document']}")
+                    print(f"     原始嵌入相似度: {item['original_embedding_similarity']:.3f} (排名: {original_ranks_comp.get(item['doc_id'], 'N/A')})")
+                    print(f"     重排模型分数: {item['rerank_score']:.3f} (排名: {rerank_model_ranks_comp.get(item['doc_id'], 'N/A')})")
+                    print(f"     RRF 融合得分: {item['rrf_score']:.6f}")
+            else:
+                print("  重排失败或没有返回分数。")
         else:
             print("  未找到相似标签")
             
@@ -303,9 +318,9 @@ def main():
                 api_base = os.getenv('OPENAI_API_BASE', 'http://localhost:11434/api')
                 model_name = os.getenv('OPENAI_EMBEDDING_MODEL_NAME', 'qwen3-embedding-0.6b:latest')
                 
-                # 创建嵌入函数和重排模型
+                # 创建嵌入函数
                 embedding_func = OllamaEmbeddingFunction(api_base, model_name)
-                reranker = RerankerModel()
+                # LM Studio Reranker (via embeddings) is used directly in the search loop
                 
                 try:
                     collection = client.get_collection(name="tags_collection", embedding_function=embedding_func)
@@ -319,17 +334,58 @@ def main():
                         for i, (doc, distance) in enumerate(zip(results['documents'][0][:8], results['distances'][0][:8])):
                             print(f"  {i+1}. {doc} (嵌入相似度: {1-distance:.3f})")
                         
-                        # 使用重排模型
-                        reranked_results, reranked_items = reranker.rerank_results(query, results, results['distances'][0])
-                        
-                        print("\n=== 重排后结果 ===")
-                        for i, item in enumerate(reranked_items[:8]):
-                            print(f"  {i+1}. {item['document']}")
-                            print(f"     嵌入相似度: {item['embedding_similarity']:.3f}")
-                            print(f"     文本相似度: {item['text_similarity']:.3f}")
-                            print(f"     综合分数: {item['final_score']:.3f}")
-                            if i < 7:  # 不在最后一个项目后添加空行
-                                print()
+                        # 使用 LM Studio Embeddings API 进行重排
+                        docs_to_rerank = results['documents'][0]
+                        query_embedding_for_rerank = get_lm_studio_embedding(query, LM_STUDIO_MODEL_NAME, LM_STUDIO_API_URL)
+                        rerank_scores = []
+                        if query_embedding_for_rerank:
+                            for doc_text in docs_to_rerank:
+                                doc_embedding_for_rerank = get_lm_studio_embedding(doc_text, LM_STUDIO_MODEL_NAME, LM_STUDIO_API_URL)
+                                if doc_embedding_for_rerank:
+                                    score = cosine_similarity_local(query_embedding_for_rerank, doc_embedding_for_rerank)
+                                    rerank_scores.append(score)
+                                else:
+                                    rerank_scores.append(0.0) # Assign low score if embedding fails
+                        else:
+                            print("  无法获取查询的 LM Studio 嵌入，跳过重排。")
+                            rerank_scores = [0.0] * len(docs_to_rerank) # Assign all zero if query embedding fails
+
+
+                        if rerank_scores:
+                            reranked_items = []
+                            for doc, score, original_distance in zip(docs_to_rerank, rerank_scores, results['distances'][0]):
+                                reranked_items.append({
+                                    'document': doc,
+                                    'original_embedding_similarity': 1 - original_distance, # 原始嵌入相似度 (来自ChromaDB)
+                                    'rerank_score': score, # 新的重排分数 (来自LM Studio)
+                                    # 'final_score' will be replaced by RRF score later
+                                    'doc_id': doc # Keep track of document for RRF
+                                })
+                            # Calculate RRF scores
+                            original_ranked_docs_main = sorted(reranked_items, key=lambda x: x['original_embedding_similarity'], reverse=True)
+                            original_ranks_main = {item['doc_id']: i + 1 for i, item in enumerate(original_ranked_docs_main)}
+
+                            rerank_model_ranked_docs_main = sorted(reranked_items, key=lambda x: x['rerank_score'], reverse=True)
+                            rerank_model_ranks_main = {item['doc_id']: i + 1 for i, item in enumerate(rerank_model_ranked_docs_main)}
+
+                            k_rrf = 20 # RRF k parameter
+                            for item in reranked_items:
+                                rank1_main = original_ranks_main.get(item['doc_id'], len(reranked_items) + 1)
+                                rank2_main = rerank_model_ranks_main.get(item['doc_id'], len(reranked_items) + 1)
+                                item['rrf_score'] = (1 / (k_rrf + rank1_main)) + (1 / (k_rrf + rank2_main))
+                            
+                            reranked_items.sort(key=lambda x: x['rrf_score'], reverse=True)
+
+                            print("\n=== 重排后结果 (使用 RRF 融合) ===")
+                            for i, item in enumerate(reranked_items[:8]):
+                                print(f"  {i+1}. {item['document']}")
+                                print(f"     原始嵌入相似度: {item['original_embedding_similarity']:.3f} (排名: {original_ranks_main.get(item['doc_id'], 'N/A')})")
+                                print(f"     重排模型分数: {item['rerank_score']:.3f} (排名: {rerank_model_ranks_main.get(item['doc_id'], 'N/A')})")
+                                print(f"     RRF 融合得分: {item['rrf_score']:.6f}")
+                                if i < 7:
+                                    print()
+                        else:
+                            print("  重排失败或没有返回分数。")
                     else:
                         print("  未找到相似标签")
                 except Exception as e:
@@ -343,6 +399,39 @@ def main():
             break
         else:
             print("无效选择，请重新输入")
+
+def get_lm_studio_embedding(text: str, model_name: str, api_url: str):
+    """Fetches an embedding for the given text using the LM Studio API."""
+    headers = {"Content-Type": "application/json"}
+    payload = {
+        "input": text,
+        "model": model_name
+    }
+    try:
+        response = requests.post(api_url, headers=headers, json=payload)
+        response.raise_for_status()
+        json_response = response.json()
+        if json_response.get("data") and isinstance(json_response["data"], list) and len(json_response["data"]) > 0:
+            embedding_data = json_response["data"][0]
+            if isinstance(embedding_data, dict) and "embedding" in embedding_data:
+                return embedding_data["embedding"]
+    except requests.exceptions.RequestException as e:
+        print(f"Error calling LM Studio API for embedding: {e}")
+    except Exception as e:
+        print(f"An unexpected error occurred during LM Studio embedding: {e}")
+    return None
+
+def cosine_similarity_local(vec1, vec2):
+    """Computes the cosine similarity between two vectors."""
+    if vec1 is None or vec2 is None:
+        return 0.0
+    vec1 = np.array(vec1)
+    vec2 = np.array(vec2)
+    if vec1.shape != vec2.shape:
+        return 0.0
+    if np.linalg.norm(vec1) == 0 or np.linalg.norm(vec2) == 0:
+        return 0.0
+    return np.dot(vec1, vec2) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))
 
 if __name__ == "__main__":
     main()
