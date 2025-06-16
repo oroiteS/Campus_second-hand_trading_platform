@@ -16,7 +16,7 @@ import java.util.Map;
  * 处理订单相关的REST API请求
  */
 @RestController
-@RequestMapping("/api/orders")
+@RequestMapping("/api/orders-legacy")
 @CrossOrigin(origins = "*")
 public class OrderController {
 

@@ -77,6 +77,15 @@ public interface OrderRepository extends BaseMapper<Order> {
                                             @Param("orderStatus") String orderStatus);
 
     /**
+     * 根据用户ID查找用户参与的所有订单（作为买家或卖家）
+     * 
+     * @param userId 用户ID
+     * @return 订单列表
+     */
+    @Select("SELECT * FROM orders WHERE Buyer_id = #{userId} OR Seller_id = #{userId} ORDER BY Sale_time DESC")
+    List<Order> findByUserId(@Param("userId") String userId);
+
+    /**
      * 根据时间范围查找订单列表
      * 
      * @param startTime 开始时间

@@ -8,7 +8,7 @@
     <name>campus-secondhand-platform</name>
     <description>校园二手交易平台</description>
     <modules>
-        <module>chat</module>
+        <module>order-management</module>
     </modules>
     <packaging>pom</packaging>
 

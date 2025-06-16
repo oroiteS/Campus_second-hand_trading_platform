@@ -1,0 +1,329 @@
+2025-06-17 00:11:17.809 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - OrderManagementDevHikariCP - Shutdown initiated...
+2025-06-17 00:11:17.821 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - OrderManagementDevHikariCP - Shutdown completed.
+2025-06-17 00:15:08.978 [restartedMain] INFO  c.c.o.OrderManagementApplication - Starting OrderManagementApplication using Java 23.0.1 with PID 28804 (E:\Compus_Sencond_Hand\Campus_branch3\Campus_second-hand_trading_platform\backend\Java_backend\order-management\target\classes started by 29742 in E:\Compus_Sencond_Hand\Campus_branch3\Campus_second-hand_trading_platform)
+2025-06-17 00:15:08.980 [restartedMain] DEBUG c.c.o.OrderManagementApplication - Running with Spring Boot v3.0.2, Spring v6.0.4
+2025-06-17 00:15:08.982 [restartedMain] INFO  c.c.o.OrderManagementApplication - The following 1 profile is active: "dev"
+2025-06-17 00:15:09.035 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-06-17 00:15:09.035 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-06-17 00:15:10.040 [restartedMain] DEBUG o.apache.ibatis.logging.LogFactory - Logging initialized using 'class org.apache.ibatis.logging.slf4j.Slf4jImpl' adapter.
+2025-06-17 00:15:10.046 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [E:\Compus_Sencond_Hand\Campus_branch3\Campus_second-hand_trading_platform\backend\Java_backend\order-management\target\classes\com\campus\ordermanagement\dao\OrderRepository.class]
+2025-06-17 00:15:10.047 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'orderRepository' and 'com.campus.ordermanagement.dao.OrderRepository' mapperInterface
+2025-06-17 00:15:10.479 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8081 (http)
+2025-06-17 00:15:10.487 [restartedMain] INFO  o.a.c.core.AprLifecycleListener - Loaded Apache Tomcat Native library [2.0.1] using APR version [1.7.0].
+2025-06-17 00:15:10.494 [restartedMain] INFO  o.a.c.core.AprLifecycleListener - OpenSSL successfully initialized [OpenSSL 3.0.5 5 Jul 2022]
+2025-06-17 00:15:10.502 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2025-06-17 00:15:10.502 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.5]
+2025-06-17 00:15:10.590 [restartedMain] INFO  o.a.c.c.C.[.[.[/order-management] - Initializing Spring embedded WebApplicationContext
+2025-06-17 00:15:10.590 [restartedMain] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1555 ms
+2025-06-17 00:15:10.716 [restartedMain] DEBUG o.s.w.f.ServerHttpObservationFilter - Filter 'serverHttpObservationFilter' configured for use
+2025-06-17 00:15:11.233 [restartedMain] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 14 endpoint(s) beneath base path '/actuator'
+2025-06-17 00:15:11.339 [restartedMain] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+2025-06-17 00:15:11.361 [restartedMain] INFO  o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+2025-06-17 00:15:11.388 [restartedMain] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - 29 mappings in 'requestMappingHandlerMapping'
+2025-06-17 00:15:11.887 [restartedMain] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/webjars/**, /**, /swagger-ui*/*swagger-initializer.js, /swagger-ui*/**] in 'resourceHandlerMapping'
+2025-06-17 00:15:11.895 [restartedMain] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 2 @ExceptionHandler, 1 ResponseBodyAdvice
+2025-06-17 00:15:12.091 [restartedMain] INFO  o.s.b.d.a.OptionalLiveReloadServer - LiveReload server is running on port 35729
+2025-06-17 00:15:12.152 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port(s): 8081 (http) with context path '/order-management'
+2025-06-17 00:15:12.162 [restartedMain] INFO  c.c.o.OrderManagementApplication - Started OrderManagementApplication in 3.655 seconds (process running for 4.396)
+2025-06-17 00:15:12.403 [RMI TCP Connection(1)-198.18.0.1] INFO  o.a.c.c.C.[.[.[/order-management] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-06-17 00:15:12.403 [RMI TCP Connection(1)-198.18.0.1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-06-17 00:15:12.403 [RMI TCP Connection(1)-198.18.0.1] DEBUG o.s.web.servlet.DispatcherServlet - Detected StandardServletMultipartResolver
+2025-06-17 00:15:12.404 [RMI TCP Connection(1)-198.18.0.1] DEBUG o.s.web.servlet.DispatcherServlet - Detected AcceptHeaderLocaleResolver
+2025-06-17 00:15:12.404 [RMI TCP Connection(1)-198.18.0.1] DEBUG o.s.web.servlet.DispatcherServlet - Detected FixedThemeResolver
+2025-06-17 00:15:12.404 [RMI TCP Connection(1)-198.18.0.1] DEBUG o.s.web.servlet.DispatcherServlet - Detected org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator@65986ea2
+2025-06-17 00:15:12.405 [RMI TCP Connection(1)-198.18.0.1] DEBUG o.s.web.servlet.DispatcherServlet - Detected org.springframework.web.servlet.support.SessionFlashMapManager@22dd23a5
+2025-06-17 00:15:12.405 [RMI TCP Connection(1)-198.18.0.1] DEBUG o.s.web.servlet.DispatcherServlet - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
+2025-06-17 00:15:12.405 [RMI TCP Connection(1)-198.18.0.1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 2 ms
+2025-06-17 00:15:12.407 [RMI TCP Connection(3)-198.18.0.1] DEBUG o.s.jdbc.datasource.DataSourceUtils - Fetching JDBC Connection from DataSource
+2025-06-17 00:15:12.410 [RMI TCP Connection(3)-198.18.0.1] INFO  com.zaxxer.hikari.HikariDataSource - OrderManagementDevHikariCP - Starting...
+2025-06-17 00:15:12.576 [RMI TCP Connection(3)-198.18.0.1] INFO  com.zaxxer.hikari.pool.HikariPool - OrderManagementDevHikariCP - Added connection com.mysql.cj.jdbc.ConnectionImpl@27e368db
+2025-06-17 00:15:12.584 [RMI TCP Connection(3)-198.18.0.1] INFO  com.zaxxer.hikari.HikariDataSource - OrderManagementDevHikariCP - Start completed.
+2025-06-17 00:15:12.597 [RMI TCP Connection(3)-198.18.0.1] DEBUG o.s.jdbc.core.JdbcTemplate - Executing SQL query [SELECT 1]
+2025-06-17 00:15:12.597 [RMI TCP Connection(3)-198.18.0.1] DEBUG o.s.jdbc.datasource.DataSourceUtils - Fetching JDBC Connection from DataSource
+2025-06-17 00:15:17.730 [http-nio-8081-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - GET "/order-management/swagger-ui/index.html", parameters={}
+2025-06-17 00:15:17.739 [http-nio-8081-exec-1] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Mapped to ResourceHttpRequestHandler [classpath [META-INF/resources/webjars/]]
+2025-06-17 00:15:17.753 [http-nio-8081-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Completed 304 NOT_MODIFIED
+2025-06-17 00:15:17.782 [http-nio-8081-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - GET "/order-management/swagger-ui/swagger-initializer.js", parameters={}
+2025-06-17 00:15:17.783 [http-nio-8081-exec-3] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Mapped to ResourceHttpRequestHandler [classpath [META-INF/resources/webjars/]]
+2025-06-17 00:15:17.801 [http-nio-8081-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2025-06-17 00:15:17.915 [http-nio-8081-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - GET "/order-management/api-docs/swagger-config", parameters={}
+2025-06-17 00:15:17.916 [http-nio-8081-exec-10] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to org.springdoc.webmvc.ui.SwaggerConfigResource#openapiJson(HttpServletRequest)
+2025-06-17 00:15:17.929 [http-nio-8081-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [*/*] and supported [application/json]
+2025-06-17 00:15:17.930 [http-nio-8081-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [{configUrl=/order-management/api-docs/swagger-config, defaultModelExpandDepth=2, defaultModelsExpand (truncated)...]
+2025-06-17 00:15:17.935 [http-nio-8081-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2025-06-17 00:15:17.956 [http-nio-8081-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - GET "/order-management/api-docs", parameters={}
+2025-06-17 00:15:17.958 [http-nio-8081-exec-5] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to org.springdoc.webmvc.api.OpenApiWebMvcResource#openapiJson(HttpServletRequest, String, Locale)
+2025-06-17 00:15:18.230 [http-nio-8081-exec-5] INFO  o.s.api.AbstractOpenApiResource - Init duration for springdoc-openapi is: 265 ms
+2025-06-17 00:15:18.243 [http-nio-8081-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, */*] and supported [application/json]
+2025-06-17 00:15:18.244 [http-nio-8081-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing ["{"openapi":"3.0.1","info":{"title":"校园二手交易平台 - 订单管理API","description":"## 订单管理模块REST API文档\n\n### 功能 (truncated)..."]
+2025-06-17 00:15:18.246 [http-nio-8081-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2025-06-17 00:17:29.996 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - OrderManagementDevHikariCP - Shutdown initiated...
+2025-06-17 00:17:30.007 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - OrderManagementDevHikariCP - Shutdown completed.
+2025-06-17 00:29:08.653 [restartedMain] INFO  c.c.o.OrderManagementApplication - Starting OrderManagementApplication using Java 23.0.1 with PID 3544 (E:\Compus_Sencond_Hand\Campus_branch3\Campus_second-hand_trading_platform\backend\Java_backend\order-management\target\classes started by 29742 in E:\Compus_Sencond_Hand\Campus_branch3\Campus_second-hand_trading_platform)
+2025-06-17 00:29:08.654 [restartedMain] DEBUG c.c.o.OrderManagementApplication - Running with Spring Boot v3.0.2, Spring v6.0.4
+2025-06-17 00:29:08.655 [restartedMain] INFO  c.c.o.OrderManagementApplication - The following 1 profile is active: "dev"
+2025-06-17 00:29:08.711 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-06-17 00:29:08.711 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-06-17 00:29:09.823 [restartedMain] DEBUG o.apache.ibatis.logging.LogFactory - Logging initialized using 'class org.apache.ibatis.logging.slf4j.Slf4jImpl' adapter.
+2025-06-17 00:29:09.828 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [E:\Compus_Sencond_Hand\Campus_branch3\Campus_second-hand_trading_platform\backend\Java_backend\order-management\target\classes\com\campus\ordermanagement\dao\OrderRepository.class]
+2025-06-17 00:29:09.830 [restartedMain] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'orderRepository' and 'com.campus.ordermanagement.dao.OrderRepository' mapperInterface
+2025-06-17 00:29:10.344 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8081 (http)
+2025-06-17 00:29:10.344 [restartedMain] INFO  o.a.c.core.AprLifecycleListener - Loaded Apache Tomcat Native library [2.0.1] using APR version [1.7.0].
+2025-06-17 00:29:10.364 [restartedMain] INFO  o.a.c.core.AprLifecycleListener - OpenSSL successfully initialized [OpenSSL 3.0.5 5 Jul 2022]
+2025-06-17 00:29:10.374 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2025-06-17 00:29:10.374 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.5]
+2025-06-17 00:29:10.455 [restartedMain] INFO  o.a.c.c.C.[.[.[/order-management] - Initializing Spring embedded WebApplicationContext
+2025-06-17 00:29:10.455 [restartedMain] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1743 ms
+2025-06-17 00:29:10.585 [restartedMain] DEBUG o.s.w.f.ServerHttpObservationFilter - Filter 'serverHttpObservationFilter' configured for use
+2025-06-17 00:29:11.202 [restartedMain] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 14 endpoint(s) beneath base path '/actuator'
+2025-06-17 00:29:11.323 [restartedMain] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+2025-06-17 00:29:11.352 [restartedMain] INFO  o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+2025-06-17 00:29:11.380 [restartedMain] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - 29 mappings in 'requestMappingHandlerMapping'
+2025-06-17 00:29:11.864 [restartedMain] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/webjars/**, /**, /swagger-ui*/*swagger-initializer.js, /swagger-ui*/**] in 'resourceHandlerMapping'
+2025-06-17 00:29:11.872 [restartedMain] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 2 @ExceptionHandler, 1 ResponseBodyAdvice
+2025-06-17 00:29:12.078 [restartedMain] INFO  o.s.b.d.a.OptionalLiveReloadServer - LiveReload server is running on port 35729
+2025-06-17 00:29:12.146 [restartedMain] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port(s): 8081 (http) with context path '/order-management'
+2025-06-17 00:29:12.157 [restartedMain] INFO  c.c.o.OrderManagementApplication - Started OrderManagementApplication in 4.038 seconds (process running for 4.925)
+2025-06-17 00:29:12.753 [RMI TCP Connection(3)-192.168.198.1] INFO  o.a.c.c.C.[.[.[/order-management] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-06-17 00:29:12.753 [RMI TCP Connection(3)-192.168.198.1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-06-17 00:29:12.753 [RMI TCP Connection(3)-192.168.198.1] DEBUG o.s.web.servlet.DispatcherServlet - Detected StandardServletMultipartResolver
+2025-06-17 00:29:12.753 [RMI TCP Connection(3)-192.168.198.1] DEBUG o.s.web.servlet.DispatcherServlet - Detected AcceptHeaderLocaleResolver
+2025-06-17 00:29:12.753 [RMI TCP Connection(3)-192.168.198.1] DEBUG o.s.web.servlet.DispatcherServlet - Detected FixedThemeResolver
+2025-06-17 00:29:12.754 [RMI TCP Connection(3)-192.168.198.1] DEBUG o.s.web.servlet.DispatcherServlet - Detected org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator@54a92f3c
+2025-06-17 00:29:12.755 [RMI TCP Connection(3)-192.168.198.1] DEBUG o.s.web.servlet.DispatcherServlet - Detected org.springframework.web.servlet.support.SessionFlashMapManager@70a9e7
+2025-06-17 00:29:12.756 [RMI TCP Connection(3)-192.168.198.1] DEBUG o.s.web.servlet.DispatcherServlet - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
+2025-06-17 00:29:12.756 [RMI TCP Connection(3)-192.168.198.1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 3 ms
+2025-06-17 00:29:12.759 [RMI TCP Connection(2)-192.168.198.1] DEBUG o.s.jdbc.datasource.DataSourceUtils - Fetching JDBC Connection from DataSource
+2025-06-17 00:29:12.759 [RMI TCP Connection(2)-192.168.198.1] INFO  com.zaxxer.hikari.HikariDataSource - OrderManagementDevHikariCP - Starting...
+2025-06-17 00:29:12.941 [RMI TCP Connection(2)-192.168.198.1] INFO  com.zaxxer.hikari.pool.HikariPool - OrderManagementDevHikariCP - Added connection com.mysql.cj.jdbc.ConnectionImpl@69b4b421
+2025-06-17 00:29:12.944 [RMI TCP Connection(2)-192.168.198.1] INFO  com.zaxxer.hikari.HikariDataSource - OrderManagementDevHikariCP - Start completed.
+2025-06-17 00:29:12.956 [RMI TCP Connection(2)-192.168.198.1] DEBUG o.s.jdbc.core.JdbcTemplate - Executing SQL query [SELECT 1]
+2025-06-17 00:29:12.956 [RMI TCP Connection(2)-192.168.198.1] DEBUG o.s.jdbc.datasource.DataSourceUtils - Fetching JDBC Connection from DataSource
+2025-06-17 00:29:48.268 [http-nio-8081-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - GET "/order-management/swagger-ui.html", parameters={}
+2025-06-17 00:29:48.282 [http-nio-8081-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to org.springdoc.webmvc.ui.SwaggerWelcomeWebMvc#redirectToUi(HttpServletRequest)
+2025-06-17 00:29:48.338 [http-nio-8081-exec-4] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json;q=0.8', given [text/html, application/xhtml+xml, image/avif, image/webp, image/apng, application/xml;q=0.9, */*;q=0.8, application/signed-exchange;v=b3;q=0.7] and supported [application/json, application/*+json]
+2025-06-17 00:29:48.338 [http-nio-8081-exec-4] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Nothing to write: null body
+2025-06-17 00:29:48.341 [http-nio-8081-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Completed 302 FOUND
+2025-06-17 00:29:48.371 [http-nio-8081-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - GET "/order-management/swagger-ui/swagger-initializer.js", parameters={}
+2025-06-17 00:29:48.374 [http-nio-8081-exec-5] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Mapped to ResourceHttpRequestHandler [classpath [META-INF/resources/webjars/]]
+2025-06-17 00:29:48.408 [http-nio-8081-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2025-06-17 00:29:48.579 [http-nio-8081-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - GET "/order-management/api-docs/swagger-config", parameters={}
+2025-06-17 00:29:48.580 [http-nio-8081-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to org.springdoc.webmvc.ui.SwaggerConfigResource#openapiJson(HttpServletRequest)
+2025-06-17 00:29:48.582 [http-nio-8081-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [*/*] and supported [application/json]
+2025-06-17 00:29:48.583 [http-nio-8081-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [{configUrl=/order-management/api-docs/swagger-config, defaultModelExpandDepth=2, defaultModelsExpand (truncated)...]
+2025-06-17 00:29:48.589 [http-nio-8081-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2025-06-17 00:29:48.607 [http-nio-8081-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - GET "/order-management/api-docs", parameters={}
+2025-06-17 00:29:48.608 [http-nio-8081-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to org.springdoc.webmvc.api.OpenApiWebMvcResource#openapiJson(HttpServletRequest, String, Locale)
+2025-06-17 00:29:48.985 [http-nio-8081-exec-6] INFO  o.s.api.AbstractOpenApiResource - Init duration for springdoc-openapi is: 369 ms
+2025-06-17 00:29:49.009 [http-nio-8081-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, */*] and supported [application/json]
+2025-06-17 00:29:49.010 [http-nio-8081-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing ["{"openapi":"3.0.1","info":{"title":"校园二手交易平台 - 订单管理API","description":"## 订单管理模块REST API文档\n\n### 功能 (truncated)..."]
+2025-06-17 00:29:49.012 [http-nio-8081-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2025-06-17 00:30:31.042 [http-nio-8081-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - POST "/order-management/api/orders/cancel", parameters={}
+2025-06-17 00:30:31.043 [http-nio-8081-exec-8] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.campus.ordermanagement.controller.OrderApiController#cancelOrder(CancelOrderRequest)
+2025-06-17 00:30:31.070 [http-nio-8081-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Read "application/json;charset=UTF-8" to [CancelOrderRequest{orderId='O202306220001', operatorId='U10000003', cancelReason='买家主动取消'}]
+2025-06-17 00:30:31.195 [http-nio-8081-exec-8] DEBUG o.s.j.support.JdbcTransactionManager - Creating new transaction with name [com.campus.ordermanagement.service.impl.OrderServiceImpl.cancelOrder]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT
+2025-06-17 00:30:31.206 [http-nio-8081-exec-8] DEBUG o.s.j.support.JdbcTransactionManager - Acquired Connection [HikariProxyConnection@956591049 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] for JDBC transaction
+2025-06-17 00:30:31.211 [http-nio-8081-exec-8] DEBUG o.s.j.support.JdbcTransactionManager - Switching JDBC Connection [HikariProxyConnection@956591049 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] to manual commit
+2025-06-17 00:30:31.311 [http-nio-8081-exec-8] DEBUG o.s.j.support.JdbcTransactionManager - Initiating transaction rollback
+2025-06-17 00:30:31.311 [http-nio-8081-exec-8] DEBUG o.s.j.support.JdbcTransactionManager - Rolling back JDBC transaction on Connection [HikariProxyConnection@956591049 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421]
+2025-06-17 00:30:31.313 [http-nio-8081-exec-8] DEBUG o.s.j.support.JdbcTransactionManager - Releasing JDBC Connection [HikariProxyConnection@956591049 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] after transaction
+2025-06-17 00:30:31.314 [http-nio-8081-exec-8] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2025-06-17 00:30:31.315 [http-nio-8081-exec-8] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [{code=500, message=服务器内部错误: null, success=false}]
+2025-06-17 00:30:31.316 [http-nio-8081-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - Completed 500 INTERNAL_SERVER_ERROR
+2025-06-17 00:32:21.664 [http-nio-8081-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - POST "/order-management/api/orders/complete", parameters={}
+2025-06-17 00:32:21.665 [http-nio-8081-exec-9] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.campus.ordermanagement.controller.OrderApiController#completeOrder(CompleteOrderRequest)
+2025-06-17 00:32:21.670 [http-nio-8081-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Read "application/json;charset=UTF-8" to [CompleteOrderRequest{orderId='O202306220001', operatorId='O202306220001', remark='订单已完成'}]
+2025-06-17 00:32:21.677 [http-nio-8081-exec-9] DEBUG o.s.j.support.JdbcTransactionManager - Creating new transaction with name [com.campus.ordermanagement.service.impl.OrderServiceImpl.completeOrder]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT
+2025-06-17 00:32:21.679 [http-nio-8081-exec-9] DEBUG o.s.j.support.JdbcTransactionManager - Acquired Connection [HikariProxyConnection@486154682 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] for JDBC transaction
+2025-06-17 00:32:21.681 [http-nio-8081-exec-9] DEBUG o.s.j.support.JdbcTransactionManager - Switching JDBC Connection [HikariProxyConnection@486154682 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] to manual commit
+2025-06-17 00:32:21.687 [http-nio-8081-exec-9] DEBUG o.s.j.support.JdbcTransactionManager - Initiating transaction rollback
+2025-06-17 00:32:21.687 [http-nio-8081-exec-9] DEBUG o.s.j.support.JdbcTransactionManager - Rolling back JDBC transaction on Connection [HikariProxyConnection@486154682 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421]
+2025-06-17 00:32:21.689 [http-nio-8081-exec-9] DEBUG o.s.j.support.JdbcTransactionManager - Releasing JDBC Connection [HikariProxyConnection@486154682 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] after transaction
+2025-06-17 00:32:21.689 [http-nio-8081-exec-9] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2025-06-17 00:32:21.690 [http-nio-8081-exec-9] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [{code=500, message=服务器内部错误: null, success=false}]
+2025-06-17 00:32:21.691 [http-nio-8081-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - Completed 500 INTERNAL_SERVER_ERROR
+2025-06-17 00:32:53.876 [http-nio-8081-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - POST "/order-management/api/orders/complete", parameters={}
+2025-06-17 00:32:53.878 [http-nio-8081-exec-10] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.campus.ordermanagement.controller.OrderApiController#completeOrder(CompleteOrderRequest)
+2025-06-17 00:32:53.879 [http-nio-8081-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Read "application/json;charset=UTF-8" to [CompleteOrderRequest{orderId='O202306220001', operatorId='O202306220001', remark='订单已完成'}]
+2025-06-17 00:32:53.880 [http-nio-8081-exec-10] DEBUG o.s.j.support.JdbcTransactionManager - Creating new transaction with name [com.campus.ordermanagement.service.impl.OrderServiceImpl.completeOrder]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT
+2025-06-17 00:32:53.881 [http-nio-8081-exec-10] DEBUG o.s.j.support.JdbcTransactionManager - Acquired Connection [HikariProxyConnection@1137153129 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] for JDBC transaction
+2025-06-17 00:32:53.882 [http-nio-8081-exec-10] DEBUG o.s.j.support.JdbcTransactionManager - Switching JDBC Connection [HikariProxyConnection@1137153129 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] to manual commit
+2025-06-17 00:32:53.885 [http-nio-8081-exec-10] DEBUG o.s.j.support.JdbcTransactionManager - Initiating transaction rollback
+2025-06-17 00:32:53.885 [http-nio-8081-exec-10] DEBUG o.s.j.support.JdbcTransactionManager - Rolling back JDBC transaction on Connection [HikariProxyConnection@1137153129 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421]
+2025-06-17 00:32:53.886 [http-nio-8081-exec-10] DEBUG o.s.j.support.JdbcTransactionManager - Releasing JDBC Connection [HikariProxyConnection@1137153129 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] after transaction
+2025-06-17 00:32:53.888 [http-nio-8081-exec-10] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2025-06-17 00:32:53.889 [http-nio-8081-exec-10] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [{code=500, message=服务器内部错误: null, success=false}]
+2025-06-17 00:32:53.889 [http-nio-8081-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - Completed 500 INTERNAL_SERVER_ERROR
+2025-06-17 00:33:36.760 [http-nio-8081-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - POST "/order-management/api/orders/create", parameters={}
+2025-06-17 00:33:36.761 [http-nio-8081-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.campus.ordermanagement.controller.OrderApiController#createOrder(CreateOrderRequest)
+2025-06-17 00:33:36.764 [http-nio-8081-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Read "application/json;charset=UTF-8" to [CreateOrderRequest{commodityId='string', buyerId='string', sellerId='string', money=0.01, saleLocati (truncated)...]
+2025-06-17 00:33:36.779 [http-nio-8081-exec-2] DEBUG o.s.j.support.JdbcTransactionManager - Creating new transaction with name [com.campus.ordermanagement.service.impl.OrderServiceImpl.createOrder]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT
+2025-06-17 00:33:36.781 [http-nio-8081-exec-2] DEBUG o.s.j.support.JdbcTransactionManager - Acquired Connection [HikariProxyConnection@1030179271 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] for JDBC transaction
+2025-06-17 00:33:36.781 [http-nio-8081-exec-2] DEBUG o.s.j.support.JdbcTransactionManager - Switching JDBC Connection [HikariProxyConnection@1030179271 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] to manual commit
+2025-06-17 00:33:36.782 [http-nio-8081-exec-2] DEBUG o.s.j.support.JdbcTransactionManager - Initiating transaction rollback
+2025-06-17 00:33:36.782 [http-nio-8081-exec-2] DEBUG o.s.j.support.JdbcTransactionManager - Rolling back JDBC transaction on Connection [HikariProxyConnection@1030179271 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421]
+2025-06-17 00:33:36.783 [http-nio-8081-exec-2] DEBUG o.s.j.support.JdbcTransactionManager - Releasing JDBC Connection [HikariProxyConnection@1030179271 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] after transaction
+2025-06-17 00:33:36.784 [http-nio-8081-exec-2] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2025-06-17 00:33:36.784 [http-nio-8081-exec-2] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [{code=400, message=买家和卖家不能是同一人, success=false}]
+2025-06-17 00:33:36.785 [http-nio-8081-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Completed 400 BAD_REQUEST
+2025-06-17 00:33:44.661 [http-nio-8081-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - POST "/order-management/api/orders/create", parameters={}
+2025-06-17 00:33:44.662 [http-nio-8081-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.campus.ordermanagement.controller.OrderApiController#createOrder(CreateOrderRequest)
+2025-06-17 00:33:44.663 [http-nio-8081-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Read "application/json;charset=UTF-8" to [CreateOrderRequest{commodityId='string', buyerId='string', sellerId='string2', money=0.01, saleLocat (truncated)...]
+2025-06-17 00:33:44.664 [http-nio-8081-exec-3] DEBUG o.s.j.support.JdbcTransactionManager - Creating new transaction with name [com.campus.ordermanagement.service.impl.OrderServiceImpl.createOrder]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT
+2025-06-17 00:33:44.665 [http-nio-8081-exec-3] DEBUG o.s.j.support.JdbcTransactionManager - Acquired Connection [HikariProxyConnection@1154040783 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] for JDBC transaction
+2025-06-17 00:33:44.665 [http-nio-8081-exec-3] DEBUG o.s.j.support.JdbcTransactionManager - Switching JDBC Connection [HikariProxyConnection@1154040783 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] to manual commit
+2025-06-17 00:33:44.820 [http-nio-8081-exec-3] DEBUG o.s.j.support.SQLErrorCodesFactory - Looking up default SQLErrorCodes for DataSource [com.zaxxer.hikari.HikariDataSource@4a51d9b9]
+2025-06-17 00:33:44.822 [http-nio-8081-exec-3] DEBUG o.s.j.support.SQLErrorCodesFactory - SQL error codes for 'MySQL' found
+2025-06-17 00:33:44.822 [http-nio-8081-exec-3] DEBUG o.s.j.support.SQLErrorCodesFactory - Caching SQL error codes for DataSource [com.zaxxer.hikari.HikariDataSource@4a51d9b9]: database product name is 'MySQL'
+2025-06-17 00:33:44.827 [http-nio-8081-exec-3] DEBUG o.s.j.s.SQLErrorCodeSQLExceptionTranslator - Translating SQLException with SQL state '23000', error code '1452', message [Cannot add or update a child row: a foreign key constraint fails (`campus`.`orders`, CONSTRAINT `fk_orders_commodity` FOREIGN KEY (`commodity_id`) REFERENCES `commodities` (`commodity_id`) ON DELETE CASCADE ON UPDATE CASCADE)] for task [
+### Error updating database.  Cause: java.sql.SQLIntegrityConstraintViolationException: Cannot add or update a child row: a foreign key constraint fails (`campus`.`orders`, CONSTRAINT `fk_orders_commodity` FOREIGN KEY (`commodity_id`) REFERENCES `commodities` (`commodity_id`) ON DELETE CASCADE ON UPDATE CASCADE)
+### The error may exist in com/campus/ordermanagement/dao/OrderRepository.java (best guess)
+### The error may involve com.campus.ordermanagement.dao.OrderRepository.insert-Inline
+### The error occurred while setting parameters
+### SQL: INSERT INTO orders  ( order_id, commodity_id, Buyer_id, Seller_id, order_status,  Money, Sale_loc )  VALUES  ( ?, ?, ?, ?, ?,  ?, ? )
+### Cause: java.sql.SQLIntegrityConstraintViolationException: Cannot add or update a child row: a foreign key constraint fails (`campus`.`orders`, CONSTRAINT `fk_orders_commodity` FOREIGN KEY (`commodity_id`) REFERENCES `commodities` (`commodity_id`) ON DELETE CASCADE ON UPDATE CASCADE)
+]
+2025-06-17 00:33:44.827 [http-nio-8081-exec-3] DEBUG o.s.j.support.JdbcTransactionManager - Initiating transaction rollback
+2025-06-17 00:33:44.827 [http-nio-8081-exec-3] DEBUG o.s.j.support.JdbcTransactionManager - Rolling back JDBC transaction on Connection [HikariProxyConnection@1154040783 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421]
+2025-06-17 00:33:44.832 [http-nio-8081-exec-3] DEBUG o.s.j.support.JdbcTransactionManager - Releasing JDBC Connection [HikariProxyConnection@1154040783 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] after transaction
+2025-06-17 00:33:44.833 [http-nio-8081-exec-3] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2025-06-17 00:33:44.834 [http-nio-8081-exec-3] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [{code=500, message=服务器内部错误: <EOL><EOL>### Error updating database.  Cause: java.sql.SQLIntegrityConstraintVi (truncated)...]
+2025-06-17 00:33:44.835 [http-nio-8081-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - Completed 500 INTERNAL_SERVER_ERROR
+2025-06-17 00:34:37.877 [http-nio-8081-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - POST "/order-management/api/orders/create", parameters={}
+2025-06-17 00:34:37.877 [http-nio-8081-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.campus.ordermanagement.controller.OrderApiController#createOrder(CreateOrderRequest)
+2025-06-17 00:34:37.878 [http-nio-8081-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Read "application/json;charset=UTF-8" to [CreateOrderRequest{commodityId='C202300001', buyerId='U10000002', sellerId='U10000001', money=0.01,  (truncated)...]
+2025-06-17 00:34:37.879 [http-nio-8081-exec-4] DEBUG o.s.j.support.JdbcTransactionManager - Creating new transaction with name [com.campus.ordermanagement.service.impl.OrderServiceImpl.createOrder]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT
+2025-06-17 00:34:37.880 [http-nio-8081-exec-4] DEBUG o.s.j.support.JdbcTransactionManager - Acquired Connection [HikariProxyConnection@940143203 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] for JDBC transaction
+2025-06-17 00:34:37.880 [http-nio-8081-exec-4] DEBUG o.s.j.support.JdbcTransactionManager - Switching JDBC Connection [HikariProxyConnection@940143203 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] to manual commit
+2025-06-17 00:34:37.885 [http-nio-8081-exec-4] DEBUG o.s.j.support.JdbcTransactionManager - Initiating transaction commit
+2025-06-17 00:34:37.885 [http-nio-8081-exec-4] DEBUG o.s.j.support.JdbcTransactionManager - Committing JDBC transaction on Connection [HikariProxyConnection@940143203 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421]
+2025-06-17 00:34:37.903 [http-nio-8081-exec-4] DEBUG o.s.j.support.JdbcTransactionManager - Releasing JDBC Connection [HikariProxyConnection@940143203 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] after transaction
+2025-06-17 00:34:37.903 [http-nio-8081-exec-4] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2025-06-17 00:34:37.904 [http-nio-8081-exec-4] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [{message=订单创建成功, code=201, success=true, data=OrderResponse{orderId='01977997-c0b8-7e94-b41c-bfaf8c7 (truncated)...]
+2025-06-17 00:34:37.908 [http-nio-8081-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Completed 201 CREATED
+2025-06-17 00:35:31.742 [http-nio-8081-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - POST "/order-management/api/orders/query/by-buyer", parameters={}
+2025-06-17 00:35:31.743 [http-nio-8081-exec-5] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.campus.ordermanagement.controller.OrderApiController#queryOrdersByBuyer(QueryOrdersByBuyerRequest)
+2025-06-17 00:35:31.747 [http-nio-8081-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Read "application/json;charset=UTF-8" to [QueryOrdersByBuyerRequest{buyerId='U10000002'}]
+2025-06-17 00:35:31.754 [http-nio-8081-exec-5] DEBUG o.s.j.support.JdbcTransactionManager - Creating new transaction with name [com.campus.ordermanagement.service.impl.OrderServiceImpl.getOrdersByBuyerId]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT,readOnly
+2025-06-17 00:35:31.757 [http-nio-8081-exec-5] DEBUG o.s.j.support.JdbcTransactionManager - Acquired Connection [HikariProxyConnection@466627609 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] for JDBC transaction
+2025-06-17 00:35:31.758 [http-nio-8081-exec-5] DEBUG o.s.jdbc.datasource.DataSourceUtils - Setting JDBC Connection [HikariProxyConnection@466627609 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] read-only
+2025-06-17 00:35:31.760 [http-nio-8081-exec-5] DEBUG o.s.j.support.JdbcTransactionManager - Switching JDBC Connection [HikariProxyConnection@466627609 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] to manual commit
+2025-06-17 00:35:31.767 [http-nio-8081-exec-5] DEBUG o.s.j.support.JdbcTransactionManager - Initiating transaction rollback
+2025-06-17 00:35:31.767 [http-nio-8081-exec-5] DEBUG o.s.j.support.JdbcTransactionManager - Rolling back JDBC transaction on Connection [HikariProxyConnection@466627609 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421]
+2025-06-17 00:35:31.768 [http-nio-8081-exec-5] DEBUG o.s.jdbc.datasource.DataSourceUtils - Resetting read-only flag of JDBC Connection [HikariProxyConnection@466627609 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421]
+2025-06-17 00:35:31.769 [http-nio-8081-exec-5] DEBUG o.s.j.support.JdbcTransactionManager - Releasing JDBC Connection [HikariProxyConnection@466627609 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] after transaction
+2025-06-17 00:35:31.770 [http-nio-8081-exec-5] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2025-06-17 00:35:31.771 [http-nio-8081-exec-5] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [{code=500, message=服务器内部错误: null, success=false}]
+2025-06-17 00:35:31.772 [http-nio-8081-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Completed 500 INTERNAL_SERVER_ERROR
+2025-06-17 00:35:41.075 [http-nio-8081-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - POST "/order-management/api/orders/query/by-buyer", parameters={}
+2025-06-17 00:35:41.077 [http-nio-8081-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.campus.ordermanagement.controller.OrderApiController#queryOrdersByBuyer(QueryOrdersByBuyerRequest)
+2025-06-17 00:35:41.078 [http-nio-8081-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Read "application/json;charset=UTF-8" to [QueryOrdersByBuyerRequest{buyerId='U10000002'}]
+2025-06-17 00:35:41.080 [http-nio-8081-exec-1] DEBUG o.s.j.support.JdbcTransactionManager - Creating new transaction with name [com.campus.ordermanagement.service.impl.OrderServiceImpl.getOrdersByBuyerId]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT,readOnly
+2025-06-17 00:35:41.081 [http-nio-8081-exec-1] DEBUG o.s.j.support.JdbcTransactionManager - Acquired Connection [HikariProxyConnection@1750089966 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] for JDBC transaction
+2025-06-17 00:35:41.081 [http-nio-8081-exec-1] DEBUG o.s.jdbc.datasource.DataSourceUtils - Setting JDBC Connection [HikariProxyConnection@1750089966 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] read-only
+2025-06-17 00:35:41.081 [http-nio-8081-exec-1] DEBUG o.s.j.support.JdbcTransactionManager - Switching JDBC Connection [HikariProxyConnection@1750089966 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] to manual commit
+2025-06-17 00:35:41.084 [http-nio-8081-exec-1] DEBUG o.s.j.support.JdbcTransactionManager - Initiating transaction rollback
+2025-06-17 00:35:41.084 [http-nio-8081-exec-1] DEBUG o.s.j.support.JdbcTransactionManager - Rolling back JDBC transaction on Connection [HikariProxyConnection@1750089966 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421]
+2025-06-17 00:35:41.085 [http-nio-8081-exec-1] DEBUG o.s.jdbc.datasource.DataSourceUtils - Resetting read-only flag of JDBC Connection [HikariProxyConnection@1750089966 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421]
+2025-06-17 00:35:41.086 [http-nio-8081-exec-1] DEBUG o.s.j.support.JdbcTransactionManager - Releasing JDBC Connection [HikariProxyConnection@1750089966 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] after transaction
+2025-06-17 00:35:41.086 [http-nio-8081-exec-1] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2025-06-17 00:35:41.087 [http-nio-8081-exec-1] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [{code=500, message=服务器内部错误: null, success=false}]
+2025-06-17 00:35:41.087 [http-nio-8081-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Completed 500 INTERNAL_SERVER_ERROR
+2025-06-17 00:36:35.842 [http-nio-8081-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - POST "/order-management/api/orders/query/by-buyer", parameters={}
+2025-06-17 00:36:35.842 [http-nio-8081-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.campus.ordermanagement.controller.OrderApiController#queryOrdersByBuyer(QueryOrdersByBuyerRequest)
+2025-06-17 00:36:35.843 [http-nio-8081-exec-6] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Read "application/json;charset=UTF-8" to [QueryOrdersByBuyerRequest{buyerId='U10000002'}]
+2025-06-17 00:36:35.843 [http-nio-8081-exec-6] DEBUG o.s.j.support.JdbcTransactionManager - Creating new transaction with name [com.campus.ordermanagement.service.impl.OrderServiceImpl.getOrdersByBuyerId]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT,readOnly
+2025-06-17 00:36:35.844 [http-nio-8081-exec-6] DEBUG o.s.j.support.JdbcTransactionManager - Acquired Connection [HikariProxyConnection@1897808092 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] for JDBC transaction
+2025-06-17 00:36:35.844 [http-nio-8081-exec-6] DEBUG o.s.jdbc.datasource.DataSourceUtils - Setting JDBC Connection [HikariProxyConnection@1897808092 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] read-only
+2025-06-17 00:36:35.845 [http-nio-8081-exec-6] DEBUG o.s.j.support.JdbcTransactionManager - Switching JDBC Connection [HikariProxyConnection@1897808092 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] to manual commit
+2025-06-17 00:36:35.850 [http-nio-8081-exec-6] DEBUG o.s.j.support.JdbcTransactionManager - Initiating transaction rollback
+2025-06-17 00:36:35.851 [http-nio-8081-exec-6] DEBUG o.s.j.support.JdbcTransactionManager - Rolling back JDBC transaction on Connection [HikariProxyConnection@1897808092 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421]
+2025-06-17 00:36:35.851 [http-nio-8081-exec-6] DEBUG o.s.jdbc.datasource.DataSourceUtils - Resetting read-only flag of JDBC Connection [HikariProxyConnection@1897808092 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421]
+2025-06-17 00:36:35.852 [http-nio-8081-exec-6] DEBUG o.s.j.support.JdbcTransactionManager - Releasing JDBC Connection [HikariProxyConnection@1897808092 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] after transaction
+2025-06-17 00:36:35.852 [http-nio-8081-exec-6] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2025-06-17 00:36:35.852 [http-nio-8081-exec-6] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [{code=500, message=服务器内部错误: null, success=false}]
+2025-06-17 00:36:35.853 [http-nio-8081-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - Completed 500 INTERNAL_SERVER_ERROR
+2025-06-17 00:37:26.166 [http-nio-8081-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - POST "/order-management/api/orders/query/by-commodity", parameters={}
+2025-06-17 00:37:26.168 [http-nio-8081-exec-7] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.campus.ordermanagement.controller.OrderApiController#queryOrdersByCommodity(QueryOrdersByCommodityRequest)
+2025-06-17 00:37:26.172 [http-nio-8081-exec-7] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Read "application/json;charset=UTF-8" to [QueryOrdersByCommodityRequest{commodityId='U10000002'}]
+2025-06-17 00:37:26.178 [http-nio-8081-exec-7] DEBUG o.s.j.support.JdbcTransactionManager - Creating new transaction with name [com.campus.ordermanagement.service.impl.OrderServiceImpl.getOrdersByCommodityId]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT,readOnly
+2025-06-17 00:37:26.180 [http-nio-8081-exec-7] DEBUG o.s.j.support.JdbcTransactionManager - Acquired Connection [HikariProxyConnection@1651496725 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] for JDBC transaction
+2025-06-17 00:37:26.180 [http-nio-8081-exec-7] DEBUG o.s.jdbc.datasource.DataSourceUtils - Setting JDBC Connection [HikariProxyConnection@1651496725 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] read-only
+2025-06-17 00:37:26.181 [http-nio-8081-exec-7] DEBUG o.s.j.support.JdbcTransactionManager - Switching JDBC Connection [HikariProxyConnection@1651496725 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] to manual commit
+2025-06-17 00:37:26.187 [http-nio-8081-exec-7] DEBUG o.s.j.support.JdbcTransactionManager - Initiating transaction commit
+2025-06-17 00:37:26.187 [http-nio-8081-exec-7] DEBUG o.s.j.support.JdbcTransactionManager - Committing JDBC transaction on Connection [HikariProxyConnection@1651496725 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421]
+2025-06-17 00:37:26.188 [http-nio-8081-exec-7] DEBUG o.s.jdbc.datasource.DataSourceUtils - Resetting read-only flag of JDBC Connection [HikariProxyConnection@1651496725 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421]
+2025-06-17 00:37:26.189 [http-nio-8081-exec-7] DEBUG o.s.j.support.JdbcTransactionManager - Releasing JDBC Connection [HikariProxyConnection@1651496725 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] after transaction
+2025-06-17 00:37:26.189 [http-nio-8081-exec-7] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2025-06-17 00:37:26.190 [http-nio-8081-exec-7] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [{success=true, data=[], total=0, message=查询成功, code=200}]
+2025-06-17 00:37:26.191 [http-nio-8081-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2025-06-17 00:37:55.390 [http-nio-8081-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - POST "/order-management/api/orders/query/by-id", parameters={}
+2025-06-17 00:37:55.391 [http-nio-8081-exec-8] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.campus.ordermanagement.controller.OrderApiController#queryOrderById(QueryOrderByIdRequest)
+2025-06-17 00:37:55.393 [http-nio-8081-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Read "application/json;charset=UTF-8" to [QueryOrderByIdRequest{orderId='U10000002'}]
+2025-06-17 00:37:55.395 [http-nio-8081-exec-8] DEBUG o.s.j.support.JdbcTransactionManager - Creating new transaction with name [com.campus.ordermanagement.service.impl.OrderServiceImpl.getOrderById]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT,readOnly
+2025-06-17 00:37:55.396 [http-nio-8081-exec-8] DEBUG o.s.j.support.JdbcTransactionManager - Acquired Connection [HikariProxyConnection@2109888801 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] for JDBC transaction
+2025-06-17 00:37:55.396 [http-nio-8081-exec-8] DEBUG o.s.jdbc.datasource.DataSourceUtils - Setting JDBC Connection [HikariProxyConnection@2109888801 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] read-only
+2025-06-17 00:37:55.397 [http-nio-8081-exec-8] DEBUG o.s.j.support.JdbcTransactionManager - Switching JDBC Connection [HikariProxyConnection@2109888801 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] to manual commit
+2025-06-17 00:37:55.400 [http-nio-8081-exec-8] DEBUG o.s.j.support.JdbcTransactionManager - Initiating transaction commit
+2025-06-17 00:37:55.401 [http-nio-8081-exec-8] DEBUG o.s.j.support.JdbcTransactionManager - Committing JDBC transaction on Connection [HikariProxyConnection@2109888801 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421]
+2025-06-17 00:37:55.402 [http-nio-8081-exec-8] DEBUG o.s.jdbc.datasource.DataSourceUtils - Resetting read-only flag of JDBC Connection [HikariProxyConnection@2109888801 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421]
+2025-06-17 00:37:55.402 [http-nio-8081-exec-8] DEBUG o.s.j.support.JdbcTransactionManager - Releasing JDBC Connection [HikariProxyConnection@2109888801 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] after transaction
+2025-06-17 00:37:55.404 [http-nio-8081-exec-8] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2025-06-17 00:37:55.404 [http-nio-8081-exec-8] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [{code=404, message=订单不存在, success=false}]
+2025-06-17 00:37:55.405 [http-nio-8081-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - Completed 404 NOT_FOUND
+2025-06-17 00:38:26.408 [http-nio-8081-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - POST "/order-management/api/orders/query/by-seller", parameters={}
+2025-06-17 00:38:26.409 [http-nio-8081-exec-9] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.campus.ordermanagement.controller.OrderApiController#queryOrdersBySeller(QueryOrdersBySellerRequest)
+2025-06-17 00:38:26.413 [http-nio-8081-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Read "application/json;charset=UTF-8" to [QueryOrdersBySellerRequest{sellerId='U10000002'}]
+2025-06-17 00:38:26.418 [http-nio-8081-exec-9] DEBUG o.s.j.support.JdbcTransactionManager - Creating new transaction with name [com.campus.ordermanagement.service.impl.OrderServiceImpl.getOrdersBySellerId]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT,readOnly
+2025-06-17 00:38:26.419 [http-nio-8081-exec-9] DEBUG o.s.j.support.JdbcTransactionManager - Acquired Connection [HikariProxyConnection@1038669006 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] for JDBC transaction
+2025-06-17 00:38:26.419 [http-nio-8081-exec-9] DEBUG o.s.jdbc.datasource.DataSourceUtils - Setting JDBC Connection [HikariProxyConnection@1038669006 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] read-only
+2025-06-17 00:38:26.420 [http-nio-8081-exec-9] DEBUG o.s.j.support.JdbcTransactionManager - Switching JDBC Connection [HikariProxyConnection@1038669006 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] to manual commit
+2025-06-17 00:38:26.423 [http-nio-8081-exec-9] DEBUG o.s.j.support.JdbcTransactionManager - Initiating transaction rollback
+2025-06-17 00:38:26.423 [http-nio-8081-exec-9] DEBUG o.s.j.support.JdbcTransactionManager - Rolling back JDBC transaction on Connection [HikariProxyConnection@1038669006 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421]
+2025-06-17 00:38:26.424 [http-nio-8081-exec-9] DEBUG o.s.jdbc.datasource.DataSourceUtils - Resetting read-only flag of JDBC Connection [HikariProxyConnection@1038669006 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421]
+2025-06-17 00:38:26.424 [http-nio-8081-exec-9] DEBUG o.s.j.support.JdbcTransactionManager - Releasing JDBC Connection [HikariProxyConnection@1038669006 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] after transaction
+2025-06-17 00:38:26.425 [http-nio-8081-exec-9] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2025-06-17 00:38:26.426 [http-nio-8081-exec-9] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [{code=500, message=服务器内部错误: null, success=false}]
+2025-06-17 00:38:26.426 [http-nio-8081-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - Completed 500 INTERNAL_SERVER_ERROR
+2025-06-17 00:38:41.741 [http-nio-8081-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - POST "/order-management/api/orders/query/by-status", parameters={}
+2025-06-17 00:38:41.742 [http-nio-8081-exec-10] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.campus.ordermanagement.controller.OrderApiController#queryOrdersByStatus(QueryOrdersByStatusRequest)
+2025-06-17 00:38:41.745 [http-nio-8081-exec-10] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Read "application/json;charset=UTF-8" to [QueryOrdersByStatusRequest{status='pending_payment'}]
+2025-06-17 00:38:41.752 [http-nio-8081-exec-10] DEBUG o.s.j.support.JdbcTransactionManager - Creating new transaction with name [com.campus.ordermanagement.service.impl.OrderServiceImpl.getOrdersByStatus]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT,readOnly
+2025-06-17 00:38:41.755 [http-nio-8081-exec-10] DEBUG o.s.j.support.JdbcTransactionManager - Acquired Connection [HikariProxyConnection@1892020969 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] for JDBC transaction
+2025-06-17 00:38:41.756 [http-nio-8081-exec-10] DEBUG o.s.jdbc.datasource.DataSourceUtils - Setting JDBC Connection [HikariProxyConnection@1892020969 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] read-only
+2025-06-17 00:38:41.757 [http-nio-8081-exec-10] DEBUG o.s.j.support.JdbcTransactionManager - Switching JDBC Connection [HikariProxyConnection@1892020969 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] to manual commit
+2025-06-17 00:38:41.766 [http-nio-8081-exec-10] DEBUG o.s.j.support.JdbcTransactionManager - Initiating transaction rollback
+2025-06-17 00:38:41.766 [http-nio-8081-exec-10] DEBUG o.s.j.support.JdbcTransactionManager - Rolling back JDBC transaction on Connection [HikariProxyConnection@1892020969 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421]
+2025-06-17 00:38:41.767 [http-nio-8081-exec-10] DEBUG o.s.jdbc.datasource.DataSourceUtils - Resetting read-only flag of JDBC Connection [HikariProxyConnection@1892020969 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421]
+2025-06-17 00:38:41.768 [http-nio-8081-exec-10] DEBUG o.s.j.support.JdbcTransactionManager - Releasing JDBC Connection [HikariProxyConnection@1892020969 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] after transaction
+2025-06-17 00:38:41.770 [http-nio-8081-exec-10] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2025-06-17 00:38:41.770 [http-nio-8081-exec-10] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [{code=500, message=服务器内部错误: null, success=false}]
+2025-06-17 00:38:41.772 [http-nio-8081-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - Completed 500 INTERNAL_SERVER_ERROR
+2025-06-17 00:39:04.462 [http-nio-8081-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - POST "/order-management/api/orders/statistics", parameters={}
+2025-06-17 00:39:04.463 [http-nio-8081-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.campus.ordermanagement.controller.OrderApiController#getOrderStatistics(OrderStatisticsRequest)
+2025-06-17 00:39:04.464 [http-nio-8081-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Read "application/json;charset=UTF-8" to [OrderStatisticsRequest{userId='U10000002', role='buyer'}]
+2025-06-17 00:39:04.469 [http-nio-8081-exec-2] DEBUG o.s.j.support.JdbcTransactionManager - Creating new transaction with name [com.campus.ordermanagement.service.impl.OrderServiceImpl.getOrderStatistics]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT,readOnly
+2025-06-17 00:39:04.470 [http-nio-8081-exec-2] DEBUG o.s.j.support.JdbcTransactionManager - Acquired Connection [HikariProxyConnection@743585131 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] for JDBC transaction
+2025-06-17 00:39:04.470 [http-nio-8081-exec-2] DEBUG o.s.jdbc.datasource.DataSourceUtils - Setting JDBC Connection [HikariProxyConnection@743585131 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] read-only
+2025-06-17 00:39:04.471 [http-nio-8081-exec-2] DEBUG o.s.j.support.JdbcTransactionManager - Switching JDBC Connection [HikariProxyConnection@743585131 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] to manual commit
+2025-06-17 00:39:04.475 [http-nio-8081-exec-2] DEBUG o.s.j.support.JdbcTransactionManager - Initiating transaction rollback
+2025-06-17 00:39:04.475 [http-nio-8081-exec-2] DEBUG o.s.j.support.JdbcTransactionManager - Rolling back JDBC transaction on Connection [HikariProxyConnection@743585131 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421]
+2025-06-17 00:39:04.476 [http-nio-8081-exec-2] DEBUG o.s.jdbc.datasource.DataSourceUtils - Resetting read-only flag of JDBC Connection [HikariProxyConnection@743585131 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421]
+2025-06-17 00:39:04.476 [http-nio-8081-exec-2] DEBUG o.s.j.support.JdbcTransactionManager - Releasing JDBC Connection [HikariProxyConnection@743585131 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] after transaction
+2025-06-17 00:39:04.477 [http-nio-8081-exec-2] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2025-06-17 00:39:04.477 [http-nio-8081-exec-2] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [{code=500, message=服务器内部错误: null, success=false}]
+2025-06-17 00:39:04.478 [http-nio-8081-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Completed 500 INTERNAL_SERVER_ERROR
+2025-06-17 00:39:58.458 [http-nio-8081-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - POST "/order-management/api/orders/update-status", parameters={}
+2025-06-17 00:39:58.458 [http-nio-8081-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.campus.ordermanagement.controller.OrderApiController#updateOrderStatus(UpdateOrderStatusRequest)
+2025-06-17 00:39:58.460 [http-nio-8081-exec-3] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Read "application/json;charset=UTF-8" to [UpdateOrderStatusRequest{orderId='O202306210001', orderStatus='pending_transaction', operatorId='O20 (truncated)...]
+2025-06-17 00:39:58.465 [http-nio-8081-exec-3] DEBUG o.s.j.support.JdbcTransactionManager - Creating new transaction with name [com.campus.ordermanagement.service.impl.OrderServiceImpl.updateOrderStatus]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT
+2025-06-17 00:39:58.466 [http-nio-8081-exec-3] DEBUG o.s.j.support.JdbcTransactionManager - Acquired Connection [HikariProxyConnection@437988008 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] for JDBC transaction
+2025-06-17 00:39:58.467 [http-nio-8081-exec-3] DEBUG o.s.j.support.JdbcTransactionManager - Switching JDBC Connection [HikariProxyConnection@437988008 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] to manual commit
+2025-06-17 00:39:58.471 [http-nio-8081-exec-3] DEBUG o.s.j.support.JdbcTransactionManager - Initiating transaction rollback
+2025-06-17 00:39:58.471 [http-nio-8081-exec-3] DEBUG o.s.j.support.JdbcTransactionManager - Rolling back JDBC transaction on Connection [HikariProxyConnection@437988008 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421]
+2025-06-17 00:39:58.472 [http-nio-8081-exec-3] DEBUG o.s.j.support.JdbcTransactionManager - Releasing JDBC Connection [HikariProxyConnection@437988008 wrapping com.mysql.cj.jdbc.ConnectionImpl@69b4b421] after transaction
+2025-06-17 00:39:58.474 [http-nio-8081-exec-3] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2025-06-17 00:39:58.474 [http-nio-8081-exec-3] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [{code=500, message=服务器内部错误: null, success=false}]
+2025-06-17 00:39:58.476 [http-nio-8081-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - Completed 500 INTERNAL_SERVER_ERROR
+2025-06-17 00:40:29.680 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - OrderManagementDevHikariCP - Shutdown initiated...
+2025-06-17 00:40:29.695 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - OrderManagementDevHikariCP - Shutdown completed.
