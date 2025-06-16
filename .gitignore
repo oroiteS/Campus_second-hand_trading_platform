@@ -5,3 +5,4 @@ backend/python/.venv
 .trae/*
 **/.idea/
 **/response.txt
+**/node_modules
