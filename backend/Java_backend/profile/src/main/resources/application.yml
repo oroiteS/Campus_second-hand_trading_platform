@@ -92,7 +92,7 @@ logging:
 aliyun:
   oss:
     endpoint: https://oss-cn-shanghai.aliyuncs.com  # OSS endpoint
-    access-key-id: LTAI5tGVpQGuxXuhSkRF3ak4              # AccessKey ID
-    access-key-secret: i2Sg1uOtRR3UihOtWoQJMgAPMAVZGO       # 你的AccessKey Secret
+    access-key-id:              # AccessKey ID
+    access-key-secret:      # 你的AccessKey Secret
     bucket-name: avatars-bysuepsw25                   # 你的bucket名称
     domain: avatars-bysuepsw25.oss-cn-shanghai.aliyuncs.com  # 你的bucket域名
