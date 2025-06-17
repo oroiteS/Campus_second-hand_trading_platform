@@ -1,5 +1,6 @@
 server:
   port: 8089
+  base-url: http://localhost:8080
 
 mybatis-plus:
   # 配置 Mapper XML 文件位置
@@ -77,8 +78,6 @@ file:
     avatar-path: e:/Compus_Sencond_Hand/Campus/Campus_second-hand_trading_platform/backend/Java_backend/uploads/avatars/
 
 # 服务器配置
-server:
-  base-url: http://localhost:8080
 
 # 日志配置
 logging:

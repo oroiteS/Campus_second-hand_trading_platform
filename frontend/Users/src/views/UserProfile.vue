@@ -4,16 +4,17 @@
       <h2>修改个人信息</h2>
       
       <!-- 头像放在最上方 -->
-      <div class="user-profile-avatar-section">
-        <img :src="avatarUrl || 'https://via.placeholder.com/100x100'" class="user-profile-avatar-preview-large" />
-        <div class="user-profile-form-group user-profile-avatar-url-group">
-          <label for="avatarUrl">头像地址</label>
+    <div class="user-profile-avatar-section">
+        <img :src="avatarPreview || avatarUrl" class="user-profile-avatar-preview-large" />
+        <div class="user-profile-form-group user-profile-avatar-upload-group">
+          <label for="avatarUpload">上传头像</label>
           <input 
-            type="text" 
-            id="avatarUrl" 
-            v-model="avatarUrl" 
-            placeholder="请输入头像URL地址"
+            type="file" 
+            id="avatarUpload" 
+            @change="handleAvatarUpload" 
+            accept="image/*"
           />
+          <div class="user-profile-input-tip">选择本地图片作为头像</div>
         </div>
       </div>
       
@@ -40,16 +41,7 @@
         <div class="user-profile-input-error" v-if="validationErrors.username">{{ validationErrors.username }}</div>
       </div>
       
-      <div class="user-profile-form-group">
-        <label for="password">密码</label>
-        <input 
-          type="password" 
-          id="password" 
-          v-model="password" 
-          placeholder="请输入密码（不少于6位）"
-        />
-        <div class="user-profile-input-error" v-if="validationErrors.password">{{ validationErrors.password }}</div>
-      </div>
+
       
       <div class="user-profile-form-group" v-if="telephone !== undefined">
         <label for="telephone">电话信息</label>
@@ -68,8 +60,10 @@
           type="text" 
           id="realName" 
           v-model="realName" 
-          placeholder="请输入真实姓名"
+          placeholder="真实姓名" 
+          disabled
         />
+        <div class="user-profile-input-tip">真实姓名不可修改</div>
       </div>
       
       <div class="user-profile-form-group" v-if="idCard !== undefined">
@@ -78,33 +72,10 @@
           type="text" 
           id="idCard" 
           v-model="idCard" 
-          placeholder="请输入身份证号"
+          placeholder="身份证号" 
+          disabled
         />
-        <div class="user-profile-input-error" v-if="validationErrors.idCard">{{ validationErrors.idCard }}</div>
-      </div>
-      
-      <div class="user-profile-form-group user-profile-location-group" v-if="longitude !== undefined || latitude !== undefined">
-        <label>用户位置</label>
-        <div class="user-profile-location-inputs">
-          <div class="user-profile-location-input" v-if="longitude !== undefined">
-            <label for="longitude">经度</label>
-            <input 
-              type="text" 
-              id="longitude" 
-              v-model="longitude" 
-              placeholder="经度"
-            />
-          </div>
-          <div class="user-profile-location-input" v-if="latitude !== undefined">
-            <label for="latitude">纬度</label>
-            <input 
-              type="text" 
-              id="latitude" 
-              v-model="latitude" 
-              placeholder="纬度"
-            />
-          </div>
-        </div>
+        <div class="user-profile-input-tip">身份证号不可修改</div>
       </div>
       
       <div class="user-profile-error-message" v-if="errorMessage">
@@ -124,26 +95,25 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: 'UserProfile',
   data() {
     return {
       userId: '',
       username: '',
-      password: '',
       telephone: '',
       realName: '',
       idCard: '',
       avatarUrl: '',
-      longitude: '',
-      latitude: '',
+      avatarPreview: null,
+      avatarFile: null,
       errorMessage: '',
       isLoading: false,
       validationErrors: {
         username: '',
-        password: '',
-        telephone: '',
-        idCard: ''
+        telephone: ''
       }
     }
   },
@@ -152,77 +122,82 @@ export default {
     this.fetchUserProfile();
   },
   methods: {
+    // 处理头像上传
+    handleAvatarUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      // 检查文件类型
+      if (!file.type.match('image.*')) {
+        this.errorMessage = '请选择图片文件';
+        return;
+      }
+      
+      // 保存文件对象
+      this.avatarFile = file;
+      
+      // 创建预览URL
+      this.avatarPreview = URL.createObjectURL(file);
+    },
+    
     // 获取用户信息
     fetchUserProfile() {
+      // 从localStorage获取userId
+      const userId = localStorage.getItem('userId');
+      if (!userId) {
+        this.errorMessage = '未找到用户ID，请先登录';
+        setTimeout(() => {
+          this.$router.push('/');
+        }, 1500);
+        return;
+      }
+      
       this.isLoading = true;
       
-      // 这里应该调用后端API获取用户信息
-      // 模拟API请求获取用户数据
-      setTimeout(() => {
-        // 模拟从后端获取的数据
-        const userData = {
-          userId: '148625502103600905',
-          username: 'jack',
-          telephone: '13800138000',
-          realName: '张三',
-          idCard: '110101199001011234',
-          avatarUrl: 'https://via.placeholder.com/150',
-          longitude: '116.404',
-          latitude: '39.915'
-        };
-        
-        // 更新数据
-        Object.keys(userData).forEach(key => {
-          if (key in this && userData[key] !== undefined) {
-            this[key] = userData[key];
-          }
-        });
-        
+      // 调用API获取用户信息
+      axios.post('http://localhost:8089/api/user/info', {
+        userId: userId
+      })
+      .then(response => {
+        if (response.data.success) {
+          const userData = response.data.data;
+          this.userId = userData.userId;
+          this.username = userData.userName;
+          this.telephone = userData.telephone;
+          this.realName = userData.realName;
+          this.idCard = userData.idCard;
+          this.avatarUrl = userData.avatarUrl;
+        } else {
+          this.errorMessage = response.data.message || '获取用户信息失败';
+        }
+      })
+      .catch(error => {
+        console.error('获取用户信息出错:', error);
+        this.errorMessage = '获取用户信息时发生错误，请稍后再试';
+      })
+      .finally(() => {
         this.isLoading = false;
-      }, 500);
+      });
     },
     
     // 表单验证
     validateForm() {
       let isValid = true;
-      
-      // 重置验证错误
-      Object.keys(this.validationErrors).forEach(key => {
-        this.validationErrors[key] = '';
-      });
+      this.validationErrors = {
+        username: '',
+        telephone: ''
+      };
       
       // 验证用户名
-      if (this.username !== undefined) {
-        if (!this.username) {
-          this.validationErrors.username = '昵称不能为空';
-          isValid = false;
-        }
+      if (this.username && this.username.length < 3) {
+        this.validationErrors.username = '用户名不能少于3个字符';
+        isValid = false;
       }
       
-      // 验证密码（如果有输入）
-      if (this.password) {
-        if (this.password.length < 6) {
-          this.validationErrors.password = '密码长度不能少于6位';
-          isValid = false;
-        }
-      }
-      
-      // 验证电话号码（中国手机号格式）
-      if (this.telephone) {
-        const phoneRegex = /^1[3-9]\d{9}$/;
-        if (!phoneRegex.test(this.telephone)) {
-          this.validationErrors.telephone = '请输入有效的中国手机号码';
-          isValid = false;
-        }
-      }
-      
-      // 验证身份证号
-      if (this.idCard) {
-        const idCardRegex = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
-        if (!idCardRegex.test(this.idCard)) {
-          this.validationErrors.idCard = '请输入有效的身份证号码';
-          isValid = false;
-        }
+      // 验证电话号码
+      if (this.telephone && !/^1[3-9]\d{9}$/.test(this.telephone)) {
+        this.validationErrors.telephone = '请输入有效的手机号码';
+        isValid = false;
       }
       
       return isValid;
@@ -239,27 +214,30 @@ export default {
         return;
       }
       
-      // 准备要提交的数据
-      const profileData = {};
+      // 准备用户信息更新数据
+      const userUpdateData = {
+        userId: this.userId,
+        userName: this.username,
+        telephone: this.telephone
+      };
       
-      // 只包含有值的字段
-      ['username', 'password', 'telephone', 'realName', 'idCard', 'avatarUrl', 'longitude', 'latitude'].forEach(field => {
-        if (this[field]) {
-          profileData[field] = this[field];
-        }
-      });
-      
-      // 调用API保存用户信息
-      // 这里应该是实际的API调用
-      console.log('提交的数据:', profileData);
-      
-      // 模拟API请求
-      setTimeout(() => {
-        // 保存成功后的处理
-        this.isLoading = false;
-        alert('个人信息保存成功！');
-        this.$router.push('/');
-      }, 1000);
+      // 调用API更新用户信息
+      axios.post('http://localhost:8089/api/user/update', userUpdateData)
+        .then(response => {
+          if (response.data.success) {
+            console.log('用户信息更新成功:', response.data);
+            this.isLoading = false;
+            alert('个人信息保存成功！');
+            this.$router.push('/');
+          } else {
+            throw new Error(response.data.message || '用户信息更新失败');
+          }
+        })
+        .catch(error => {
+          console.error('保存用户信息出错:', error);
+          this.errorMessage = error.message || '保存信息时发生错误，请稍后再试';
+          this.isLoading = false;
+        });
     },
     
     cancel() {
