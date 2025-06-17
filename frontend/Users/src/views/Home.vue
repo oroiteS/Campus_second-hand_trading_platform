@@ -357,7 +357,8 @@ export default {
       this.$router.push({
         path: '/profile',
         query: {
-          userId: userId
+          userId: userId,
+          name: this.userInfo.name
         }
       });
     },
