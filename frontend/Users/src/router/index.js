@@ -10,6 +10,8 @@ import ProductDetail from '../views/ProductDetail.vue'
 import OrderManagement from '../views/OrderManagement.vue'
 import PublishProduct from '../views/PublishProduct.vue'
 import NoticeDetail from '../views/NoticeDetail.vue'
+import WalletManagement from '../views/WalletManagement.vue'
+import ProductBrowse from '../views/ProductBrowse.vue'
 
 const routes = [
   {
@@ -53,6 +55,11 @@ const routes = [
     component: ProductDetail
   },
   {
+    path: '/browse/:categoryId',
+    name: 'ProductBrowse',
+    component: ProductBrowse
+  },
+  {
     path: '/orders',
     name: 'OrderManagement',
     component: OrderManagement
@@ -68,9 +75,9 @@ const routes = [
     component: NoticeDetail
   },
   {
-    path: '/chat-list/:userId',
-    name: 'ChatList',
-    component: () => import('../views/ChatList.vue')
+    path: '/wallet',
+    name: 'WalletManagement',
+    component: WalletManagement
   }
 ]
 

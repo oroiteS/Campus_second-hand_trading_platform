@@ -4,7 +4,7 @@
   }
   
   /* 顶部导航 */
-  .order-header {
+  .order-management .order-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     position: sticky;
     top: 0;
@@ -47,14 +47,14 @@
   }
   
   /* 订单容器 */
-  .order-container {
+  .order-management .order-container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
   }
   
   /* 订单标签页 */
-  .order-tabs {
+  .order-management .order-tabs {
     display: flex;
     background: white;
     border-radius: 12px;
@@ -85,7 +85,7 @@
   }
   
   /* 订单列表 */
-  .order-list {
+  .order-management .order-list {
     display: flex;
     flex-direction: column;
     gap: 16px;

@@ -181,30 +181,139 @@
     border-left: 4px solid #667eea;
   }
   
-  .product-details {
-    margin-bottom: 30px;
+  /* 商品详细信息 - 防止全局样式影响 */
+  .product-detail .product-details {
+    margin-bottom: 30px !important;
+    background: #ffffff !important;
+    border-radius: 12px !important;
+    padding: 20px !important;
+    border: 1px solid #e9ecef !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05) !important;
+    display: block !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
   
+  /* 确保每个详情项独占一行 - 强化版本 */
+  .product-detail .product-details .detail-item {
+    display: block !important;
+    width: 100% !important;
+    padding: 15px 0 !important;
+    margin: 0 !important;
+    border-bottom: 1px solid #f0f0f0 !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+    clear: both !important;
+    float: none !important;
+    position: static !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+    flex: none !important;
+    grid-column: unset !important;
+    grid-row: unset !important;
+    align-items: unset !important;
+    justify-content: unset !important;
+  }
+  
+  .product-detail .product-details .detail-item:last-child {
+    border-bottom: none !important;
+  }
+  
+  /* 标签和值在同一行内显示 */
+  .product-detail .product-details .detail-item .label {
+    font-weight: 600 !important;
+    color: #333 !important;
+    display: inline !important;
+    margin-right: 8px !important;
+    float: none !important;
+    position: static !important;
+    vertical-align: baseline !important;
+    width: auto !important;
+    flex: none !important;
+  }
+  
+  .product-detail .product-details .detail-item .value {
+    color: #666 !important;
+    display: inline !important;
+    font-weight: normal !important;
+    float: none !important;
+    position: static !important;
+    vertical-align: baseline !important;
+    width: auto !important;
+    flex: none !important;
+  }
+  
+  /* 成色特殊样式 */
+  .product-detail .product-details .detail-item .value.condition {
+    background: #e8f5e8 !important;
+    color: #2d5a2d !important;
+    padding: 2px 8px !important;
+    border-radius: 4px !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    display: inline-block !important;
+    margin-left: 4px !important;
+    vertical-align: baseline !important;
+  }
+  
+  /* 位置特殊样式 */
+  .product-detail .product-details .detail-item .value.location {
+    color: #667eea !important;
+    font-weight: 500 !important;
+  }
+  
+  /* 重置所有可能的全局样式影响 */
+  .product-detail .product-details .detail-item * {
+    box-sizing: border-box !important;
+    flex: none !important;
+    grid-column: unset !important;
+    grid-row: unset !important;
+  }
+  
+  .product-detail .product-details .detail-item::before,
+  .product-detail .product-details .detail-item::after {
+    content: none !important;
+    display: none !important;
+  }
+  
+  /* 确保容器不受flex或grid影响 */
+  .product-detail .product-details {
+    display: block !important;
+    flex-direction: unset !important;
+    grid-template-columns: none !important;
+    grid-template-rows: none !important;
+    align-items: unset !important;
+    justify-content: unset !important;
+  }
+  
+  /* 移除可能冲突的旧样式 */
   .detail-item {
-    display: flex;
-    align-items: center;
-    padding: 12px 0;
-    border-bottom: 1px solid #f0f0f0;
+    display: block !important;
+    align-items: unset !important;
+    padding: 15px 0 !important;
+    border-bottom: 1px solid #f0f0f0 !important;
+    width: 100% !important;
+    clear: both !important;
+    float: none !important;
+    flex: none !important;
   }
   
   .detail-item:last-child {
-    border-bottom: none;
+    border-bottom: none !important;
   }
   
   .detail-item .label {
-    font-weight: 500;
-    color: #666;
-    width: 100px;
-    flex-shrink: 0;
+    font-weight: 600 !important;
+    color: #333 !important;
+    width: auto !important;
+    flex-shrink: unset !important;
+    display: inline !important;
+    margin-right: 8px !important;
   }
   
   .detail-item .value {
-    color: #333;
+    color: #666 !important;
+    display: inline !important;
   }
   
   .condition {

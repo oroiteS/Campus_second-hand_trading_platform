@@ -30,6 +30,11 @@
               <span class="home-user-name">{{ userInfo.name }}</span>
               <span class="home-user-status">{{ userInfo.status }}</span>
             </div>
+            <!-- 消息通知按钮 -->
+            <div class="home-notification-btn" @click="showNotifications">
+              <span class="notification-icon">🔔</span>
+              <span v-if="unreadCount > 0" class="notification-badge">{{ unreadCount }}</span>
+            </div>
             <!-- 悬浮菜单 -->
             <div class="home-user-dropdown">
               <button @click.stop="logout" class="home-logout-btn">退出登录</button>
@@ -49,7 +54,7 @@
       <aside class="home-sidebar">
         <div class="home-category-menu">
           <h3 class="home-category-title">商品分类</h3>
-          <div class="home-category-item" v-for="category in categories" :key="category.id">
+          <div class="home-category-item" v-for="category in categories" :key="category.id" @click="goToCategoryBrowse(category.id)">
             <span class="home-category-icon">{{ category.icon }}</span>
             <span class="home-category-name">{{ category.name }}</span>
           </div>
@@ -179,6 +184,13 @@ export default {
         avatar: '/测试图片.jpg',
         status: '在线'
       },
+      // 消息通知相关数据
+      unreadCount: 3, // 未读消息数量
+      notifications: [
+        { id: 1, title: '交易提醒', content: '您的商品有新的询价', time: '2分钟前', read: false },
+        { id: 2, title: '系统通知', content: '您的商品已通过审核', time: '1小时前', read: false },
+        { id: 3, title: '订单消息', content: '买家已确认收货', time: '3小时前', read: false }
+      ],
       categories: [
         { id: 1, name: '数码电子', icon: '📱' },
         { id: 2, name: '教材书籍', icon: '📚' },
@@ -334,7 +346,7 @@ export default {
             console.error('解析用户信息失败:', e);
             // 使用默认用户信息
             this.userInfo = {
-              name: localStorage.getItem('username') || '默认用户名',
+              name: localStorage.getItem('username') || 'xy21675070351',
               avatar: '/测试图片.jpg',
               status: '在线'
             };
@@ -357,12 +369,7 @@ export default {
     },
     // 跳转到个人资料页面
     goToProfile() {
-      this.$router.push({
-        path: '/profile',
-        query: {
-          userId: this.userInfo.userId
-        }
-      });
+      this.$router.push('/profile');
     },
     // 手动更新登录状态
     updateLoginStatus() {
@@ -391,6 +398,11 @@ export default {
       // 跳转到首页
       this.$router.push('/');
     },
+    // 跳转到分类浏览页面
+    goToCategoryBrowse(categoryId) {
+      this.$router.push(`/browse/${categoryId}`);
+    },
+    
     // 跳转到发布页面
     goToPublish() {
       // 检查是否已登录
@@ -404,7 +416,18 @@ export default {
     // 跳转到公告详情页面
     goToNoticeDetail(noticeId) {
       this.$router.push(`/notice/${noticeId}`);
-    }
+    },
+    // 显示消息通知
+    showNotifications() {
+      // 这里可以显示消息列表弹窗或跳转到消息页面
+      alert(`您有 ${this.unreadCount} 条未读消息\n\n${this.notifications.map(n => `${n.title}: ${n.content}`).join('\n')}`);
+      
+      // 标记所有消息为已读
+      this.notifications.forEach(notification => {
+        notification.read = true;
+      });
+      this.unreadCount = 0;
+    },
   }
 }
 </script>
