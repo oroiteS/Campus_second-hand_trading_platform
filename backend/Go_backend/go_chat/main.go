@@ -76,6 +76,8 @@ func main() {
 			chat.POST("/messages", chatHandler.SendMessage)
 			chat.PUT("/messages/:message_id/read", chatHandler.MarkAsRead)
 			chat.GET("/user/:user_id/unread", chatHandler.GetUnreadCount)
+			// 添加用户信息获取路由
+			chat.GET("/user/:user_id/info", chatHandler.GetCurrentUser)
 		}
 	}
 

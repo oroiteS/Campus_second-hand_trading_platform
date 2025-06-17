@@ -13,8 +13,8 @@ import (
 
 // ChatHandler 聊天处理器
 type ChatHandler struct {
-	chatService   *services.ChatService
-	webSocketHub  *services.WebSocketHub
+	chatService  *services.ChatService
+	webSocketHub *services.WebSocketHub
 }
 
 // NewChatHandler 创建聊天处理器
@@ -223,4 +223,30 @@ func (h *ChatHandler) GetUnreadCount(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, response)
+}
+
+// GetCurrentUser 获取当前用户信息
+// @Summary 获取当前用户信息
+// @Description 根据用户ID获取用户详细信息
+// @Tags User
+// @Produce json
+// @Param user_id path string true "用户ID"
+// @Success 200 {object} models.User
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /chat/user/{user_id}/info [get]
+func (h *ChatHandler) GetCurrentUser(c *gin.Context) {
+	userID := c.Param("user_id")
+	if userID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User ID is required"})
+		return
+	}
+
+	user, err := h.chatService.GetUserInfo(userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
 }

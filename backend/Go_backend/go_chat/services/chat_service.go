@@ -226,3 +226,13 @@ func (s *ChatService) decrementUnreadCount(userID string) {
 	}
 	s.rdb.Decr(ctx, key)
 }
+
+// GetUserInfo 获取用户信息
+func (s *ChatService) GetUserInfo(userID string) (*models.User, error) {
+	var user models.User
+	err := s.db.Where("user_id = ?", userID).First(&user).Error
+	if err != nil {
+		return nil, fmt.Errorf("user not found: %w", err)
+	}
+	return &user, nil
+}
