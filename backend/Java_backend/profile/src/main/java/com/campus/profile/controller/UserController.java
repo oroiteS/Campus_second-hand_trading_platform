@@ -19,6 +19,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import com.campus.profile.dto.ChangePasswordRequest; // 新增导入
+import java.nio.charset.StandardCharsets; // 新增导入
+import java.security.MessageDigest; // 新增导入
+import java.security.NoSuchAlgorithmException; // 新增导入
+
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +39,7 @@ import java.util.Map;
 public class UserController {
 
     @Autowired
-    private UserService userService;
+    private UserService UserService;
     
     @Autowired
     private FileUploadUtil fileUploadUtil;
@@ -64,7 +69,7 @@ public class UserController {
             String userId = request.getUserId();
             
             // 通过服务层获取用户信息
-            User user = userService.getUserById(userId);
+            User user = UserService.getUserById(userId);
             
             if (user == null) {
                 Map<String, Object> errorResponse = new HashMap<>();
@@ -128,7 +133,7 @@ public class UserController {
             // 从请求体中获取用户ID
             String userId = request.getUserId();
             
-            User user = userService.getUserById(userId);
+            User user = UserService.getUserById(userId);
             
             if (user == null) {
                 Map<String, Object> errorResponse = new HashMap<>();
@@ -190,7 +195,7 @@ public class UserController {
             // 从请求体中获取用户ID
             String userId = request.getUserId();
             
-            User user = userService.getUserById(userId);
+            User user = UserService.getUserById(userId);
             
             if (user == null) {
                 Map<String, Object> errorResponse = new HashMap<>();
@@ -251,7 +256,7 @@ public class UserController {
             String telephone = request.getTelephone();
             
             // 调用服务层更新用户信息
-            boolean updateResult = userService.updateUserInfo(userId, userName, telephone);
+            boolean updateResult = UserService.updateUserInfo(userId, userName, telephone);
             
             if (updateResult) {
                 // 更新成功，返回成功响应
@@ -261,7 +266,7 @@ public class UserController {
                 response.put("code", 200);
                 
                 // 返回更新后的用户信息
-                User updatedUser = userService.getUserById(userId);
+                User updatedUser = UserService.getUserById(userId);
                 if (updatedUser != null) {
                     Map<String, Object> userInfo = new HashMap<>();
                     userInfo.put("userId", updatedUser.getUserId());
@@ -340,7 +345,7 @@ public class UserController {
             }
             
             // 获取用户当前头像URL（用于删除旧文件）
-            User currentUser = userService.getUserById(userId.trim());
+            User currentUser = UserService.getUserById(userId.trim());
             if (currentUser == null) {
                 Map<String, Object> errorResponse = new HashMap<>();
                 errorResponse.put("success", false);
@@ -368,7 +373,7 @@ public class UserController {
             }
             
             // 更新数据库中的头像URL（存储完整的访问URL）
-            boolean updateResult = userService.updateUserAvatar(userId.trim(), fullAvatarUrl);
+            boolean updateResult = UserService.updateUserAvatar(userId.trim(), fullAvatarUrl);
             
             if (updateResult) {
                 // 删除旧头像文件（如果存在）
@@ -417,99 +422,7 @@ public class UserController {
         }
     }
     
-    /**
-     * 获取头像访问URL
-     * 
-     * @param userId 用户ID
-     * @param urlType URL类型：presigned（预签名URL，默认）或 public（公共URL）
-     * @return 头像访问URL
-     */
-    @Operation(summary = "获取头像访问URL", description = "获取用户头像的访问URL，支持预签名URL和公共URL")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "获取成功"),
-        @ApiResponse(responseCode = "400", description = "请求参数错误"),
-        @ApiResponse(responseCode = "404", description = "用户不存在或头像不存在"),
-        @ApiResponse(responseCode = "500", description = "服务器内部错误")
-    })
-    @GetMapping("/avatar/url/{userId}")
-    public ResponseEntity<Map<String, Object>> getAvatarUrl(
-            @Parameter(description = "用户ID", required = true)
-            @PathVariable String userId,
-            @Parameter(description = "URL类型：presigned（预签名URL，默认）或 public（公共URL）")
-            @RequestParam(defaultValue = "presigned") String urlType) {
-        try {
-            // 参数验证
-            if (userId == null || userId.trim().isEmpty()) {
-                Map<String, Object> errorResponse = new HashMap<>();
-                errorResponse.put("success", false);
-                errorResponse.put("message", "用户ID不能为空");
-                errorResponse.put("code", 400);
-                return ResponseEntity.status(400).body(errorResponse);
-            }
-            
-            // 获取用户信息
-            User user = userService.getUserById(userId.trim());
-            if (user == null) {
-                Map<String, Object> errorResponse = new HashMap<>();
-                errorResponse.put("success", false);
-                errorResponse.put("message", "用户不存在");
-                errorResponse.put("code", 404);
-                return ResponseEntity.status(404).body(errorResponse);
-            }
-            
-            String avatarFileKey = user.getAvatarUrl();
-            if (avatarFileKey == null || avatarFileKey.isEmpty()) {
-                Map<String, Object> errorResponse = new HashMap<>();
-                errorResponse.put("success", false);
-                errorResponse.put("message", "用户未设置头像");
-                errorResponse.put("code", 404);
-                return ResponseEntity.status(404).body(errorResponse);
-            }
-            
-            // 生成访问URL
-            String accessUrl;
-            if ("public".equals(urlType)) {
-                accessUrl = ossUtil.generatePublicUrl(avatarFileKey);
-            } else {
-                accessUrl = ossUtil.generatePresignedUrl(avatarFileKey);
-            }
-            
-            if (accessUrl == null) {
-                Map<String, Object> errorResponse = new HashMap<>();
-                errorResponse.put("success", false);
-                errorResponse.put("message", "生成访问URL失败");
-                errorResponse.put("code", 500);
-                return ResponseEntity.status(500).body(errorResponse);
-            }
-            
-            // 返回成功响应
-            Map<String, Object> successResponse = new HashMap<>();
-            successResponse.put("success", true);
-            successResponse.put("message", "获取头像URL成功");
-            successResponse.put("code", 200);
-            successResponse.put("data", Map.of(
-                "userId", userId.trim(),
-                "avatarUrl", accessUrl,
-                "urlType", urlType,
-                "expiresIn", "public".equals(urlType) ? "永久" : "1小时"
-            ));
-            return ResponseEntity.ok(successResponse);
-            
-        } catch (Exception e) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("success", false);
-            errorResponse.put("message", "服务器内部错误: " + e.getMessage());
-            errorResponse.put("code", 500);
-            return ResponseEntity.status(500).body(errorResponse);
-        }
-    }
-    
-    /**
-     * 获取用户头像URL（通过JSON请求体）
-     * 
-     * @param request 包含用户ID的请求体
-     * @return 用户头像URL
-     */
+
     /**
      * 获取头像访问URL（使用JSON请求体）
      * 
@@ -532,7 +445,7 @@ public class UserController {
             String userId = request.getUserId();
             
             // 获取用户信息
-            User user = userService.getUserById(userId);
+            User user = UserService.getUserById(userId);
             if (user == null) {
                 Map<String, Object> errorResponse = new HashMap<>();
                 errorResponse.put("success", false);
@@ -568,6 +481,94 @@ public class UserController {
             errorResponse.put("message", "服务器内部错误: " + e.getMessage());
             errorResponse.put("code", 500);
             return ResponseEntity.status(500).body(errorResponse);
+        }
+    }
+
+
+    private static String encryptPassword(String password) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(password.getBytes(StandardCharsets.UTF_8));
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) {
+                    hexString.append('0');
+                }
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("SHA-256算法不可用", e);
+        }
+    }
+
+    @Operation(summary = "修改用户密码", description = "根据用户ID、原密码和新密码修改用户密码")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "密码修改成功"),
+            @ApiResponse(responseCode = "400", description = "请求参数无效或原密码错误"),
+            @ApiResponse(responseCode = "404", description = "用户不存在"),
+            @ApiResponse(responseCode = "500", description = "服务器内部错误")
+    })
+    @PostMapping("/password/change")
+    public ResponseEntity<Map<String, Object>> changePassword(
+            @Parameter(description = "修改密码请求体", required = true)
+            @Valid @RequestBody ChangePasswordRequest request) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            String userId = request.getUserId();
+            String oldPassword = request.getOldPassword();
+            String newPassword = request.getNewPassword();
+
+            User user = UserService.getUserById(userId);
+
+            if (user == null) {
+                response.put("success", false);
+                response.put("message", "用户不存在");
+                response.put("code", 404);
+                return ResponseEntity.status(404).body(response);
+            }
+
+            // 加密传入的原密码和新密码
+            String encryptedOldPassword = encryptPassword(oldPassword);
+            String encryptedNewPassword = encryptPassword(newPassword);
+
+            // 验证原密码
+            if (!user.getPassword().equals(encryptedOldPassword)) {
+                response.put("success", false);
+                response.put("message", "原密码错误");
+                response.put("code", 400); // 或者使用更具体的错误码，例如401表示未授权（密码错误）
+                return ResponseEntity.status(400).body(response);
+            }
+
+            // 更新密码
+            user.setPassword(encryptedNewPassword);
+            User updatedUser = UserService.updateUser(user); // 假设userService有updateUser方法来更新整个用户信息
+            // 或者可以创建一个专门的updatePassword方法
+
+            if (updatedUser != null) {
+                response.put("success", true);
+                response.put("message", "密码修改成功");
+                response.put("code", 200);
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("success", false);
+                response.put("message", "密码修改失败，请稍后重试");
+                response.put("code", 500);
+                return ResponseEntity.status(500).body(response);
+            }
+
+        } catch (RuntimeException e) {
+            // 处理 encryptPassword 可能抛出的 RuntimeException
+            response.put("success", false);
+            response.put("message", "密码加密失败: " + e.getMessage());
+            response.put("code", 500);
+            return ResponseEntity.status(500).body(response);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "服务器内部错误: " + e.getMessage());
+            response.put("code", 500);
+            return ResponseEntity.status(500).body(response);
         }
     }
  }

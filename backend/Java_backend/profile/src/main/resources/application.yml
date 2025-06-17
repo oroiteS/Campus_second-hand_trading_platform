@@ -1,12 +1,6 @@
 server:
   port: 8089
-<<<<<<< HEAD
   base-url: http://localhost:8089
-
-
-=======
-  base-url: http://localhost:8080
->>>>>>> da7ef48447db14bee01dddb594eb85ba0809d532
 
 mybatis-plus:
   # 配置 Mapper XML 文件位置
@@ -93,5 +87,9 @@ logging:
     org.apache.ibatis: debug
 
 aliyun:
-  access-key-id: ${ALIYUN_ACCESS_KEY_ID}
-  access-key-secret: ${ALIYUN_ACCESS_KEY_SECRET}
+  oss:
+    endpoint: https://oss-cn-shanghai.aliyuncs.com  # OSS endpoint
+    access-key-id: ${OSS_ACCESS_KEY_ID}             # AccessKey ID
+    access-key-secret: ${OSS_ACCESS_KEY_SECRET}    # AccessKey Secret
+    bucket-name: avatars-bysuepsw25                   # bucket
+    domain: avatars-bysuepsw25.oss-cn-shanghai.aliyuncs.com  # 你ucket
