@@ -39,16 +39,5 @@ func InitMySQL(cfg config.MySQLConfig) (*gorm.DB, error) {
 	sqlDB.SetMaxOpenConns(100)
 	sqlDB.SetConnMaxLifetime(time.Hour)
 
-	// 注释掉自动迁移，因为表已经存在
-	// 如果需要创建新表，请手动执行SQL脚本
-	// err = db.AutoMigrate(
-	// 	&models.User{},
-	// 	&models.ChatSession{},
-	// 	&models.ChatMessage{},
-	// )
-	// if err != nil {
-	// 	return nil, fmt.Errorf("failed to migrate database: %w", err)
-	// }
-
 	return db, nil
 }
