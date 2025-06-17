@@ -7,8 +7,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/go_chat/models"
-	"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/go_chat/services"
+	"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/chat/models"
+	"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/chat/services"
 )
 
 // ChatHandler 聊天处理器

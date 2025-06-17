@@ -8,12 +8,12 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
-	"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/go_chat/config"
-	"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/go_chat/database"
-	_ "github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/go_chat/docs"
-	"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/go_chat/handlers"
-	"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/go_chat/middleware"
-	"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/go_chat/services"
+	"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/chat/config"
+	"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/chat/database"
+	_ "github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/chat/docs"
+	"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/chat/handlers"
+	"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/chat/middleware"
+	"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/chat/services"
 )
 
 // @title Campus Chat API
