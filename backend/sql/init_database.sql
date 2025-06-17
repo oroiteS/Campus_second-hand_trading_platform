@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `users` (
     `password` VARCHAR(64) NOT NULL COMMENT 'sha256加密后的密码',
     `telephone` CHAR(11) NOT NULL COMMENT '用户电话号',
     `real_name` VARCHAR(50) NOT NULL COMMENT '真实姓名',
-    `avatar_url` VARCHAR(255) DEFAULT NULL COMMENT '头像url（默认地址：）',
+    `avatar_url` VARCHAR(2048) DEFAULT NULL COMMENT '头像url（默认地址：）',
     `User_Loc_longitude` DECIMAL(9,6) NOT NULL DEFAULT 121.891585 COMMENT '存储经度',
     `User_sta` BOOLEAN NOT NULL DEFAULT FALSE COMMENT '是否封号（默认否）',
     `Create_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS `commodities` (
     `current_price` DECIMAL(10,2) NOT NULL COMMENT '商品售价（如3500.00）',
     `commodity_status` ENUM('on_sale', 'sold', 'off_sale') NOT NULL DEFAULT 'on_sale' COMMENT '商品状态：在售/已售/下架',
     `seller_id` CHAR(9) NOT NULL COMMENT '关联用户表的外键',
-    `main_image_url` VARCHAR(255) DEFAULT NULL COMMENT '商品主图链接',
+    `main_image_url` VARCHAR(2048) DEFAULT NULL COMMENT '商品主图链接',
     `image_list` JSON DEFAULT NULL COMMENT '多图链接数组（可选）',
     `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '商品发布时间',
     `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '信息更新时间',
@@ -277,6 +277,7 @@ CREATE TABLE IF NOT EXISTS `appeals` (
     `Reason` TEXT NOT NULL COMMENT '申诉理由',
     `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '申诉发起（创建）时间',
     `Root_id` CHAR(9) DEFAULT NULL COMMENT '外键指向Root表',
+    `status` BOOLEAN DEFAULT FALSE comment '是否通过，通过代表完成'
 
     -- 创建索引
     INDEX `idx_appeal_argue1_id` (`Argue1_id`),
