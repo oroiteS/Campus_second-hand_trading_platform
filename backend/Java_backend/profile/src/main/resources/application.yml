@@ -88,4 +88,4 @@ logging:
     com.campus.profile.dao: debug
     org.apache.ibatis: debug
 
-# 阿里云OSS配置
+
