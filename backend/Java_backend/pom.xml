@@ -7,12 +7,9 @@
     <version>1.0.0</version>
     <name>campus-secondhand-platform</name>
     <description>校园二手交易平台</description>
-<<<<<<< HEAD
-=======
     <modules>
         <module>order-management</module>
     </modules>
->>>>>>> c4e64f8c3031d74b985ad2e88de7dbcc78e03d0c
     <packaging>pom</packaging>
 
     <properties>
