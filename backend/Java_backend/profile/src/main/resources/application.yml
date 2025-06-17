@@ -88,4 +88,6 @@ logging:
     com.campus.profile.dao: debug
     org.apache.ibatis: debug
 
-
+aliyun:
+  access-key-id: ${ALIYUN_ACCESS_KEY_ID}
+  access-key-secret: ${ALIYUN_ACCESS_KEY_SECRET}
