@@ -16,3 +16,4 @@ backend/python/**/__pycache__/
 backend/python/embedding_recommendation/model/Qwen3-Reranker-4B.Q5_K_M.gguf
 backend/python/embedding_recommendation/safe_tensor_model/
 backend/python/embedding_recommendation/model/
+backend/python/app/Qwen3-reranker
