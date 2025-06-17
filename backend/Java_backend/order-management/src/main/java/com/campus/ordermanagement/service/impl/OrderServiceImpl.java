@@ -214,23 +214,24 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public boolean cancelOrder(String orderId) {
-        if (orderId == null || orderId.trim().isEmpty()) {
-            throw new IllegalArgumentException("订单ID不能为空");
-        }
-        
-        Order order = orderRepository.selectById(orderId.trim());
-        if (order == null) {
-            return false;
-        }
-        
-        // 只有待付款状态的订单才能取消
-        if (!order.isPendingPayment()) {
-            throw new IllegalStateException("只有待付款状态的订单才能取消");
-        }
-        
-        // 删除订单
-        int result = orderRepository.deleteById(orderId.trim());
-        return result > 0;
+            if (orderId == null || orderId.trim().isEmpty()) {
+                throw new IllegalArgumentException("订单ID不能为空");
+            }
+            
+            Order order = orderRepository.selectById(orderId.trim());
+            if (order == null) {
+                return false;
+            }
+            
+            // 只有待付款状态的订单才能取消
+            if (!order.isPendingPayment()) {
+                throw new IllegalStateException("只有待付款状态的订单才能取消");
+            }
+            
+            // 删除订单
+            int result = orderRepository.deleteById(orderId.trim());
+            return result > 0;
+
     }
 
     @Override

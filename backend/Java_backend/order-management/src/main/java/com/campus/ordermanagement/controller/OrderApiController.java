@@ -9,8 +9,7 @@ import com.campus.ordermanagement.dto.QueryOrdersByBuyerRequest;
 import com.campus.ordermanagement.dto.QueryOrdersBySellerRequest;
 import com.campus.ordermanagement.dto.QueryOrdersByCommodityRequest;
 import com.campus.ordermanagement.dto.QueryOrdersByStatusRequest;
-import com.campus.ordermanagement.dto.ConfirmPaymentRequest;
-import com.campus.ordermanagement.dto.CompleteOrderRequest;
+
 import com.campus.ordermanagement.dto.CancelOrderRequest;
 import com.campus.ordermanagement.dto.OrderStatisticsRequest;
 import com.campus.ordermanagement.dto.QueryOrdersByUserRequest;
@@ -88,7 +87,7 @@ public class OrderApiController {
             "code", code
         ));
     }
-    
+
     private ResponseEntity<?> handleException(Exception e) {
         if (e instanceof IllegalArgumentException || e instanceof IllegalStateException) {
             return errorResponse(e.getMessage(), 400);
@@ -269,45 +268,7 @@ public class OrderApiController {
         }
     }
 
-    /**
-     * 确认付款
-     */
-    @PostMapping("/confirm-payment")
-    @Operation(summary = "确认付款", description = "确认订单付款")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "付款确认成功"),
-        @ApiResponse(responseCode = "400", description = "请求参数错误")
-    })
-    public ResponseEntity<?> confirmPayment(
-        @Parameter(description = "确认付款请求体，包含订单ID")
-        @Valid @RequestBody ConfirmPaymentRequest request) {
-        try {
-            OrderResponse orderResponse = orderService.confirmPayment(request.getOrderId());
-            return successResponse("付款确认成功", orderResponse);
-        } catch (Exception e) {
-            return handleException(e);
-        }
-    }
 
-    /**
-     * 完成订单
-     */
-    @PostMapping("/complete")
-    @Operation(summary = "完成订单", description = "标记订单为已完成")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "订单完成成功"),
-        @ApiResponse(responseCode = "400", description = "请求参数错误")
-    })
-    public ResponseEntity<?> completeOrder(
-        @Parameter(description = "完成订单请求体，包含订单ID")
-        @Valid @RequestBody CompleteOrderRequest request) {
-        try {
-            OrderResponse orderResponse = orderService.completeOrder(request.getOrderId());
-            return successResponse("订单完成成功", orderResponse);
-        } catch (Exception e) {
-            return handleException(e);
-        }
-    }
 
     /**
      * 取消订单
@@ -322,8 +283,12 @@ public class OrderApiController {
         @Parameter(description = "取消订单请求体，包含订单ID")
         @Valid @RequestBody CancelOrderRequest request) {
         try {
-            orderService.cancelOrder(request.getOrderId());
-            return successResponse("订单取消成功", null);
+            boolean result = orderService.cancelOrder(request.getOrderId());
+            if (result) {
+                return successResponse("订单取消成功", null);
+            } else {
+                return errorResponse("订单不存在或无法取消", 404);
+            }
         } catch (Exception e) {
             return handleException(e);
         }

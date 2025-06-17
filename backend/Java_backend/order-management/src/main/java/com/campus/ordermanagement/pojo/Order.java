@@ -55,6 +55,7 @@ public class Order {
         PENDING_TRANSACTION("pending_transaction", "待交易"),
         COMPLETED("completed", "已完成");
 
+        @EnumValue
         private final String code;
         private final String description;
 
@@ -232,14 +233,14 @@ public class Order {
      * 检查订单是否待付款
      */
     public boolean isPendingPayment() {
-        return OrderStatus.PENDING_PAYMENT.equals(this.orderStatus);
+        return this.orderStatus != null && this.orderStatus.equals(OrderStatus.PENDING_PAYMENT);
     }
 
     /**
      * 检查订单是否待交易
      */
     public boolean isPendingTransaction() {
-        return OrderStatus.PENDING_TRANSACTION.equals(this.orderStatus);
+        return this.orderStatus != null && this.orderStatus.equals(OrderStatus.PENDING_TRANSACTION);
     }
 
     /**

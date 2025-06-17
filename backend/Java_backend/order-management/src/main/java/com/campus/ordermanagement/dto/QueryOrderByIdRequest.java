@@ -15,7 +15,6 @@ public class QueryOrderByIdRequest {
      */
     @Schema(description = "订单ID", example = "ORD123456")
     @NotBlank(message = "订单ID不能为空")
-    @Size(max = 36, message = "订单ID长度不能超过36位")
     @JsonProperty("orderId")
     private String orderId;
 
