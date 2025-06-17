@@ -143,12 +143,10 @@ export default {
   data() {
     return {
       activeTab: 'selling',
+      userId: '',
       userInfo: {
         username: 'xy21675070351',
-        school: '计算机学院',
         avatar: '/测试图片.jpg',
-        badge: '认证用户',
-        creditScore: '98%',
         dealCount: 47,
         favoriteCount: 23
       },
@@ -156,7 +154,9 @@ export default {
         { id: 1, name: '我的收藏', icon: '❤️', color: '#FF6B6B', action: 'favorites' },
         { id: 2, name: '订单管理', icon: '📋', color: '#4ECDC4', action: 'orders' },
         { id: 3, name: '个人信息', icon: '⚙️', color: '#45B7D1', action: 'settings' },
-        { id: 5, name: '附近的人', icon: '❓', color: '#FFEAA7', action: 'nearby' }
+        { id: 4, name: '附近的人', icon: '❓', color: '#FFEAA7', action: 'nearby' },
+        { id: 5, name: '钱包管理', icon: '💰', color: '#FFA500', action: 'wallet' },
+        { id: 6, name: '密码修改', icon: '🔒', color: '#9370DB', action: 'password' }
       ],
       productTabs: [
         { id: 'selling', name: '在售' },
@@ -192,9 +192,17 @@ export default {
     }
   },
   created() {
-    // 从路由参数中获取userId
+    // 从路由参数中获取userId和name
     if (this.$route.query.userId) {
       console.log('Profile页面获取到的userId:', this.$route.query.userId);
+      // 保存userId以便后续使用
+      this.userId = this.$route.query.userId;
+    }
+    
+    // 如果传递了name参数，更新userInfo中的username
+    if (this.$route.query.name) {
+      console.log('Profile页面获取到的name:', this.$route.query.name);
+      this.userInfo.username = this.$route.query.name;
     }
   },
   methods: {
@@ -231,7 +239,21 @@ export default {
           // 可以添加帮助中心页面
           await this.handleNearbyClick()
           console.log('跳转到附近的人')
-          
+          break
+        case 'wallet':
+          // 跳转到钱包管理页面
+          console.log('跳转到钱包管理')
+          this.$router.push('/wallet')
+          break
+        case 'password':
+          // 跳转到密码修改页面
+          console.log('跳转到密码修改')
+          this.$router.push({
+            path: '/password-reset',
+            query: {
+              userId: this.userId
+            }
+          })
           break
         default:
           console.log('未知操作:', action)

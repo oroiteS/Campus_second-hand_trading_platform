@@ -115,6 +115,10 @@ export default {
       try {
         // 这里应该调用实际的API进行密码修改
         // 模拟API调用
+        console.log('修改密码，用户ID:', this.userId)
+        
+        // 在实际API调用中使用userId参数
+        // 例如：await api.updatePassword(this.userId, this.currentPassword, this.newPassword)
         await new Promise(resolve => setTimeout(resolve, 1000))
         
         // 模拟成功响应
