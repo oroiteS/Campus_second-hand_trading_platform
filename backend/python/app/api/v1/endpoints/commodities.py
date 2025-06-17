@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.crud import commodity as crud_commodity
 from app.schemas.commodity import Commodity,Commodity_username,Commodity_id
+from app.schemas.SearchCommodityRequest import SearchCommodityRequest
 from app.api.deps import get_db
 
 router = APIRouter()
@@ -40,8 +41,13 @@ def update_commodity_status(
         return {"message": "商品状态更新成功"}
     else:
         return {"message": "商品状态更新失败"}
-@router.get("/recommendation/{user_id}",response_model=List[Commodity_id])
-def get_recommendation_commodity_id(user_id:str,db: Session= Depends(get_db)):
-    """给指定用户推送推荐的商品id"""
+# @router.get("/recommendation/{user_id}",response_model=List[Commodity_id])
+# def get_recommendation_commodity_id(user_id:str,db: Session= Depends(get_db)):
+#     """给指定用户推送推荐的商品id"""
     
+
+@router.post("/search",response_model=List[Commodity])
+def get_commodities_by_search(request: SearchCommodityRequest,db: Session = Depends(get_db)):
+    results = crud_commodity.get_commodities_by_search(db,request)
+    return results  # 直接返回列表，空列表也是有效的
 
