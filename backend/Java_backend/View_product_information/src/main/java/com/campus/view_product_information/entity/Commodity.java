@@ -45,10 +45,10 @@ public class Commodity {
     private Integer categoryId;
 
     /**
-     * 存储标签数组（如["95新","国行"]）
+     * 存储标签ID数组（如[1,2,3]）
      */
-    @TableField("tags")
-    private String tags;
+    @TableField("tags_Id")
+    private String tagsId;
 
     /**
      * 商品售价（如3500.00）
@@ -57,7 +57,7 @@ public class Commodity {
     private BigDecimal currentPrice;
 
     /**
-     * 商品状态：在售/已售/下架
+     * 商品状态：on_sale=在售/sold=已售/off_sale=下架
      */
     @TableField("commodity_status")
     private String commodityStatus;
@@ -77,7 +77,7 @@ public class Commodity {
     /**
      * 多图链接数组（可选）
      */
-    @TableField("image_list")
+    @TableField(value = "image_list", typeHandler = com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler.class)
     private List<String> imageList;
 
     /**
@@ -91,6 +91,12 @@ public class Commodity {
      */
     @TableField("updated_at")
     private LocalDateTime updatedAt;
+
+    /**
+     * 商品数量
+     */
+    @TableField("quantity")
+    private Integer quantity;
 
     /**
      * 商品类别名称（关联查询字段，不对应数据库字段）

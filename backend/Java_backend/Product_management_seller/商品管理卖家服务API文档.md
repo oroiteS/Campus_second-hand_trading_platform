@@ -265,7 +265,7 @@ http://localhost:8084/swagger-ui.html
     "commodityName": "二手iPhone 13",
     "commodityDescription": "9成新，无划痕，配件齐全",
     "categoryId": 1,
-    "tags": "[\"电子产品\", \"手机\"]",
+    "tagsId": "[1,2,3]",
     "currentPrice": 4500.00,
     "commodityStatus": "ON_SALE",
     "sellerId": "202100001",
@@ -303,7 +303,7 @@ public class Commodity {
     private String commodityName;        // 商品名称
     private String commodityDescription; // 商品描述
     private Integer categoryId;          // 商品类别ID
-    private String tags;                 // 标签 (JSON格式)
+    private String tagsId;               // 标签ID (JSON格式)
     private BigDecimal currentPrice;     // 当前价格
     private CommodityStatus commodityStatus; // 商品状态
     private String sellerId;             // 卖家ID

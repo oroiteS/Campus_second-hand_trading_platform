@@ -12,7 +12,11 @@ CREATE TABLE IF NOT EXISTS `orders` (
     `Sale_time` DATETIME DEFAULT NULL COMMENT '交易时间',
     `Money` DECIMAL(12,2) DEFAULT NULL COMMENT '交易金额',
     `Sale_loc` VARCHAR(250) DEFAULT NULL COMMENT '交易地址',
-    
+    `buy_quantity` INT UNSIGNED NOT NULL DEFAULT 1 COMMENT '购买数量',
+    `refund_reason` TEXT DEFAULT NULL COMMENT '退款理由',
+
+
+
     -- 创建索引
     INDEX `idx_commodity_id` (`commodity_id`),
     INDEX `idx_buyer_id` (`Buyer_id`),
@@ -25,12 +29,12 @@ CREATE TABLE IF NOT EXISTS `orders` (
     INDEX `idx_commodity_time` (`commodity_id`, `Sale_time`),
     INDEX `idx_buyer_status` (`Buyer_id`, `order_status`),
     INDEX `idx_seller_status` (`Seller_id`, `order_status`),
-    
+
     -- 外键约束
     CONSTRAINT `fk_orders_commodity` FOREIGN KEY (`commodity_id`) REFERENCES `commodities` (`commodity_id`) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT `fk_orders_buyer` FOREIGN KEY (`Buyer_id`) REFERENCES `users` (`User_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT `fk_orders_seller` FOREIGN KEY (`Seller_id`) REFERENCES `users` (`User_ID`) ON DELETE CASCADE ON UPDATE CASCADE
-    
+
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='订单表';
 
 -- 显示表结构

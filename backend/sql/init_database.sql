@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS `commodities` (
     CONSTRAINT `fk_commodities_seller` FOREIGN KEY (`seller_id`) REFERENCES `users` (`User_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
     
     -- 检查约束
-    CONSTRAINT `chk_price_positive` CHECK (`current_price` > 0)
+    CONSTRAINT `chk_price_positive` CHECK (`current_price` > 0),
     CONSTRAINT `chk_quantity_non_negative` CHECK (`quantity` >= 0)
     
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='商品表';
