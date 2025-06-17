@@ -56,27 +56,47 @@
 </template>
 
 <script>
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 export default {
   name: 'NearbyUsers',
+  mounted() {
+    this.fetchNearbyUsers()
+    },
+
+  setup() {
+    const route = useRoute()
+    const showLocationInfo = ref(true)
+    const locationInfo = ref({
+      userId: '',
+      longitude: '',
+      latitude: '',
+      
+    })
+
+    onMounted(() => {
+      // 从路由参数中获取定位信息
+      locationInfo.value = {
+        userId: route.query.userId || '未知用户',
+        longitude: route.query.lon || '未知',
+        latitude: route.query.lat || '未知',
+        
+      }
+      
+      // 这里可以调用API获取附近用户，使用获取到的位置信息
+      // fetchNearbyUsers(locationInfo.value.longitude, locationInfo.value.latitude)
+    })
+
+    return {
+      showLocationInfo,
+      locationInfo
+    }
+  },
   data() {
     return {
       currentPage: 1,
       usersPerPage: 8,
-      nearbyUsers: [
-        // 模拟数据
-        { id: 1, studentId: '2023001', nickname: '张同学' },
-        { id: 2, studentId: '2023002', nickname: '李同学' },
-        { id: 3, studentId: '2023003', nickname: '王同学' },
-        { id: 4, studentId: '2023004', nickname: '赵同学' },
-        { id: 5, studentId: '2023005', nickname: '陈同学' },
-        { id: 6, studentId: '2023006', nickname: '刘同学' },
-        { id: 7, studentId: '2023007', nickname: '周同学' },
-        { id: 8, studentId: '2023008', nickname: '吴同学' },
-        { id: 9, studentId: '2023009', nickname: '郑同学' },
-        { id: 10, studentId: '2023010', nickname: '孙同学' },
-        { id: 11, studentId: '2023011', nickname: '马同学' },
-        { id: 12, studentId: '2023012', nickname: '朱同学' }
-      ]
+      nearbyUsers: []
     }
   },
   computed: {
@@ -90,11 +110,38 @@ export default {
     }
   },
   methods: {
-    searchNearbyUsers() {
-      // 这里应该调用API获取附近的用户
-      // 目前使用模拟数据
-      console.log('返回第一页')
-      this.currentPage = 1 // 重置到第一页
+    async fetchNearbyUsers() {
+      const { userId, lat, lon } = this.$route.query
+
+      try {
+        const response = await fetch(
+          `http://localhost:8086/api/user/nearby?userId=${userId}&lat=${lat}&lon=${lon}`,
+          {
+            method: 'POST',
+            headers: {
+              'Accept': '*/*'
+            }
+          }
+        )
+
+        if (!response.ok) {
+          throw new Error('请求失败')
+        }
+
+        const data = await response.json()
+
+        // 将后端返回的数据映射为当前页面可用的数据格式
+        this.nearbyUsers = data.map((user, index) => ({
+          id: index + 1,
+          studentId: user.userId,
+          nickname: user.realName,
+          avatarUrl: user.avatarUrl, // 你可以在 UI 中使用这个头像字段
+          latitude: user.userLocLatitude,
+          longitude: user.userLocLongitude
+        }))
+      } catch (error) {
+        console.error('获取附近用户失败:', error)
+      }
     },
     prevPage() {
       if (this.currentPage > 1) {
@@ -116,4 +163,49 @@ export default {
 
 <style scoped>
 @import '../styles/NearbyUsers.css';
+.location-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 80%;
+  max-width: 400px;
+}
+
+.info-row {
+  margin: 10px 0;
+  display: flex;
+}
+
+.label {
+  font-weight: bold;
+  width: 80px;
+}
+
+.value {
+  flex: 1;
+  word-break: break-all;
+}
+
+.close-btn {
+  margin-top: 15px;
+  padding: 8px 16px;
+  background: #1890ff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
 </style>
