@@ -83,4 +83,9 @@ public class CommodityDetailDTO {
      * 商品数量
      */
     private Integer quantity;
+
+    /**
+     * 商品新旧度
+     */
+    private String newness;
 }

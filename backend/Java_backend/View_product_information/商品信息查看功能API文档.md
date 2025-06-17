@@ -61,7 +61,8 @@ Content-Type: application/json
     ],
     "createdAt": "2024-01-15T10:30:00",
     "updatedAt": "2024-01-15T10:30:00",
-    "quantity": 1
+    "quantity": 1,
+    "newness": "九成新"
   }
 }
 ```
@@ -104,6 +105,7 @@ Content-Type: application/json
 | createdAt | DateTime | 商品发布时间 |
 | updatedAt | DateTime | 信息更新时间 |
 | quantity | Integer | 商品数量 |
+| newness | String | 商品新旧度 |
 
 ### 2. 健康检查
 
@@ -161,6 +163,7 @@ Content-Type: application/json
 | created_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | 商品发布时间 |
 | updated_at | DATETIME | DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP | 信息更新时间 |
 | quantity | INT UNSIGNED | NOT NULL DEFAULT 1 | 商品数量 |
+| newness | VARCHAR(50) | NOT NULL | 商品新旧度 |
 
 ### 类别表 (categories)
 

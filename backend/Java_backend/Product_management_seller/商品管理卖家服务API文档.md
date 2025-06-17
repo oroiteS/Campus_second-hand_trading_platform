@@ -95,7 +95,63 @@ http://localhost:8084/swagger-ui.html
 
 ### 接口列表
 
-#### 1. 商品上架
+#### 1. 创建并上架商品
+
+- **URL**: `/api/commodity/create-and-put-on-sale`
+- **方法**: `POST`
+- **描述**: 创建新商品并直接设置为在售状态。
+- **Content-Type**: `application/json`
+
+**请求参数**:
+
+```json
+{
+  "commodityName": "string",
+  "commodityDescription": "string",
+  "categoryId": 1,
+  "tagsId": "[1,2,3]",
+  "currentPrice": 100.00,
+  "newness": "string",
+  "sellerId": "string",
+  "mainImageUrl": "string",
+  "imageList": "[\"url1\", \"url2\"]"
+}
+```
+
+| 参数名               | 类型    | 必填 | 描述         | 验证规则                    |
+|---------------------|---------|------|--------------|-----------------------------|
+| commodityName       | string  | 是   | 商品名称     | 不能为空                    |
+| commodityDescription| string  | 否   | 商品描述     | 可选                        |
+| categoryId          | integer | 是   | 商品类别ID   | 不能为空                    |
+| tagsId              | string  | 否   | 标签ID列表   | JSON格式，可选              |
+| currentPrice        | decimal | 是   | 商品价格     | 必须为正数                  |
+| newness             | string  | 是   | 商品新旧度   | 不能为空                    |
+| sellerId            | string  | 是   | 卖家ID       | 不能为空                    |
+| mainImageUrl        | string  | 否   | 主图URL      | 可选                        |
+| imageList           | string  | 否   | 图片列表     | JSON格式，可选              |
+
+**响应示例**:
+
+```json
+{
+  "success": true,
+  "message": "商品创建并上架成功",
+  "data": {
+    "commodityId": "12345678-1234-1234-1234-123456789012",
+    "commodityName": "二手iPhone 13",
+    "commodityDescription": "9成新，无划痕，配件齐全",
+    "categoryId": 1,
+    "currentPrice": 4500.00,
+    "newness": "九成新",
+    "commodityStatus": "ON_SALE",
+    "sellerId": "202100001",
+    "createdAt": "2024-12-17T22:00:00",
+    "updatedAt": "2024-12-17T22:00:00"
+  }
+}
+```
+
+#### 2. 商品上架
 
 - **URL**: `/api/commodity/put-on-sale`
 - **方法**: `POST`
@@ -127,7 +183,7 @@ http://localhost:8084/swagger-ui.html
 }
 ```
 
-#### 2. 商品下架
+#### 3. 商品下架
 
 - **URL**: `/api/commodity/put-off-sale`
 - **方法**: `POST`
@@ -159,11 +215,49 @@ http://localhost:8084/swagger-ui.html
 }
 ```
 
-#### 3. 修改商品描述
+#### 4. 更新商品信息
+
+- **URL**: `/api/commodity/update-info`
+- **方法**: `POST`
+- **描述**: 更新商品的详细信息，包括名称、描述、价格和新旧度。支持部分字段更新。
+- **Content-Type**: `application/json`
+
+**请求参数**:
+
+```json
+{
+  "commodityId": "string",
+  "sellerId": "string",
+  "commodityName": "string",
+  "commodityDescription": "string",
+  "currentPrice": 0.00,
+  "newness": "string"
+}
+```
+
+| 参数名               | 类型    | 必填 | 描述         | 验证规则                    |
+|---------------------|---------|------|--------------|-----------------------------|
+| commodityId         | string  | 是   | 商品ID       | 不能为空                    |
+| sellerId            | string  | 是   | 卖家ID       | 不能为空                    |
+| commodityName       | string  | 否   | 商品名称     | 可选，提供时不能为空字符串   |
+| commodityDescription| string  | 否   | 商品描述     | 可选，允许为空（清空描述）   |
+| currentPrice        | decimal | 否   | 当前价格     | 可选，必须为正数            |
+| newness             | string  | 否   | 商品新旧度   | 可选，提供时不能为空字符串   |
+
+**响应示例**:
+
+```json
+{
+  "success": true,
+  "message": "商品信息更新成功"
+}
+```
+
+#### 5. 修改商品描述（已废弃）
 
 - **URL**: `/api/commodity/update-description`
 - **方法**: `POST`
-- **描述**: 更新商品的描述信息。
+- **描述**: ⚠️ **此接口已废弃，请使用 `/update-info` 接口进行商品信息更新**
 - **Content-Type**: `application/json`
 
 **请求参数**:
@@ -191,7 +285,7 @@ http://localhost:8084/swagger-ui.html
 }
 ```
 
-#### 4. 获取卖家商品列表
+#### 6. 获取卖家商品列表
 
 - **URL**: `/api/commodity/list/{sellerId}`
 - **方法**: `GET`
@@ -216,6 +310,7 @@ http://localhost:8084/swagger-ui.html
       "commodityDescription": "9成新，无划痕，配件齐全",
       "categoryId": 1,
       "currentPrice": 4500.00,
+      "newness": "九成新",
       "commodityStatus": "ON_SALE",
       "sellerId": "202100001",
       "mainImageUrl": "http://example.com/image.jpg",
@@ -226,7 +321,7 @@ http://localhost:8084/swagger-ui.html
 }
 ```
 
-#### 5. 根据状态获取商品列表
+#### 7. 根据状态获取商品列表
 
 - **URL**: `/api/commodity/list/{sellerId}/status/{status}`
 - **方法**: `GET`
@@ -241,7 +336,7 @@ http://localhost:8084/swagger-ui.html
 
 **响应示例**: (同上)
 
-#### 6. 获取商品详情
+#### 8. 获取商品详情
 
 - **URL**: `/api/commodity/detail/{commodityId}/seller/{sellerId}`
 - **方法**: `GET`
@@ -267,6 +362,7 @@ http://localhost:8084/swagger-ui.html
     "categoryId": 1,
     "tagsId": "[1,2,3]",
     "currentPrice": 4500.00,
+    "newness": "九成新",
     "commodityStatus": "ON_SALE",
     "sellerId": "202100001",
     "mainImageUrl": "http://example.com/image.jpg",
@@ -277,7 +373,7 @@ http://localhost:8084/swagger-ui.html
 }
 ```
 
-#### 7. 健康检查
+#### 9. 健康检查
 
 - **URL**: `/api/commodity/health`
 - **方法**: `GET`
@@ -305,6 +401,7 @@ public class Commodity {
     private Integer categoryId;          // 商品类别ID
     private String tagsId;               // 标签ID (JSON格式)
     private BigDecimal currentPrice;     // 当前价格
+    private String newness;              // 商品新旧度
     private CommodityStatus commodityStatus; // 商品状态
     private String sellerId;             // 卖家ID
     private String mainImageUrl;         // 主图URL
@@ -363,8 +460,10 @@ src/main/java/com/example/product_management_seller/
 │   └── CommodityController.java             # 控制器层
 ├── dto/
 │   ├── ApiResponse.java                     # 统一响应格式
+│   ├── CommodityCreateRequest.java          # 商品创建请求DTO
+│   ├── CommodityUpdateRequest.java          # 商品信息更新请求DTO
 │   ├── CommodityStatusUpdateRequest.java    # 状态更新请求DTO
-│   └── CommodityDescriptionUpdateRequest.java # 描述更新请求DTO
+│   └── CommodityDescriptionUpdateRequest.java # 描述更新请求DTO（已废弃）
 ├── entity/
 │   └── Commodity.java                       # 商品实体类
 ├── exception/
@@ -405,8 +504,16 @@ mvn verify
 ## 版本信息
 
 - **当前版本**: 0.0.1-SNAPSHOT
-- **最后更新**: 2023年10月
+- **最后更新**: 2024年12月
 - **维护状态**: 活跃开发中
+
+## 更新日志
+
+### v0.0.1-SNAPSHOT (2024年12月)
+- 新增商品信息统一更新接口 `/update-info`
+- 添加商品新旧度字段支持
+- 废弃原有的 `/update-description` 接口
+- 支持商品名称、描述、价格、新旧度的统一更新
 
 ## 联系方式
 

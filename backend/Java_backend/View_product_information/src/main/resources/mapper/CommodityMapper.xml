@@ -17,6 +17,7 @@
         <result column="created_at" property="createdAt"/>
         <result column="updated_at" property="updatedAt"/>
         <result column="quantity" property="quantity"/>
+        <result column="newness" property="newness"/>
         <result column="category" property="categoryName"/>
     </resultMap>
 
@@ -36,6 +37,7 @@
             c.created_at,
             c.updated_at,
             c.quantity,
+            c.newness,
             cat.category
         FROM commodities c
         LEFT JOIN categories cat ON c.category_id = cat.category_id
