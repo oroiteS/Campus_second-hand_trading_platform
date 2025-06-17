@@ -30,8 +30,8 @@ public class Commodity {
     @Column(name = "category_id", nullable = false)
     private Integer categoryId;
     
-    @Column(name = "tags", columnDefinition = "JSON")
-    private String tags;
+    @Column(name = "tags_Id", columnDefinition = "JSON")
+    private String tagsId;
     
     @NotNull(message = "商品价格不能为空")
     @Positive(message = "商品价格必须大于0")
@@ -59,6 +59,11 @@ public class Commodity {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+    
+    @NotNull(message = "商品数量不能为空")
+    @Positive(message = "商品数量必须大于0")
+    @Column(name = "quantity", nullable = false)
+    private Integer quantity = 1;
     
     // 商品状态枚举
     public enum CommodityStatus {
@@ -98,6 +103,7 @@ public class Commodity {
         this.categoryId = categoryId;
         this.currentPrice = currentPrice;
         this.sellerId = sellerId;
+        this.quantity = 1;
     }
     
     // Getter和Setter方法
@@ -133,12 +139,20 @@ public class Commodity {
         this.categoryId = categoryId;
     }
     
-    public String getTags() {
-        return tags;
+    public String getTagsId() {
+        return tagsId;
     }
     
-    public void setTags(String tags) {
-        this.tags = tags;
+    public void setTagsId(String tagsId) {
+        this.tagsId = tagsId;
+    }
+    
+    public Integer getQuantity() {
+        return quantity;
+    }
+    
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
     }
     
     public BigDecimal getCurrentPrice() {
@@ -204,9 +218,13 @@ public class Commodity {
                 ", commodityName='" + commodityName + '\'' +
                 ", commodityDescription='" + commodityDescription + '\'' +
                 ", categoryId=" + categoryId +
+                ", tagsId='" + tagsId + '\'' +
                 ", currentPrice=" + currentPrice +
                 ", commodityStatus=" + commodityStatus +
                 ", sellerId='" + sellerId + '\'' +
+                ", mainImageUrl='" + mainImageUrl + '\'' +
+                ", imageList='" + imageList + '\'' +
+                ", quantity=" + quantity +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';

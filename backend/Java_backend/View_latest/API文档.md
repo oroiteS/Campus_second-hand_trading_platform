@@ -30,7 +30,7 @@
 
 #### 1.1 获取最新在售商品
 
-**接口描述**: 获取最新6个发布的在售商品信息
+**接口描述**: 获取最新6个发布的在售商品的完整信息，包含所有字段
 
 - **请求方式**: `GET`
 - **请求路径**: `/api/commodities/latest`
@@ -45,17 +45,19 @@
   "message": "获取最新商品成功",
   "data": [
     {
-      "commodityId": "商品ID",
-      "commodityName": "商品名称",
-      "commodityDescription": "商品描述",
-      "commodityPrice": 99.99,
+      "commodityId": "01234567-89ab-cdef-0123-456789abcdef",
+      "commodityName": "苹果iPhone 13",
+      "commodityDescription": "9成新，无划痕，原装充电器",
+      "categoryId": 1,
+      "tagsId": "[1,2,3]",
+      "currentPrice": 3500.00,
       "commodityStatus": "on_sale",
-      "commodityCategory": "商品分类",
-      "commodityLocation": "商品位置",
-      "sellerId": "卖家ID",
+      "sellerId": "202112345",
+      "mainImageUrl": "https://example.com/images/iphone13.jpg",
+      "imageList": "[\"https://example.com/images/1.jpg\",\"https://example.com/images/2.jpg\"]",
       "createdAt": "2024-01-01T12:00:00",
       "updatedAt": "2024-01-01T12:00:00",
-      "commodityImageUrl": "商品图片URL"
+      "quantity": 1
     }
   ]
 }
@@ -65,17 +67,19 @@
 
 | 字段名 | 类型 | 说明 |
 |--------|------|------|
-| commodityId | String | 商品唯一标识 |
-| commodityName | String | 商品名称 |
-| commodityDescription | String | 商品详细描述 |
-| commodityPrice | BigDecimal | 商品价格 |
-| commodityStatus | String | 商品状态（on_sale: 在售） |
-| commodityCategory | String | 商品分类 |
-| commodityLocation | String | 商品所在位置 |
-| sellerId | String | 卖家用户ID |
-| createdAt | LocalDateTime | 商品创建时间 |
-| updatedAt | LocalDateTime | 商品更新时间 |
-| commodityImageUrl | String | 商品图片链接 |
+| commodityId | String | 商品唯一标识符（UUIDv7） |
+| commodityName | String | 商品标题（如"苹果iPhone 13"） |
+| commodityDescription | String | 详细描述（颜色、瑕疵等） |
+| categoryId | Integer | 关联类别表的外键 |
+| tagsId | String | 存储标签ID数组（如[1,2]） |
+| currentPrice | BigDecimal | 商品售价（如3500.00） |
+| commodityStatus | String | 商品状态：on_sale(在售)/sold(已售)/off_sale(下架) |
+| sellerId | String | 关联用户表的外键 |
+| mainImageUrl | String | 商品主图链接 |
+| imageList | String | 多图链接数组（可选） |
+| createdAt | LocalDateTime | 商品发布时间 |
+| updatedAt | LocalDateTime | 信息更新时间 |
+| quantity | Integer | 商品数量 |
 
 **错误响应**:
 ```json
@@ -162,17 +166,19 @@
 
 | 字段名 | 类型 | 说明 |
 |--------|------|------|
-| commodity_id | VARCHAR | 商品ID（主键） |
-| commodity_name | VARCHAR | 商品名称 |
-| commodity_description | TEXT | 商品描述 |
-| commodity_price | DECIMAL | 商品价格 |
-| commodity_status | VARCHAR | 商品状态 |
-| commodity_category | VARCHAR | 商品分类 |
-| commodity_location | VARCHAR | 商品位置 |
-| seller_id | VARCHAR | 卖家ID |
-| created_at | DATETIME | 创建时间 |
-| updated_at | DATETIME | 更新时间 |
-| commodity_image_url | VARCHAR | 商品图片URL |
+| commodity_id | CHAR(36) | 商品唯一标识符（UUIDv7）（主键） |
+| commodity_name | VARCHAR(100) | 商品标题（如"苹果iPhone 13"） |
+| commodity_description | TEXT | 详细描述（颜色、瑕疵等） |
+| category_id | INT UNSIGNED | 关联类别表的外键 |
+| tags_Id | JSON | 存储标签ID数组（如[1,2]） |
+| current_price | DECIMAL(10,2) | 商品售价（如3500.00） |
+| commodity_status | ENUM | 商品状态：on_sale/sold/off_sale |
+| seller_id | CHAR(9) | 关联用户表的外键 |
+| main_image_url | VARCHAR(255) | 商品主图链接 |
+| image_list | JSON | 多图链接数组（可选） |
+| created_at | DATETIME | 商品发布时间 |
+| updated_at | DATETIME | 信息更新时间 |
+| quantity | INT UNSIGNED | 商品数量 |
 
 ### 用户表 (users)
 

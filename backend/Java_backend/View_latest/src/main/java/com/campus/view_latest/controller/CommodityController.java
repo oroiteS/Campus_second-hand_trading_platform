@@ -28,15 +28,16 @@ public class CommodityController {
     private final CommodityService commodityService;
     
     /**
-     * 获取最新6个在售商品
-     * @return 商品列表
+     * 获取最新6个在售商品的所有字段
+     * @return 包含所有字段的商品列表
      */
     @GetMapping("/latest")
-    @Operation(summary = "获取最新在售商品", description = "获取最新6个发布的在售商品信息")
+    @Operation(summary = "获取最新在售商品", description = "获取最新6个发布的在售商品的完整信息，包含所有字段")
     public Result<List<Commodity>> getLatestOnSaleCommodities() {
-        log.info("接收到获取最新在售商品的请求");
+        log.info("接收到获取最新在售商品所有字段的请求");
         try {
             List<Commodity> commodities = commodityService.getLatestOnSaleCommodities();
+            log.info("成功返回{}个商品的完整信息", commodities.size());
             return Result.success("获取最新商品成功", commodities);
         } catch (Exception e) {
             log.error("获取最新商品失败", e);
