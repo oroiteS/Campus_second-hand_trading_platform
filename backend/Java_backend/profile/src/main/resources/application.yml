@@ -1,6 +1,6 @@
 server:
   port: 8089
-  base-url: http://localhost:8080
+  base-url: http://localhost:8089
 
 mybatis-plus:
   # 配置 Mapper XML 文件位置
@@ -35,7 +35,7 @@ spring:
     url: jdbc:mysql://localhost:3306/campus_trading?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
     username: campus_test
     password: campus_suep
-  
+
   # JPA 配置（如果需要混合使用）
   jpa:
     hibernate:
@@ -51,6 +51,7 @@ spring:
           max-file-size: 5MB
           max-request-size: 10MB
           file-size-threshold: 2KB
+            
 
 # Swagger 配置
 springdoc:
