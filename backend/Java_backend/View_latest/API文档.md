@@ -57,7 +57,8 @@
       "imageList": "[\"https://example.com/images/1.jpg\",\"https://example.com/images/2.jpg\"]",
       "createdAt": "2024-01-01T12:00:00",
       "updatedAt": "2024-01-01T12:00:00",
-      "quantity": 1
+      "quantity": 1,
+      "newness": "九成新"
     }
   ]
 }
@@ -80,6 +81,7 @@
 | createdAt | LocalDateTime | 商品发布时间 |
 | updatedAt | LocalDateTime | 信息更新时间 |
 | quantity | Integer | 商品数量 |
+| newness | String | 商品新旧度 |
 
 **错误响应**:
 ```json
@@ -179,6 +181,7 @@
 | created_at | DATETIME | 商品发布时间 |
 | updated_at | DATETIME | 信息更新时间 |
 | quantity | INT UNSIGNED | 商品数量 |
+| newness | VARCHAR(50) | 商品新旧度 |
 
 ### 用户表 (users)
 
