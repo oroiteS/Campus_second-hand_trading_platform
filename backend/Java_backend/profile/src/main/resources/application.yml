@@ -86,10 +86,3 @@ logging:
     com.campus.profile.dao: debug
     org.apache.ibatis: debug
 
-aliyun:
-  oss:
-    endpoint: https://oss-cn-shanghai.aliyuncs.com  # OSS endpoint
-    access-key-id: ${OSS_ACCESS_KEY_ID}             # AccessKey ID
-    access-key-secret: ${OSS_ACCESS_KEY_SECRET}    # AccessKey Secret
-    bucket-name: avatars-bysuepsw25                   # bucket
-    domain: avatars-bysuepsw25.oss-cn-shanghai.aliyuncs.com  # 你ucket
