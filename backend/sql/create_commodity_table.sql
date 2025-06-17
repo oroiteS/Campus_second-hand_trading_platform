@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS `commodities` (
     `commodity_name` VARCHAR(100) NOT NULL COMMENT '商品标题（如"苹果iPhone 13"）',
     `commodity_description` TEXT DEFAULT NULL COMMENT '详细描述（颜色、瑕疵等）',
     `category_id` INT UNSIGNED NOT NULL COMMENT '关联类别表的外键',
-    `tags` JSON DEFAULT NULL COMMENT '存储标签数组（如["95新","国行"]）',
+    `tags_Id` JSON DEFAULT NULL COMMENT '存储标签ID数组（如[1,2]）',
     `current_price` DECIMAL(10,2) NOT NULL COMMENT '商品售价（如3500.00）',
     `commodity_status` ENUM('on_sale', 'sold', 'off_sale') NOT NULL DEFAULT 'on_sale' COMMENT '商品状态：在售/已售/下架',
     `seller_id` CHAR(9) NOT NULL COMMENT '关联用户表的外键',
@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS `commodities` (
     `image_list` JSON DEFAULT NULL COMMENT '多图链接数组（可选）',
     `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '商品发布时间',
     `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '信息更新时间',
+    `quantity` INT UNSIGNED NOT NULL DEFAULT 1 COMMENT '商品数量',
     
     -- 创建索引
     INDEX `idx_commodity_name` (`commodity_name`),
@@ -42,13 +43,15 @@ CREATE TABLE IF NOT EXISTS `commodities` (
     INDEX `idx_category_status` (`category_id`, `commodity_status`),
     INDEX `idx_seller_status` (`seller_id`, `commodity_status`),
     INDEX `idx_status_time` (`commodity_status`, `created_at`),
+    INDEX `idx_status_quantity` (`commodity_status`, `quantity`),
     
     -- 外键约束
     CONSTRAINT `fk_commodities_category` FOREIGN KEY (`category_id`) REFERENCES `categories` (`category_id`) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT `fk_commodities_seller` FOREIGN KEY (`seller_id`) REFERENCES `users` (`User_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
     
     -- 检查约束
-    CONSTRAINT `chk_price_positive` CHECK (`current_price` > 0)
+    CONSTRAINT `chk_price_positive` CHECK (`current_price` > 0),
+    CONSTRAINT `chk_quantity_non_negative` CHECK (`quantity` >= 0)
     
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='商品表';
 

@@ -3,12 +3,12 @@
     <div class="login-box">
       <h2>用户登录</h2>
       <div class="form-group">
-        <label for="username">用户名</label>
+        <label for="username">用户ID</label>
         <input 
           type="text" 
           id="username" 
           v-model="username" 
-          placeholder="请输入用户名"
+          placeholder="请输入用户ID"
         />
       </div>
       <div class="form-group">
@@ -35,6 +35,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   name: 'LoginPage',
   data() {
@@ -56,132 +58,73 @@ export default {
       this.isLoading = true
       this.errorMessage = ''
       
-      // 模拟API调用
-      setTimeout(() => {
-        // 这里是静态数据测试，实际项目中应该调用后端API
-        if (this.username === '00000000' && this.password === '00000000') {
-          // 管理员登录成功
-          alert('管理员登录成功!')
-          // 存储管理员登录状态
-          localStorage.setItem('isAdminLoggedIn', 'true')
-          localStorage.setItem('adminToken', 'admin-token-' + Date.now())
-          localStorage.setItem('adminUsername', '管理员')
-          // 跳转到管理员后台
-          this.$router.push('/AdminDashboard')
-        } else if (this.username === 'admin' && this.password === '123456') {
-          // 普通用户登录成功
+      // 调用实际后端API
+      const loginRequest = {
+        userId: this.username,
+        password: this.password
+      }
+      
+      axios.post('http://localhost:8080/api/user/login', loginRequest, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(response => {
+        const result = response.data
+        
+        if (result.code === 200 && result.data.success) {
+          // 登录成功
           alert('登录成功!')
-          // 修改：统一使用userToken和userInfo
+          
+          // 存储用户信息
           const userToken = 'user-token-' + Date.now()
           const userInfo = {
-            username: this.username,
-            name: 'xy21675070351', // 显示名称
-            avatar: '/测试图片.jpg',
+            username: result.data.userName,
+            name: result.data.realName,
+            userId: result.data.userId,
+            avatar: result.data.avatarUrl || '/测试图片.jpg',
             status: '在线'
           }
           
           localStorage.setItem('userToken', userToken)
           localStorage.setItem('userInfo', JSON.stringify(userInfo))
-          localStorage.setItem('isLoggedIn', 'true') // 保持兼容性
-          localStorage.setItem('username', this.username) // 保持兼容性
+          localStorage.setItem('isLoggedIn', 'true')
+          localStorage.setItem('username', result.data.userName)
           
-          // 跳转到首页
-          this.$router.push('/')
+          // 跳转到首页，携带userId数据
+          this.$router.push({
+            path: '/',
+            query: {
+              userId: result.data.userId
+            }
+          })
         } else {
           // 登录失败
-          this.errorMessage = '用户名或密码错误'
+          this.errorMessage = result.message || '登录失败'
         }
+      })
+      .catch(error => {
+        console.error('登录请求失败:', error)
+        if (error.response) {
+          // 服务器返回错误响应
+          const result = error.response.data
+          this.errorMessage = result.message || '登录失败'
+        } else if (error.request) {
+          // 请求发送失败
+          this.errorMessage = '网络连接失败，请检查后端服务是否启动'
+        } else {
+          // 其他错误
+          this.errorMessage = '登录失败，请稍后重试'
+        }
+      })
+      .finally(() => {
         this.isLoading = false
-      }, 1000)
+      })
     }
   }
 }
 </script>
 
 <style scoped>
-.login-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background-image: url('../assets/background.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
-.login-box {
-  width: 400px;
-  padding: 30px;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-h2 {
-  text-align: center;
-  margin-bottom: 30px;
-  color: #2c3e50;
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: bold;
-  color: #333;
-}
-
-input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 16px;
-}
-
-.error-message {
-  color: #e53935;
-  margin-bottom: 15px;
-}
-
-.login-btn {
-  width: 100%;
-  padding: 12px;
-  background-color: #42b983;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.login-btn:hover {
-  background-color: #3aa876;
-}
-
-.login-btn:disabled {
-  background-color: #a8d5c3;
-  cursor: not-allowed;
-}
-
-.links {
-  margin-top: 20px;
-  text-align: center;
-  display: flex;
-  justify-content: space-between;
-}
-
-.back-link, .register-link {
-  color: #42b983;
-  text-decoration: none;
-}
-
-.back-link:hover, .register-link:hover {
-  text-decoration: underline;
-}
+@import '../styles/Login.css';
 </style>

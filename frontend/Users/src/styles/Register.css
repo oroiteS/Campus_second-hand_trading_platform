@@ -1,0 +1,131 @@
+/* Register页面样式 - 所有类名添加register-前缀防止全局冲突 */
+.register-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 20px 0;
+  background-color: #f5f5f5;
+  background-image: url('../assets/background.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow-y: auto;
+}
+
+.register-box {
+  width: 400px;
+  max-width: 90vw;
+  padding: 30px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin: auto;
+}
+
+.register-title {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #2c3e50;
+}
+
+.register-form-group {
+  margin-bottom: 20px;
+}
+
+.register-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #333;
+}
+
+.register-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.register-input-tip {
+  font-size: 12px;
+  color: #ff9800;
+  margin-top: 5px;
+}
+
+.register-error-message {
+  color: #e53935;
+  margin-bottom: 15px;
+}
+
+.register-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #42b983;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.register-btn:hover {
+  background-color: #3aa876;
+}
+
+.register-btn:disabled {
+  background-color: #a8d5c3;
+  cursor: not-allowed;
+}
+
+.register-links {
+  margin-top: 20px;
+  text-align: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.register-login-link, .register-back-link {
+  color: #42b983;
+  text-decoration: none;
+}
+
+.register-login-link:hover, .register-back-link:hover {
+  text-decoration: underline;
+}
+
+/* 爱好标签样式 */
+.hobby-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.hobby-tag {
+  padding: 6px 12px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  background-color: #f9f9f9;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  user-select: none;
+}
+
+.hobby-tag:hover {
+  border-color: #42b983;
+  background-color: #e8f5e8;
+}
+
+.hobby-tag.selected {
+  background-color: #42b983;
+  color: white;
+  border-color: #42b983;
+}
+
+.hobby-tag.selected:hover {
+  background-color: #3aa876;
+}

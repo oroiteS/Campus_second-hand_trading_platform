@@ -1,12 +1,12 @@
 <template>
-  <div class="profile-container">
-    <div class="profile-box">
+  <div class="user-profile-container">
+    <div class="user-profile-box">
       <h2>修改个人信息</h2>
       
       <!-- 头像放在最上方 -->
-      <div class="avatar-section">
-        <img :src="avatarUrl || 'https://via.placeholder.com/100x100'" class="avatar-preview-large" />
-        <div class="form-group avatar-url-group">
+      <div class="user-profile-avatar-section">
+        <img :src="avatarUrl || 'https://via.placeholder.com/100x100'" class="user-profile-avatar-preview-large" />
+        <div class="user-profile-form-group user-profile-avatar-url-group">
           <label for="avatarUrl">头像地址</label>
           <input 
             type="text" 
@@ -17,7 +17,7 @@
         </div>
       </div>
       
-      <div class="form-group" v-if="userId">
+      <div class="user-profile-form-group" v-if="userId">
         <label for="userId">用户ID</label>
         <input 
           type="text" 
@@ -26,10 +26,10 @@
           placeholder="用户ID" 
           disabled
         />
-        <div class="input-tip">用户ID不可修改</div>
+        <div class="user-profile-input-tip">用户ID不可修改</div>
       </div>
       
-      <div class="form-group" v-if="username !== undefined">
+      <div class="user-profile-form-group" v-if="username !== undefined">
         <label for="username">昵称</label>
         <input 
           type="text" 
@@ -37,10 +37,10 @@
           v-model="username" 
           placeholder="请输入昵称"
         />
-        <div class="input-error" v-if="validationErrors.username">{{ validationErrors.username }}</div>
+        <div class="user-profile-input-error" v-if="validationErrors.username">{{ validationErrors.username }}</div>
       </div>
       
-      <div class="form-group">
+      <div class="user-profile-form-group">
         <label for="password">密码</label>
         <input 
           type="password" 
@@ -48,10 +48,10 @@
           v-model="password" 
           placeholder="请输入密码（不少于6位）"
         />
-        <div class="input-error" v-if="validationErrors.password">{{ validationErrors.password }}</div>
+        <div class="user-profile-input-error" v-if="validationErrors.password">{{ validationErrors.password }}</div>
       </div>
       
-      <div class="form-group" v-if="telephone !== undefined">
+      <div class="user-profile-form-group" v-if="telephone !== undefined">
         <label for="telephone">电话信息</label>
         <input 
           type="text" 
@@ -59,10 +59,10 @@
           v-model="telephone" 
           placeholder="请输入电话号码"
         />
-        <div class="input-error" v-if="validationErrors.telephone">{{ validationErrors.telephone }}</div>
+        <div class="user-profile-input-error" v-if="validationErrors.telephone">{{ validationErrors.telephone }}</div>
       </div>
       
-      <div class="form-group" v-if="realName !== undefined">
+      <div class="user-profile-form-group" v-if="realName !== undefined">
         <label for="realName">真实姓名</label>
         <input 
           type="text" 
@@ -72,7 +72,7 @@
         />
       </div>
       
-      <div class="form-group" v-if="idCard !== undefined">
+      <div class="user-profile-form-group" v-if="idCard !== undefined">
         <label for="idCard">身份证号</label>
         <input 
           type="text" 
@@ -80,13 +80,13 @@
           v-model="idCard" 
           placeholder="请输入身份证号"
         />
-        <div class="input-error" v-if="validationErrors.idCard">{{ validationErrors.idCard }}</div>
+        <div class="user-profile-input-error" v-if="validationErrors.idCard">{{ validationErrors.idCard }}</div>
       </div>
       
-      <div class="form-group location-group" v-if="longitude !== undefined || latitude !== undefined">
+      <div class="user-profile-form-group user-profile-location-group" v-if="longitude !== undefined || latitude !== undefined">
         <label>用户位置</label>
-        <div class="location-inputs">
-          <div class="location-input" v-if="longitude !== undefined">
+        <div class="user-profile-location-inputs">
+          <div class="user-profile-location-input" v-if="longitude !== undefined">
             <label for="longitude">经度</label>
             <input 
               type="text" 
@@ -95,7 +95,7 @@
               placeholder="经度"
             />
           </div>
-          <div class="location-input" v-if="latitude !== undefined">
+          <div class="user-profile-location-input" v-if="latitude !== undefined">
             <label for="latitude">纬度</label>
             <input 
               type="text" 
@@ -107,15 +107,15 @@
         </div>
       </div>
       
-      <div class="error-message" v-if="errorMessage">
+      <div class="user-profile-error-message" v-if="errorMessage">
         {{ errorMessage }}
       </div>
       
-      <div class="button-group">
-        <button @click="saveProfile" class="save-btn" :disabled="isLoading">
+      <div class="user-profile-button-group">
+        <button @click="saveProfile" class="user-profile-save-btn" :disabled="isLoading">
           {{ isLoading ? '保存中...' : '保存' }}
         </button>
-        <button @click="cancel" class="cancel-btn">
+        <button @click="cancel" class="user-profile-cancel-btn">
           取消
         </button>
       </div>
@@ -270,182 +270,5 @@ export default {
 </script>
 
 <style scoped>
-.profile-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background-color: #f8f9fa;
-  padding: 20px;
-}
-
-.profile-box {
-  width: 100%;
-  max-width: 500px;
-  background: white;
-  border-radius: 15px;
-  padding: 30px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-}
-
-h2 {
-  text-align: center;
-  margin-bottom: 30px;
-  color: #333;
-  font-weight: bold;
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 500;
-  color: #555;
-}
-
-input {
-  width: 100%;
-  padding: 12px 15px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 14px;
-  transition: border 0.3s;
-}
-
-input:focus {
-  border-color: #667eea;
-  outline: none;
-}
-
-input:disabled {
-  background-color: #f5f5f5;
-  cursor: not-allowed;
-}
-
-.input-tip {
-  font-size: 12px;
-  color: #888;
-  margin-top: 5px;
-}
-
-.error-message {
-  color: #e74c3c;
-  margin-bottom: 15px;
-  font-size: 14px;
-}
-
-.button-group {
-  display: flex;
-  gap: 15px;
-}
-
-.save-btn, .cancel-btn {
-  flex: 1;
-  padding: 12px 0;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.save-btn {
-  background: #667eea;
-  color: white;
-}
-
-.save-btn:hover {
-  background: #5a6fd8;
-}
-
-.save-btn:disabled {
-  background: #a5afd7;
-  cursor: not-allowed;
-}
-
-.cancel-btn {
-  background: #f0f0f0;
-  color: #666;
-}
-
-.cancel-btn:hover {
-  background: #e0e0e0;
-}
-
-.avatar-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 30px;
-}
-
-.avatar-preview-large {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid #667eea;
-  margin-bottom: 15px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-}
-
-.avatar-url-group {
-  width: 100%;
-}
-
-.avatar-container {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.avatar-preview {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #ddd;
-}
-
-.input-error {
-  color: #e74c3c;
-  font-size: 12px;
-  margin-top: 5px;
-}
-
-.location-group {
-  margin-bottom: 25px;
-}
-
-.location-inputs {
-  display: flex;
-  gap: 15px;
-}
-
-.location-input {
-  flex: 1;
-}
-
-.location-input label {
-  font-size: 12px;
-  margin-bottom: 5px;
-}
-
-@media (max-width: 576px) {
-  .profile-box {
-    padding: 20px;
-  }
-  
-  .location-inputs {
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .button-group {
-    flex-direction: column;
-  }
-}
+@import '../styles/UserProfile.css';
 </style>

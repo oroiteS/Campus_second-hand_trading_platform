@@ -1,0 +1,54 @@
+package database
+
+import (
+	"fmt"
+	"time"
+
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
+
+	"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/chat/config"
+)
+
+// InitMySQL 初始化MySQL连接
+func InitMySQL(cfg config.MySQLConfig) (*gorm.DB, error) {
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		cfg.User,
+		cfg.Password,
+		cfg.Host,
+		cfg.Port,
+		cfg.Database,
+	)
+
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect to database: %w", err)
+	}
+
+	// 获取底层的sql.DB对象进行连接池配置
+	sqlDB, err := db.DB()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get underlying sql.DB: %w", err)
+	}
+
+	// 设置连接池参数
+	sqlDB.SetMaxIdleConns(10)
+	sqlDB.SetMaxOpenConns(100)
+	sqlDB.SetConnMaxLifetime(time.Hour)
+
+	// 注释掉自动迁移，因为表已经存在
+	// 如果需要创建新表，请手动执行SQL脚本
+	// err = db.AutoMigrate(
+	// 	&models.User{},
+	// 	&models.ChatSession{},
+	// 	&models.ChatMessage{},
+	// )
+	// if err != nil {
+	// 	return nil, fmt.Errorf("failed to migrate database: %w", err)
+	// }
+
+	return db, nil
+}

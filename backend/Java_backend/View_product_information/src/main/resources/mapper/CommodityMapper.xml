@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.campus.view_product_information.mapper.CommodityMapper">
+
+    <!-- 商品详情结果映射 -->
+    <resultMap id="CommodityDetailMap" type="com.campus.view_product_information.dto.CommodityDetailDTO">
+        <id column="commodity_id" property="commodityId"/>
+        <result column="commodity_name" property="commodityName"/>
+        <result column="commodity_description" property="commodityDescription"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="tags_Id" property="tagsId"/>
+        <result column="current_price" property="currentPrice"/>
+        <result column="commodity_status" property="commodityStatus"/>
+        <result column="seller_id" property="sellerId"/>
+        <result column="main_image_url" property="mainImageUrl"/>
+        <result column="image_list" property="imageList" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="quantity" property="quantity"/>
+        <result column="category" property="categoryName"/>
+    </resultMap>
+
+    <!-- 根据商品ID查询商品详情（包含类别名称） -->
+    <select id="selectCommodityDetailById" parameterType="string" resultMap="CommodityDetailMap">
+        SELECT 
+            c.commodity_id,
+            c.commodity_name,
+            c.commodity_description,
+            c.category_id,
+            c.tags_Id,
+            c.current_price,
+            c.commodity_status,
+            c.seller_id,
+            c.main_image_url,
+            c.image_list,
+            c.created_at,
+            c.updated_at,
+            c.quantity,
+            cat.category
+        FROM commodities c
+        LEFT JOIN categories cat ON c.category_id = cat.category_id
+        WHERE c.commodity_id = #{commodityId}
+    </select>
+
+</mapper>

@@ -1,0 +1,32 @@
+server:
+  port: 8087
+
+spring:
+  application:
+    name: view-latest-service
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/campus?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: campus_test
+    password: campus_suep
+  
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: assign_id
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+# 日志配置
+logging:
+  level:
+    com.campus.view_latest: debug
+    org.springframework.web: debug
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html

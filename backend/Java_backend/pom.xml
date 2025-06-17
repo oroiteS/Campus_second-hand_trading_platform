@@ -7,9 +7,6 @@
     <version>1.0.0</version>
     <name>campus-secondhand-platform</name>
     <description>校园二手交易平台</description>
-    <modules>
-        <module>chat</module>
-    </modules>
     <packaging>pom</packaging>
 
     <properties>
@@ -71,7 +68,7 @@
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
-            <scope>runtime</scope>
+            <version>8.0.33</version>
         </dependency>
         
         <!-- Lombok -->

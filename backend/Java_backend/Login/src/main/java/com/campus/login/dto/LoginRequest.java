@@ -11,10 +11,10 @@ import jakarta.validation.constraints.NotBlank;
 public class LoginRequest {
     
     /**
-     * 用户名或电话号码
+     * 用户ID
      */
-    @NotBlank(message = "用户名或电话号码不能为空")
-    private String username;
+    @NotBlank(message = "用户ID不能为空")
+    private String userId;
     
     /**
      * 密码

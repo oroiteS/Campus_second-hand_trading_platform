@@ -48,7 +48,7 @@ public class UserController {
      */
     @PostMapping("/login")
     public Result<Map<String, Object>> login(@Valid @RequestBody LoginRequest loginRequest) {
-        log.info("用户登录请求，用户名: {}", loginRequest.getUsername());
+        log.info("用户登录请求，用户ID: {}", loginRequest.getUserId());
         
         Map<String, Object> result = userService.login(loginRequest);
         
@@ -123,6 +123,15 @@ public class UserController {
     }
     
     /**
+     * 检查用户ID是否可用
+     */
+    @GetMapping("/check-userid")
+    public Result<Boolean> checkUserId(@RequestParam String userId) {
+        User user = userService.getUserById(userId);
+        return Result.success(user == null); // 返回是否可用（不存在即可用）
+    }
+    
+    /**
      * 验证令牌
      */
     @PostMapping("/validate-token")
@@ -138,6 +147,39 @@ public class UserController {
             
         } catch (Exception e) {
             return Result.success(false);
+        }
+    }
+    
+    /**
+     * 获取当前用户头像URL
+     */
+    @GetMapping("/avatar")
+    public Result<String> getUserAvatar(@RequestHeader("Authorization") String token) {
+        try {
+            // 移除Bearer前缀
+            if (token.startsWith("Bearer ")) {
+                token = token.substring(7);
+            }
+            
+            // 验证token
+            if (!jwtUtil.isValidToken(token)) {
+                return Result.unauthorized("无效的令牌");
+            }
+            
+            // 获取用户ID
+            String userId = jwtUtil.getUserIdFromToken(token);
+            User user = userService.getUserById(userId);
+            
+            if (user == null) {
+                return Result.error("用户不存在");
+            }
+            
+            // 返回用户头像URL
+            return Result.success(user.getAvatarUrl());
+            
+        } catch (Exception e) {
+            log.error("获取用户头像失败", e);
+            return Result.error("获取用户头像失败");
         }
     }
 }
