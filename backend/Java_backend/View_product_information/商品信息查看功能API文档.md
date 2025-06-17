@@ -50,9 +50,9 @@ Content-Type: application/json
     "commodityDescription": "95新，国行，无拆修，功能正常",
     "categoryId": 1,
     "categoryName": "数码产品",
-    "tags": "[\"95新\",\"国行\"]",
+    "tagsId": "[1,2,3]",
     "currentPrice": 3500.00,
-    "commodityStatus": "在售",
+    "commodityStatus": "on_sale",
     "sellerId": "user123",
     "mainImageUrl": "https://example.com/images/iphone13_main.jpg",
     "imageList": [
@@ -60,7 +60,8 @@ Content-Type: application/json
       "https://example.com/images/iphone13_2.jpg"
     ],
     "createdAt": "2024-01-15T10:30:00",
-    "updatedAt": "2024-01-15T10:30:00"
+    "updatedAt": "2024-01-15T10:30:00",
+    "quantity": 1
   }
 }
 ```
@@ -94,14 +95,15 @@ Content-Type: application/json
 | commodityDescription | String | 商品详细描述 |
 | categoryId | Integer | 类别ID |
 | categoryName | String | 类别名称 |
-| tags | String | 商品标签（JSON字符串格式） |
+| tagsId | String | 商品标签ID（JSON字符串格式） |
 | currentPrice | BigDecimal | 商品价格 |
-| commodityStatus | String | 商品状态（在售/已售/下架） |
+| commodityStatus | String | 商品状态（on_sale=在售/sold=已售/off_sale=下架） |
 | sellerId | String | 卖家ID |
 | mainImageUrl | String | 商品主图链接 |
 | imageList | Array<String> | 多图链接数组 |
 | createdAt | DateTime | 商品发布时间 |
 | updatedAt | DateTime | 信息更新时间 |
+| quantity | Integer | 商品数量 |
 
 ### 2. 健康检查
 
@@ -146,18 +148,19 @@ Content-Type: application/json
 
 | 字段名 | 类型 | 约束 | 描述 |
 |--------|------|------|------|
-| commodity_id | VARCHAR(36) | PRIMARY KEY | 商品唯一标识符（UUIDv7） |
-| commodity_name | VARCHAR(255) | NOT NULL | 商品标题 |
-| commodity_description | TEXT | | 详细描述 |
-| category_id | INT | FOREIGN KEY | 关联类别表的外键 |
-| tags | JSON | | 存储标签数组 |
+| commodity_id | CHAR(36) | PRIMARY KEY | 商品唯一标识符（UUIDv7） |
+| commodity_name | VARCHAR(100) | NOT NULL | 商品标题 |
+| commodity_description | TEXT | DEFAULT NULL | 详细描述 |
+| category_id | INT UNSIGNED | NOT NULL, FOREIGN KEY | 关联类别表的外键 |
+| tags_Id | JSON | DEFAULT NULL | 存储标签ID数组 |
 | current_price | DECIMAL(10,2) | NOT NULL | 商品售价 |
-| commodity_status | VARCHAR(20) | NOT NULL | 商品状态 |
-| seller_id | VARCHAR(36) | FOREIGN KEY | 关联用户表的外键 |
-| main_image_url | VARCHAR(500) | | 商品主图链接 |
-| image_list | JSON | | 多图链接数组 |
-| created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | 商品发布时间 |
-| updated_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP | 信息更新时间 |
+| commodity_status | ENUM('on_sale', 'sold', 'off_sale') | NOT NULL DEFAULT 'on_sale' | 商品状态 |
+| seller_id | CHAR(9) | NOT NULL, FOREIGN KEY | 关联用户表的外键 |
+| main_image_url | VARCHAR(255) | DEFAULT NULL | 商品主图链接 |
+| image_list | JSON | DEFAULT NULL | 多图链接数组 |
+| created_at | DATETIME | DEFAULT CURRENT_TIMESTAMP | 商品发布时间 |
+| updated_at | DATETIME | DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP | 信息更新时间 |
+| quantity | INT UNSIGNED | NOT NULL DEFAULT 1 | 商品数量 |
 
 ### 类别表 (categories)
 

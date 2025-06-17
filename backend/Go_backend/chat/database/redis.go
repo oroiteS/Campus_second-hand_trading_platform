@@ -7,7 +7,7 @@ import (
 
 	"github.com/go-redis/redis/v8"
 
-	"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/go_chat/config"
+	"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/chat/config"
 )
 
 // InitRedis 初始化Redis连接

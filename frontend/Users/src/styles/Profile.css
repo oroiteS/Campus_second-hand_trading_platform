@@ -93,6 +93,10 @@
 
 .profile-user-basic-info {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
 }
 
 .profile-username {
@@ -357,8 +361,11 @@
 @media (max-width: 768px) {
   .profile-user-card {
     flex-direction: column;
-    text-align: center;
     gap: 20px;
+  }
+  
+  .profile-user-basic-info {
+    align-items: center;
   }
   
   .profile-user-stats {

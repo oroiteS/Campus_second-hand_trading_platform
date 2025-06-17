@@ -37,7 +37,7 @@ type RedisConfig struct {
 func Load() *Config {
 	return &Config{
 		Server: ServerConfig{
-			Port: getEnv("SERVER_PORT", "8080"),
+			Port: getEnv("SERVER_PORT", "8088"),
 		},
 		MySQL: MySQLConfig{
 			Host:     getEnv("MYSQL_HOST", "localhost"),

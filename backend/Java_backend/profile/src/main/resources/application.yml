@@ -1,8 +1,12 @@
 server:
   port: 8089
+<<<<<<< HEAD
   base-url: http://localhost:8089
 
 
+=======
+  base-url: http://localhost:8080
+>>>>>>> da7ef48447db14bee01dddb594eb85ba0809d532
 
 mybatis-plus:
   # 配置 Mapper XML 文件位置

@@ -40,9 +40,9 @@ public class CommodityDetailDTO {
     private String categoryName;
 
     /**
-     * 商品标签
+     * 商品标签ID
      */
-    private String tags;
+    private String tagsId;
 
     /**
      * 商品价格
@@ -50,7 +50,7 @@ public class CommodityDetailDTO {
     private BigDecimal currentPrice;
 
     /**
-     * 商品状态
+     * 商品状态：on_sale=在售/sold=已售/off_sale=下架
      */
     private String commodityStatus;
 
@@ -78,4 +78,9 @@ public class CommodityDetailDTO {
      * 信息更新时间
      */
     private LocalDateTime updatedAt;
+
+    /**
+     * 商品数量
+     */
+    private Integer quantity;
 }

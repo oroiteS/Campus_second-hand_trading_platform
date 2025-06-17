@@ -140,7 +140,6 @@ export default {
         { id: 1, name: '我的收藏', icon: '❤️', color: '#FF6B6B', action: 'favorites' },
         { id: 2, name: '订单管理', icon: '📋', color: '#4ECDC4', action: 'orders' },
         { id: 3, name: '个人信息', icon: '⚙️', color: '#45B7D1', action: 'settings' },
-        { id: 4, name: '钱包管理', icon: '💰', color: '#FFA726', action: 'wallet' },
         { id: 5, name: '附近的人', icon: '❓', color: '#FFEAA7', action: 'help' }
       ],
       productTabs: [
@@ -176,6 +175,12 @@ export default {
       return this.products[this.activeTab] || []
     }
   },
+  created() {
+    // 从路由参数中获取userId
+    if (this.$route.query.userId) {
+      console.log('Profile页面获取到的userId:', this.$route.query.userId);
+    }
+  },
   methods: {
     goBack() {
       this.$router.go(-1)
@@ -198,19 +203,23 @@ export default {
           this.$router.push('/favorites')
           break
         case 'orders':
+          // 跳转到订单管理页面
           this.$router.push('/orders')
           break
         case 'settings':
+          // 跳转到UserProfile.vue页面
           console.log('跳转到个人信息')
           this.$router.push('/userprofile')
           break
-        case 'wallet':
-          console.log('跳转到钱包管理')
-          this.$router.push('/wallet')
-          break
         case 'help':
+          // 可以添加帮助中心页面
           console.log('跳转到附近的人')
-          this.$router.push('/nearbyusers')
+          this.$router.push({
+            path: '/nearbyusers',
+            query: {
+              userId: this.$route.query.userId
+            }
+          })
           break
         default:
           console.log('未知操作:', action)

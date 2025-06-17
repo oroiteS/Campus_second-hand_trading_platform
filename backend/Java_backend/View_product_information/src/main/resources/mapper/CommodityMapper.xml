@@ -8,13 +8,15 @@
         <result column="commodity_name" property="commodityName"/>
         <result column="commodity_description" property="commodityDescription"/>
         <result column="category_id" property="categoryId"/>
-        <result column="tags" property="tags"/>
+        <result column="tags_Id" property="tagsId"/>
         <result column="current_price" property="currentPrice"/>
         <result column="commodity_status" property="commodityStatus"/>
         <result column="seller_id" property="sellerId"/>
         <result column="main_image_url" property="mainImageUrl"/>
+        <result column="image_list" property="imageList" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
         <result column="created_at" property="createdAt"/>
         <result column="updated_at" property="updatedAt"/>
+        <result column="quantity" property="quantity"/>
         <result column="category" property="categoryName"/>
     </resultMap>
 
@@ -25,13 +27,15 @@
             c.commodity_name,
             c.commodity_description,
             c.category_id,
-            c.tags,
+            c.tags_Id,
             c.current_price,
             c.commodity_status,
             c.seller_id,
             c.main_image_url,
+            c.image_list,
             c.created_at,
             c.updated_at,
+            c.quantity,
             cat.category
         FROM commodities c
         LEFT JOIN categories cat ON c.category_id = cat.category_id

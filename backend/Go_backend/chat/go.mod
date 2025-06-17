@@ -1,4 +1,4 @@
-module github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/go_chat
+module github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/chat
 
 go 1.24.4
 
