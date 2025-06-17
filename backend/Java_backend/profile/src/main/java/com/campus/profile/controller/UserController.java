@@ -571,4 +571,62 @@ public class UserController {
             return ResponseEntity.status(500).body(response);
         }
     }
+
+
+   @Operation(summary = "重置用户密码", description = "根据用户ID将用户密码重置为默认密码123456")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "密码重置成功"),
+        @ApiResponse(responseCode = "404", description = "用户不存在"),
+        @ApiResponse(responseCode = "500", description = "服务器内部错误")
+    })
+    @PostMapping("/password/reset")
+    public ResponseEntity<Map<String, Object>> resetPassword(
+            @Parameter(description = "用户信息请求体，包含用户ID", required = true)
+            @Valid @RequestBody UserInfoRequest request) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            String userId = request.getUserId();
+
+            User user = UserService.getUserById(userId);
+
+            if (user == null) {
+                response.put("success", false);
+                response.put("message", "用户不存在");
+                response.put("code", 404);
+                return ResponseEntity.status(404).body(response);
+            }
+
+            // 将密码重置为默认密码123456，并进行SHA-256加密
+            String defaultPassword = "123456";
+            String encryptedDefaultPassword = encryptPassword(defaultPassword);
+
+            // 更新密码
+            user.setPassword(encryptedDefaultPassword);
+            User updatedUser = UserService.updateUser(user);
+
+            if (updatedUser != null) {
+                response.put("success", true);
+                response.put("message", "密码重置成功，新密码为：123456");
+                response.put("code", 200);
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("success", false);
+                response.put("message", "密码重置失败，请稍后重试");
+                response.put("code", 500);
+                return ResponseEntity.status(500).body(response);
+            }
+
+        } catch (RuntimeException e) {
+            // 处理 encryptPassword 可能抛出的 RuntimeException
+            response.put("success", false);
+            response.put("message", "密码加密失败: " + e.getMessage());
+            response.put("code", 500);
+            return ResponseEntity.status(500).body(response);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "服务器内部错误: " + e.getMessage());
+            response.put("code", 500);
+            return ResponseEntity.status(500).body(response);
+        }
+    }
  }

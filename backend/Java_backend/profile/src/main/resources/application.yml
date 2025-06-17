@@ -85,4 +85,3 @@ logging:
   level:
     com.campus.profile.dao: debug
     org.apache.ibatis: debug
-
