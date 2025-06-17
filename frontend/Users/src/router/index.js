@@ -12,6 +12,7 @@ import PublishProduct from '../views/PublishProduct.vue'
 import NoticeDetail from '../views/NoticeDetail.vue'
 import WalletManagement from '../views/WalletManagement.vue'
 import ProductBrowse from '../views/ProductBrowse.vue'
+import ChatList from '@/views/ChatList.vue'
 
 const routes = [
   {
@@ -78,6 +79,11 @@ const routes = [
     path: '/wallet',
     name: 'WalletManagement',
     component: WalletManagement
+  },
+  {
+    path: '/chat-list/:userId',
+    name: 'ChatList',
+    component: ChatList
   }
 ]
 
