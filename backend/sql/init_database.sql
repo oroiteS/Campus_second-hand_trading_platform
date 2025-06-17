@@ -64,15 +64,15 @@ CREATE TABLE IF NOT EXISTS `commodities` (
     `commodity_name` VARCHAR(100) NOT NULL COMMENT '商品标题（如"苹果iPhone 13"）',
     `commodity_description` TEXT DEFAULT NULL COMMENT '详细描述（颜色、瑕疵等）',
     `category_id` INT UNSIGNED NOT NULL COMMENT '关联类别表的外键',
-    `tags` JSON DEFAULT NULL COMMENT '存储标签数组（如["95新","国行"]）',
+    `tags_Id` JSON DEFAULT NULL COMMENT '存储标签ID数组（如[1,2]）',
     `current_price` DECIMAL(10,2) NOT NULL COMMENT '商品售价（如3500.00）',
-    `quantity` INT UNSIGNED NOT NULL DEFAULT 1 COMMENT '商品数量',
     `commodity_status` ENUM('on_sale', 'sold', 'off_sale') NOT NULL DEFAULT 'on_sale' COMMENT '商品状态：在售/已售/下架',
     `seller_id` CHAR(9) NOT NULL COMMENT '关联用户表的外键',
     `main_image_url` VARCHAR(255) DEFAULT NULL COMMENT '商品主图链接',
     `image_list` JSON DEFAULT NULL COMMENT '多图链接数组（可选）',
     `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '商品发布时间',
     `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '信息更新时间',
+    `quantity` INT UNSIGNED NOT NULL DEFAULT 1 COMMENT '商品数量',
     
     -- 创建索引
     INDEX `idx_commodity_name` (`commodity_name`),
@@ -124,6 +124,10 @@ CREATE TABLE IF NOT EXISTS `orders` (
     `Sale_time` DATETIME DEFAULT NULL COMMENT '交易时间',
     `Money` DECIMAL(12,2) DEFAULT NULL COMMENT '交易金额',
     `Sale_loc` VARCHAR(250) DEFAULT NULL COMMENT '交易地址',
+    `buy_quantity` INT UNSIGNED NOT NULL DEFAULT 1 COMMENT '购买数量',
+    `refund_reason` TEXT DEFAULT NULL COMMENT '退款理由',
+
+
 
     -- 创建索引
     INDEX `idx_commodity_id` (`commodity_id`),
@@ -220,3 +224,87 @@ CREATE TABLE IF NOT EXISTS `chat_messages` (
     CONSTRAINT `fk_chat_messages_receiver` FOREIGN KEY (`receiver_id`) REFERENCES `users` (`User_ID`) ON DELETE CASCADE
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='聊天消息表';
+
+-- 13. 创建购物车表
+CREATE TABLE IF NOT EXISTS `cart` (
+    `Cart_ID` VARCHAR(10) NOT NULL PRIMARY KEY COMMENT '主键',
+    `User_ID` CHAR(9) NOT NULL COMMENT '外键指向users表',
+    `commodity_id` CHAR(36) NOT NULL COMMENT '商品唯一标识符（UUIDv7）//外键指向commodities表',
+    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '购物车添加时间',
+
+    -- 创建索引
+    INDEX `idx_cart_user_id` (`User_ID`),
+    INDEX `idx_cart_commodity_id` (`commodity_id`),
+    INDEX `idx_cart_created_at` (`created_at`),
+
+    -- 外键约束
+    CONSTRAINT `fk_cart_user` FOREIGN KEY (`User_ID`) REFERENCES `users` (`User_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT `fk_cart_commodity` FOREIGN KEY (`commodity_id`) REFERENCES `commodities` (`commodity_id`) ON DELETE CASCADE ON UPDATE CASCADE
+
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='购物车表';
+
+-- 14. 创建管理员表
+CREATE TABLE IF NOT EXISTS `Root` (
+    `Root_id` CHAR(9) NOT NULL PRIMARY KEY COMMENT '主键',
+    `password` VARCHAR(64) NOT NULL COMMENT 'sha256'
+
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='管理员表';
+
+-- 15. 创建公告表
+CREATE TABLE IF NOT EXISTS `announcements` (
+    `Announcement_Id` VARCHAR(10) NOT NULL PRIMARY KEY COMMENT '公告ID，主键',
+    `Root_id` CHAR(9) NOT NULL COMMENT '外键指向Root表',
+    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '公告创建时间',
+    `content` TEXT NOT NULL COMMENT '公告内容',
+    `visible_status` BOOLEAN NOT NULL DEFAULT 0 COMMENT '公告是否可见，0为可见，1为不可见，默认值为0',
+
+    -- 创建索引
+    INDEX `idx_announcement_root_id` (`Root_id`),
+    INDEX `idx_announcement_created_at` (`created_at`),
+    INDEX `idx_announcement_visible_status` (`visible_status`),
+
+    -- 外键约束
+    CONSTRAINT `fk_announcements_root` FOREIGN KEY (`Root_id`) REFERENCES `Root` (`Root_id`) ON DELETE CASCADE ON UPDATE CASCADE
+
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='公告表';
+
+-- 16. 创建申诉表
+CREATE TABLE IF NOT EXISTS `appeals` (
+    `Argument_Id` VARCHAR(10) NOT NULL PRIMARY KEY COMMENT '申诉ID，主键',
+    `Argue1_id` CHAR(9) NOT NULL COMMENT '外键指向Root表的User_ID，申诉发起者',
+    `Argue2_id` CHAR(9) NOT NULL COMMENT '外键指向Root表的User_ID，被申诉者',
+    `order_id` CHAR(36) NOT NULL COMMENT 'UUID v7，作为外键指向orders表',
+    `Reason` TEXT NOT NULL COMMENT '申诉理由',
+    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '申诉发起（创建）时间',
+    `Root_id` CHAR(9) DEFAULT NULL COMMENT '外键指向Root表',
+
+    -- 创建索引
+    INDEX `idx_appeal_argue1_id` (`Argue1_id`),
+    INDEX `idx_appeal_argue2_id` (`Argue2_id`),
+    INDEX `idx_appeal_order_id` (`order_id`),
+    INDEX `idx_appeal_created_at` (`created_at`),
+    INDEX `idx_appeal_root_id` (`Root_id`),
+
+    -- 外键约束
+    CONSTRAINT `fk_appeals_argue1` FOREIGN KEY (`Argue1_id`) REFERENCES `users` (`User_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT `fk_appeals_argue2` FOREIGN KEY (`Argue2_id`) REFERENCES `users` (`User_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT `fk_appeals_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT `fk_appeals_root` FOREIGN KEY (`Root_id`) REFERENCES `Root` (`Root_id`) ON DELETE SET NULL ON UPDATE CASCADE
+
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='申诉表';
+
+-- 17. 创建特征表
+CREATE TABLE IF NOT EXISTS `tags` (
+    `TID` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
+    `tags_Id` JSON DEFAULT NULL COMMENT '标签ID（JSON格式）',
+    `category_id` INT UNSIGNED NOT NULL COMMENT '外键指向categories',
+    `tag_Name` VARCHAR(20) NOT NULL COMMENT '特征名',
+
+    -- 创建索引
+    INDEX `idx_tags_category_id` (`category_id`),
+    INDEX `idx_tags_tag_name` (`tag_Name`),
+
+    -- 外键约束
+    CONSTRAINT `fk_tags_category` FOREIGN KEY (`category_id`) REFERENCES `categories` (`category_id`) ON DELETE CASCADE ON UPDATE CASCADE
+
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='特征表';
