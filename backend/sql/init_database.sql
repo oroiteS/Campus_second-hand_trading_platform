@@ -73,6 +73,7 @@ CREATE TABLE IF NOT EXISTS `commodities` (
     `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '商品发布时间',
     `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '信息更新时间',
     `quantity` INT UNSIGNED NOT NULL DEFAULT 1 COMMENT '商品数量',
+    `newness` VARCHAR(50) NOT NULL COMMENT '商品新旧度（如：全新、9成新、8成新等）',
     
     -- 创建索引
     INDEX `idx_commodity_name` (`commodity_name`),
@@ -277,7 +278,7 @@ CREATE TABLE IF NOT EXISTS `appeals` (
     `Reason` TEXT NOT NULL COMMENT '申诉理由',
     `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '申诉发起（创建）时间',
     `Root_id` CHAR(9) DEFAULT NULL COMMENT '外键指向Root表',
-    `status` BOOLEAN DEFAULT FALSE comment '是否通过，通过代表完成'
+    `status` BOOLEAN DEFAULT FALSE comment '是否通过，通过代表完成',
 
     -- 创建索引
     INDEX `idx_appeal_argue1_id` (`Argue1_id`),

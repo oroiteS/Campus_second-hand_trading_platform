@@ -3,6 +3,8 @@ package com.campus.product_management_seller.controller;
 import com.campus.product_management_seller.dto.ApiResponse;
 import com.campus.product_management_seller.dto.CommodityDescriptionUpdateRequest;
 import com.campus.product_management_seller.dto.CommodityStatusUpdateRequest;
+import com.campus.product_management_seller.dto.CommodityCreateRequest;
+import com.campus.product_management_seller.dto.CommodityUpdateRequest;
 import com.campus.product_management_seller.service.CommodityService;
 import com.campus.product_management_seller.entity.Commodity;
 import jakarta.validation.Valid;
@@ -16,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/commodity")
@@ -28,7 +32,27 @@ public class CommodityController {
     private CommodityService commodityService;
     
     /**
-     * 上架商品
+     * 创建并上架商品接口
+     * @param request 商品创建请求
+     * @return 响应结果
+     */
+    @PostMapping("/create-and-put-on-sale")
+    public ResponseEntity<ApiResponse<Commodity>> createAndPutOnSale(@Valid @RequestBody CommodityCreateRequest request) {
+        logger.info("收到创建并上架商品请求: {}", request);
+        
+        try {
+            Commodity commodity = commodityService.createAndPutOnSale(request);
+            return ResponseEntity.ok(ApiResponse.success("商品创建并上架成功", commodity));
+            
+        } catch (Exception e) {
+            logger.error("商品创建并上架异常: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("商品创建并上架失败: " + e.getMessage(), "CREATE_FAILED"));
+        }
+    }
+    
+    /**
+     * 上架商品（原有功能，用于已存在商品的状态更新）
      * @param request 上架请求
      * @param bindingResult 验证结果
      * @return 响应结果
@@ -124,11 +148,54 @@ public class CommodityController {
     }
     
     /**
+     * 更新商品信息（名称、描述、价格、新旧度）
+     * @param request 更新请求
+     * @param bindingResult 验证结果
+     * @return 响应结果
+     */
+    @PostMapping("/update-info")
+    public ResponseEntity<ApiResponse<Void>> updateCommodityInfo(
+            @Valid @RequestBody CommodityUpdateRequest request,
+            BindingResult bindingResult) {
+        
+        logger.info("收到更新商品信息请求: {}", request);
+        
+        // 参数验证
+        if (bindingResult.hasErrors()) {
+            String errorMessage = bindingResult.getFieldErrors().get(0).getDefaultMessage();
+            logger.warn("更新商品信息参数验证失败: {}", errorMessage);
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("参数验证失败: " + errorMessage, "VALIDATION_ERROR"));
+        }
+        
+        try {
+            boolean success = commodityService.updateCommodityInfo(request);
+            
+            if (success) {
+                logger.info("商品信息更新成功: commodityId={}, sellerId={}", 
+                           request.getCommodityId(), request.getSellerId());
+                return ResponseEntity.ok(ApiResponse.success("商品信息更新成功"));
+            } else {
+                logger.warn("商品信息更新失败，商品不存在或无权限: commodityId={}, sellerId={}", 
+                           request.getCommodityId(), request.getSellerId());
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(ApiResponse.error("商品不存在或您无权限操作此商品", "COMMODITY_NOT_FOUND"));
+            }
+        } catch (Exception e) {
+            logger.error("商品信息更新异常: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("服务器内部错误: " + e.getMessage(), "INTERNAL_ERROR"));
+        }
+    }
+    
+    /**
      * 修改商品描述
+     * @deprecated 此接口已废弃，请使用 /update-info 接口进行商品信息更新
      * @param request 修改请求
      * @param bindingResult 验证结果
      * @return 响应结果
      */
+    @Deprecated
     @PostMapping("/update-description")
     public ResponseEntity<ApiResponse<Void>> updateDescription(
             @Valid @RequestBody CommodityDescriptionUpdateRequest request,

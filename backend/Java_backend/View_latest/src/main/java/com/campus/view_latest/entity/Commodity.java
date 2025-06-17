@@ -94,4 +94,10 @@ public class Commodity {
      */
     @TableField("quantity")
     private Integer quantity;
+
+    /**
+     * 商品新旧度
+     */
+    @TableField("newness")
+    private String newness;
 }
