@@ -8,7 +8,7 @@ spring:
     active: local  # 默认激活local profile
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://rm-cn-smw4b7vtl0001ho.rwlb.rds.aliyuncs.com/campus?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://localhost:3306/campus?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
     # username和password移除，在application-local.yml中配置
   
 mybatis-plus:
@@ -25,7 +25,7 @@ mybatis-plus:
 # JWT配置
 jwt:
   secret: campus-secondhand-platform-secret-key-2024
-  expiration: 3600000  # 1小时
+  expiration: 3600000  # 24小时
 
 # 日志配置
 logging:
