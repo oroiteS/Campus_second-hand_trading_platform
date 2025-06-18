@@ -46,7 +46,7 @@ func Load() *Config {
 	}
 
 	// 获取Redis DB配置，默认为0
-	redisDB := 0
+	redisDB := 1
 	if dbStr := os.Getenv("REDIS_DB"); dbStr != "" {
 		if db, err := strconv.Atoi(dbStr); err == nil {
 			redisDB = db
