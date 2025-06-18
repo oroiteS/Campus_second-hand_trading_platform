@@ -2650,3 +2650,5 @@ Identify and stop the process that's listening on port 8081 or configure this ap
 2025-06-18 09:03:07.295 [http-nio-8095-exec-9] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
 2025-06-18 09:03:07.295 [http-nio-8095-exec-9] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [{code=400, message=购买数量超过商品库存。当前库存：4，请求数量：10, success=false}]
 2025-06-18 09:03:07.295 [http-nio-8095-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - Completed 400 BAD_REQUEST
+2025-06-18 09:13:18.607 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - OrderManagementDevHikariCP - Shutdown initiated...
+2025-06-18 09:13:18.619 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - OrderManagementDevHikariCP - Shutdown completed.
