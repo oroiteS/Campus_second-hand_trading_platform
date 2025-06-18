@@ -90,7 +90,9 @@ export default {
       // 敏感词列表
       sensitiveWords: [
         // 辱骂词汇
-        '辱骂',
+        '傻逼', '白痴', '智障', '脑残', '垃圾', '废物', '混蛋', '王八蛋', '狗屎', '操你妈',
+        '去死', '滚蛋', '畜生', '贱人', '婊子', '妓女', '草泥马', '日你妈', '你妈的', '他妈的',
+        '妈的', '靠', '艹', '草', '尼玛', '煞笔', 'sb', 'SB', 'cnm', 'CNM', 'nmsl', 'NMSL',
         //政治
         '政治'
       ]
@@ -226,7 +228,7 @@ export default {
     // 内容检测方法
     checkMessageContent(content) {
       const lowerContent = content.toLowerCase()
-
+      
       // 检查是否包含敏感词
       for (let word of this.sensitiveWords) {
         if (lowerContent.includes(word.toLowerCase())) {
@@ -236,7 +238,7 @@ export default {
           }
         }
       }
-
+      
       // 检查是否全是特殊字符或数字（可能的垃圾信息）
       const specialCharPattern = /^[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?\s\d]*$/
       if (specialCharPattern.test(content)) {
@@ -245,7 +247,7 @@ export default {
           message: '请发送有意义的文字内容'
         }
       }
-
+      
       // 检查消息长度
       if (content.length > 500) {
         return {
@@ -253,7 +255,7 @@ export default {
           message: '消息内容过长，请控制在500字以内'
         }
       }
-
+      
       return { isValid: true }
     },
 

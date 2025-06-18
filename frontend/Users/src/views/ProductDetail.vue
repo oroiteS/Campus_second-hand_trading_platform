@@ -475,15 +475,12 @@ export default {
       this.currentImageIndex = index
     },
     contactSeller() {
-      // 跳转到聊天页面，传递商品和卖家信息
+      // 获取从Home.vue传递过来的userId
+      const userId = this.$route.query.userId;
+      
+      // 跳转到聊天列表页面，使用路径参数传递userId
       this.$router.push({
-        path: '/chat',
-        query: {
-          productId: this.product.id,
-          sellerId: this.product.seller.id,
-          sellerName: this.product.seller.name,
-          sellerSchool: this.product.seller.school
-        }
+        path: `/chat-list/${userId}`,
       })
     },
     buyNow() {
