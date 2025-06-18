@@ -57,6 +57,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   name: 'PasswordReset',
   data() {
@@ -113,29 +115,51 @@ export default {
       this.isLoading = true
       
       try {
-        // 这里应该调用实际的API进行密码修改
-        // 模拟API调用
+        // 调用后端API进行密码修改
         console.log('修改密码，用户ID:', this.userId)
         
-        // 在实际API调用中使用userId参数
-        // 例如：await api.updatePassword(this.userId, this.currentPassword, this.newPassword)
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        if (!this.userId) {
+          this.errorMessage = '用户ID不存在，请重新登录'
+          return
+        }
         
-        // 模拟成功响应
-        this.successMessage = '密码修改成功！'
+        // 调用后端API
+        const response = await axios.post('http://localhost:8089/api/user/password/change', {
+          userId: this.userId,
+          oldPassword: this.currentPassword,
+          newPassword: this.newPassword
+        })
         
-        // 清空表单
-        this.currentPassword = ''
-        this.newPassword = ''
-        this.confirmPassword = ''
-        
-        // 3秒后自动返回上一页
-        setTimeout(() => {
-          this.goBack()
-        }, 3000)
+        // 处理响应
+        if (response.data.success && response.data.code === 200) {
+          this.successMessage = response.data.message || '密码修改成功！'
+          
+          // 清空表单
+          this.currentPassword = ''
+          this.newPassword = ''
+          this.confirmPassword = ''
+          
+          // 3秒后自动返回上一页
+          setTimeout(() => {
+            this.goBack()
+          }, 3000)
+        } else {
+          this.errorMessage = response.data.message || '密码修改失败，请稍后再试'
+        }
       } catch (error) {
         console.error('密码修改失败:', error)
-        this.errorMessage = '密码修改失败，请稍后再试'
+        // 处理不同类型的错误
+        if (error.response) {
+          // 服务器返回了错误状态码
+          const responseData = error.response.data
+          this.errorMessage = responseData.message || `密码修改失败: ${error.response.status} ${error.response.statusText}`
+        } else if (error.request) {
+          // 请求已发送但没有收到响应
+          this.errorMessage = '服务器无响应，请检查网络连接'
+        } else {
+          // 请求设置时发生错误
+          this.errorMessage = `请求错误: ${error.message}`
+        }
       } finally {
         this.isLoading = false
       }
