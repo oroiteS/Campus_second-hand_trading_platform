@@ -1,0 +1,7 @@
+# 数据库连接配置
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/campus?useSSL=false&serverTimezone=Asia/Shanghai
+    username: campus_test
+    password: campus_suep
+    driver-class-name: com.mysql.cj.jdbc.Driver
