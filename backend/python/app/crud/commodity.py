@@ -44,7 +44,7 @@ def get_commodities_username(db: Session) -> List[Commodity_username]:
             Commodity.commodity_name,
             Commodity.commodity_description,
             Commodity.category_id,
-            Commodity.tags,
+            Commodity.tags_Id,
             Commodity.current_price,
             Commodity.commodity_status,
             Commodity.seller_id,
@@ -52,6 +52,8 @@ def get_commodities_username(db: Session) -> List[Commodity_username]:
             Commodity.image_list,
             Commodity.created_at,
             Commodity.updated_at,
+            Commodity.newness,
+            Commodity.quantity,
             User.user_name
         )
         .join(User, Commodity.seller_id == User.user_id)
@@ -75,6 +77,7 @@ def get_commodity_recommendation(db: Session,user_id: str) -> List[Commodity]:
 
     #合并两个list
     results_commendation_cid = results_commendation_buy_cid + results_commendation_like_cid
+    print('推荐结果',results_commendation_buy_cid)
     #去重
     results_commendation_cid = list(set(results_commendation_cid))
     #返回

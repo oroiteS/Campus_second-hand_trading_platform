@@ -24,6 +24,9 @@ class CommodityBase(BaseModel):
     seller_id: str
     main_image_url: Optional[str] = None
     image_list: Optional[List[str]] = None
+    quantity: int
+    newness: str
+
 
 
 class CommodityCreate(CommodityBase):

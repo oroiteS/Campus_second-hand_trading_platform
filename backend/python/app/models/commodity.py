@@ -15,7 +15,7 @@ class Commodity(Base):
     commodity_name = Column(String(100))
     commodity_description = Column(Text)
     category_id = Column(Integer)
-    tags_id = Column(JSON)
+    tags_Id = Column(JSON)
     
     # 价格和状态字段
     current_price = Column(DECIMAL(10, 2))
@@ -31,6 +31,10 @@ class Commodity(Base):
     # 时间戳字段
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+    
+    # 其他字段
+    quantity = Column(Integer)
+    newness = Column(String(20))
     
     def __repr__(self):
         return f"<Commodity(id={self.commodity_id}, name={self.commodity_name}, price={self.current_price})>"
