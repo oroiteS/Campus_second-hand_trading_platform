@@ -13,13 +13,14 @@ import (
 // InitRedis 初始化Redis连接
 func InitRedis(cfg config.RedisConfig) (*redis.Client, error) {
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     fmt.Sprintf("%s:%s", cfg.Host, cfg.Port),
-		Password: cfg.Password,
-		DB:       cfg.DB,
-		PoolSize: 10,
+		Addr:         fmt.Sprintf("%s:%s", cfg.Host, cfg.Port),
+		Username:     cfg.Username,
+		Password:     cfg.Password,
+		DB:           cfg.DB,
+		PoolSize:     10,
 		MinIdleConns: 5,
-		MaxConnAge: time.Hour,
-		IdleTimeout: time.Minute * 5,
+		MaxConnAge:   time.Hour,
+		IdleTimeout:  time.Minute * 5,
 	})
 
 	// 测试连接

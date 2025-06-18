@@ -114,7 +114,7 @@ export default {
       }
 
       try {
-        const response = await fetch(`http://localhost:8080/api/v1/chat/user/${userId}/info`)
+        const response = await fetch(`http://localhost:8088/api/v1/chat/user/${userId}/info`)
         this.currentUser = await response.json()
       } catch (error) {
         console.error('获取用户信息失败:', error)
@@ -123,7 +123,7 @@ export default {
 
     async loadSessions() {
       try {
-        const response = await fetch(`http://localhost:8080/api/v1/chat/user/${this.currentUser.user_id}/sessions`)
+        const response = await fetch(`http://localhost:8088/api/v1/chat/user/${this.currentUser.user_id}/sessions`)
         this.sessions = await response.json()
 
         // 为每个会话加载最后一条消息和未读数量
@@ -138,7 +138,7 @@ export default {
 
     async loadSessionLastMessage(session) {
       try {
-        const response = await fetch(`http://localhost:8080/api/v1/chat/session/${session.session_id}/messages?limit=1&offset=0`)
+        const response = await fetch(`http://localhost:8088/api/v1/chat/session/${session.session_id}/messages?limit=1&offset=0`)
         const messages = await response.json()
         if (messages.length > 0) {
           session.lastMessage = messages[0].content
@@ -152,7 +152,7 @@ export default {
     async loadSessionUnreadCount(session) {
       try {
         // 获取会话中当前用户未读的消息数量
-        const response = await fetch(`http://localhost:8080/api/v1/chat/session/${session.session_id}/messages?limit=100&offset=0`)
+        const response = await fetch(`http://localhost:8088/api/v1/chat/session/${session.session_id}/messages?limit=100&offset=0`)
         const messages = await response.json()
 
         // 计算当前用户作为接收者的未读消息数量
@@ -179,7 +179,7 @@ export default {
     async markSessionAsRead(session) {
       try {
         // 获取会话中当前用户未读的消息
-        const response = await fetch(`http://localhost:8080/api/v1/chat/session/${session.session_id}/messages?limit=100&offset=0`)
+        const response = await fetch(`http://localhost:8088/api/v1/chat/session/${session.session_id}/messages?limit=100&offset=0`)
         const messages = await response.json()
 
         const unreadMessages = messages.filter(msg =>
@@ -188,7 +188,7 @@ export default {
 
         // 标记所有未读消息为已读
         for (let message of unreadMessages) {
-          await fetch(`http://localhost:8080/api/v1/chat/messages/${message.message_id}/read?user_id=${this.currentUser.user_id}`, {
+          await fetch(`http://localhost:8088/api/v1/chat/messages/${message.message_id}/read?user_id=${this.currentUser.user_id}`, {
             method: 'PUT'
           })
         }
@@ -202,7 +202,7 @@ export default {
 
     async loadMessages() {
       try {
-        const response = await fetch(`http://localhost:8080/api/v1/chat/session/${this.selectedSessionId}/messages?limit=50&offset=0`)
+        const response = await fetch(`http://localhost:8088/api/v1/chat/session/${this.selectedSessionId}/messages?limit=50&offset=0`)
         this.messages = await response.json()
         this.scrollToBottom()
       } catch (error) {
@@ -213,7 +213,7 @@ export default {
     // 内容检测方法
     checkMessageContent(content) {
       const lowerContent = content.toLowerCase()
-      
+
       // 检查是否包含敏感词
       for (let word of this.sensitiveWords) {
         if (lowerContent.includes(word.toLowerCase())) {
@@ -223,7 +223,7 @@ export default {
           }
         }
       }
-      
+
       // 检查是否全是特殊字符或数字（可能的垃圾信息）
       const specialCharPattern = /^[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?\s\d]*$/
       if (specialCharPattern.test(content)) {
@@ -232,7 +232,7 @@ export default {
           message: '请发送有意义的文字内容'
         }
       }
-      
+
       // 检查消息长度
       if (content.length > 500) {
         return {
@@ -240,7 +240,7 @@ export default {
           message: '消息内容过长，请控制在500字以内'
         }
       }
-      
+
       return { isValid: true }
     },
 
@@ -272,7 +272,7 @@ export default {
       const otherUser = this.getOtherUser(this.selectedSession)
 
       try {
-        const response = await fetch('http://localhost:8080/api/v1/chat/messages', {
+        const response = await fetch('http://localhost:8088/api/v1/chat/messages', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -297,7 +297,7 @@ export default {
     },
 
     connectWebSocket() {
-      this.ws = new WebSocket(`ws://localhost:8080/api/v1/ws/${this.currentUser.user_id}`)
+      this.ws = new WebSocket(`ws://localhost:8088/api/v1/ws/${this.currentUser.user_id}`)
 
       this.ws.onmessage = (event) => {
         const data = JSON.parse(event.data)

@@ -1,14 +1,13 @@
 package config
 
-import (
-	"os"
-)
+import "os"
 
 // Config 应用配置结构
 type Config struct {
-	Server ServerConfig
-	MySQL  MySQLConfig
-	Redis  RedisConfig
+	Server  ServerConfig
+	MySQL   MySQLConfig
+	Redis   RedisConfig
+	MongoDB MongoDBConfig
 }
 
 // ServerConfig 服务器配置
@@ -29,31 +28,34 @@ type MySQLConfig struct {
 type RedisConfig struct {
 	Host     string
 	Port     string
-	Username string
 	Password string
 	DB       int
+}
+
+// MongoDBConfig MongoDB配置
+type MongoDBConfig struct {
 }
 
 // Load 加载配置
 func Load() *Config {
 	return &Config{
 		Server: ServerConfig{
-			Port: getEnv("SERVER_PORT", "8088"),
+			Port: getEnv("SERVER_PORT", "8091"),
 		},
 		MySQL: MySQLConfig{
-			Host:     getEnv("MYSQL_HOST", "rm-cn-smw4b7vtl0001ho.rwlb.rds.aliyuncs.com"),
+			Host:     getEnv("MYSQL_HOST", "localhost"),
 			Port:     getEnv("MYSQL_PORT", "3306"),
 			User:     getEnv("MYSQL_USER", "campus_test"),
-			Password: getEnv("MYSQL_PASSWORD", "Campus_suep2022"),
+			Password: getEnv("MYSQL_PASSWORD", "campus_suep"),
 			Database: getEnv("MYSQL_DATABASE", "campus"),
 		},
 		Redis: RedisConfig{
-			Host:     getEnv("REDIS_HOST", "r-uf683p0x96aj2ht6whpd.redis.rds.aliyuncs.com"),
+			Host:     getEnv("REDIS_HOST", "localhost"),
 			Port:     getEnv("REDIS_PORT", "6379"),
-			Username: getEnv("REDIS_USERNAME", "campus_test"),
-			Password: getEnv("REDIS_PASSWORD", "Campus_suep2022"),
+			Password: getEnv("REDIS_PASSWORD", "123456"),
 			DB:       0,
 		},
+		MongoDB: MongoDBConfig{},
 	}
 }
 

@@ -2,17 +2,16 @@ package database
 
 import (
 	"fmt"
-	"time"
-
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	"time"
 
-	"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/chat/config"
+	"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/comment/config"
 )
 
-// InitMySQL 初始化MySQL连接
-func InitMySQL(cfg config.MySQLConfig) (*gorm.DB, error) {
+// InitMySQL 初始化MySQL数据库
+func InitMySQL(cfg *config.MySQLConfig) (*gorm.DB, error) {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		cfg.User,
 		cfg.Password,
