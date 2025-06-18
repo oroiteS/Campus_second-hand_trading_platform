@@ -9,6 +9,8 @@ from app.schemas.Response import ResponseBase
 from app.schemas.register_Request import RegisterRequest
 from app.schemas.BuyCommodityRequest import BuyCommodityRequest
 from app.schemas.ClickCommodityRequest import ClickCommodityRequest
+from app.schemas.AddCartRequest import AddCartRequest
+from app.schemas.UploadCommodityRequest import UploadCommodityRequest
 
 from app.api.deps import get_db
 
@@ -51,9 +53,9 @@ def update_commodity_status(
         return {"code": "1"}
 
 @router.get("/recommendation/{user_id}",response_model=List[Commodity])
-def get_recommendation_commodity_id(user_id:str,db: Session= Depends(get_db)):
-    """给指定用户推送推荐的商品id"""
-    commodity_list = crud_commodity.get_commodity_id(db,user_id)
+def get_recommendation_commodity_recommendation(user_id:str,db: Session= Depends(get_db)):
+    """给指定用户推送推荐的商品"""
+    commodity_list = crud_commodity.get_commodity_recommendation(db,user_id)
     return commodity_list
     
 
@@ -86,6 +88,33 @@ def buy_commodity(request:BuyCommodityRequest,db: Session = Depends(get_db)):
 def click_commodity(request:ClickCommodityRequest,db: Session = Depends(get_db)):
     """用户点击商品时，更新用户兴趣行为"""
     result = crud_commodity.click_commodity(request,db)
+    if result == 0:
+        return {"code": 0}
+    else:
+        return {"code": 1}
+
+@router.post("/add_cart",response_model=ResponseBase)
+def add_cart(request:AddCartRequest,db: Session = Depends(get_db)):
+    """用户将商品加入购物车时，更新用户兴趣行为"""
+    result = crud_commodity.add_cart(request,db)
+    if result == 0:
+        return {"code": 0}
+    else:
+        return {"code": 1}
+
+@router.post("/upload_commodity",response_model=ResponseBase)
+def upload_commodity(request:UploadCommodityRequest,db: Session = Depends(get_db)):
+    """用户上传商品时，更新商品嵌入向量"""
+    result = crud_commodity.upload_commodity(request,db)
+    if result == 0:
+        return {"code": 0}
+    else:
+        return {"code": 1}
+
+@router.delete("/delete_commodity",response_model=ResponseBase)
+def delete_commodity(request:Commodity_id,db: Session = Depends(get_db)):
+    """用户删除商品时，删除商品嵌入向量"""
+    result = crud_commodity.delete_commodity(request,db)
     if result == 0:
         return {"code": 0}
     else:

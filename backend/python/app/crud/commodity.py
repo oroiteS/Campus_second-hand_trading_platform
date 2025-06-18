@@ -10,14 +10,16 @@ import numpy as np
 load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), '.env'))
 from app.models.commodity import Commodity
 from app.models.user import User
-from app.schemas.commodity import Commodity_username
+from app.schemas.commodity import Commodity_username,Commodity_id
 from sqlalchemy import select, or_, func
 from app.lib.Tokenization import Tokenization
 from app.schemas.SearchCommodityRequest import SearchCommodityRequest
 from app.schemas.register_Request import RegisterRequest
-from app.lib.text_embedding import get_embedding,get_embedding_tag_id,get_embedding_category_id,get_embedding_commodity_id,get_embedding_commodity_id
+from app.lib.text_embedding import get_embedding,get_embedding_tag_id,get_embedding_category_id,get_embedding_commodity_id,get_embedding_commodity_id,update_embedding_commodity_id,delete_embedding_commodity_id
 from app.schemas.BuyCommodityRequest import BuyCommodityRequest
 from app.schemas.ClickCommodityRequest import ClickCommodityRequest
+from app.schemas.AddCartRequest import AddCartRequest
+from app.schemas.UploadCommodityRequest import UploadCommodityRequest
 
 from app.lib.get_embedding import Embedder
 import random
@@ -63,7 +65,7 @@ def get_commodities_username(db: Session) -> List[Commodity_username]:
     #     Commodity_username.model_validate(row._asdict()) for row in results
     # ]
     return results
-def get_commodity_id(db: Session,user_id: str) -> List[Commodity]:
+def get_commodity_recommendation(db: Session,user_id: str) -> List[Commodity]:
     """获取推荐的商品list"""
     #部分1-按照用户的购买行为返回list
     embedder = Embedder()
@@ -80,7 +82,6 @@ def get_commodity_id(db: Session,user_id: str) -> List[Commodity]:
     results_commendation = db.execute(query).scalars().all()
     query2 = select(Commodity).where(Commodity.commodity_id.in_(results_commendation_like_cid))
     res = db.execute(query2).scalars().all()
-    print("喜好",res)
     return results_commendation
 
 
@@ -240,6 +241,33 @@ def click_commodity(request:ClickCommodityRequest,db: Session):
     #1.2-更新用户画像
     user_doc = mongo_collection.find_one({"user_id": user_id,"action":"like"})
     if user_doc:
+        # 计算新的嵌入向量(利用0.92与0.08的权重更新)
+        new_embedding = 0.92*np.array(user_doc["embedding"]) + 0.08*np.array(commodity_embedding)
+        # 更新用户文档
+        now = datetime.datetime.now()
+        mongo_collection.update_one(
+            {"_id": user_doc["_id"]},
+            {"$set": {"embedding": new_embedding.tolist(), "updated_at": now}}
+        )
+    else:
+        return 1
+    return 0
+
+def add_cart(request:AddCartRequest,db: Session):#add与click可以考虑优化合并
+    user_id = request.user_id
+    commodity_id = request.commodity_id
+        #1-更新用户画像
+    mongo_uri = os.getenv("MONGODB_URI")
+    mongo_db_name = os.getenv("MONGODB_DB_NAME")
+    mongo_collection_name = "user_embeddings"
+    mongo_client = pymongo.MongoClient(mongo_uri)
+    mongo_db = mongo_client[mongo_db_name]
+    mongo_collection = mongo_db[mongo_collection_name]
+    #1.1-获取商品嵌入向量
+    commodity_embedding = get_embedding_commodity_id(commodity_id)
+    #1.2-更新用户画像
+    user_doc = mongo_collection.find_one({"user_id": user_id,"action":"like"})
+    if user_doc:
         # 计算新的嵌入向量(利用0.9与0.1的权重更新)
         new_embedding = 0.9*np.array(user_doc["embedding"]) + 0.1*np.array(commodity_embedding)
         # 更新用户文档
@@ -251,3 +279,25 @@ def click_commodity(request:ClickCommodityRequest,db: Session):
     else:
         return 1
     return 0
+
+def upload_commodity(request:UploadCommodityRequest,db:Session):
+    seller_id = request.seller_id
+    commodity_id = request.commodity_id
+    category_id = request.category_id
+    tags = request.tags
+    #更新商品根基向量库
+    embedding_category = get_embedding_category_id(category_id=category_id)
+    embedding_tags = np.zeros(2560)
+    for tag_id in tags:
+        tag_embedding = get_embedding_tag_id(tag_id=tag_id)
+        embedding_tags += tag_embedding 
+    embedding_sum = embedding_category + embedding_tags
+    #更新商品向量库
+    code = update_embedding_commodity_id(commodity_id,embedding_sum,seller_id)
+    return code
+
+def delete_commodity(request:Commodity_id,db:Session):
+    commodity_id = request.commodity_id
+    #删除商品向量库
+    code = delete_embedding_commodity_id(commodity_id)
+    return code

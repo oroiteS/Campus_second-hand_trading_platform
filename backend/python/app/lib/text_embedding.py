@@ -60,3 +60,29 @@ def get_embedding_commodity_id(commodity_id):
         return query["embeddings"][0]
     else:
         return np.zeros(2560)
+def update_embedding_commodity_id(commodity_id,embedding,seller_id):
+    client = chromadb.PersistentClient("app/embedding_folder")
+    collection = client.get_or_create_collection("commodities")
+    try:
+        collection.upsert(
+            ids=[commodity_id],
+            embeddings=[embedding.tolist()],
+            metadatas= [
+                {
+                    'seller_id':seller_id
+                }
+            ]
+        )
+    except Exception as e:
+        return 1
+    return 0
+def delete_embedding_commodity_id(commodity_id):
+    client = chromadb.PersistentClient("app/embedding_folder")
+    collection = client.get_or_create_collection("commodities")
+    try:
+        collection.delete(
+            ids=[commodity_id]
+        )
+    except Exception as e:
+        return 1
+    return 0
