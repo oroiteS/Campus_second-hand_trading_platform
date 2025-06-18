@@ -4,13 +4,17 @@ import com.campus.product_management_seller.repository.CommodityRepository;
 import com.campus.product_management_seller.entity.Commodity;
 import com.campus.product_management_seller.dto.CommodityCreateRequest;
 import com.campus.product_management_seller.dto.CommodityUpdateRequest;
+import com.campus.product_management_seller.util.OssUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -23,6 +27,9 @@ public class CommodityService {
     
     @Autowired
     private CommodityRepository commodityRepository;
+    
+    @Autowired
+    private OssUtil ossUtil;
     
     /**
      * 创建并上架商品
@@ -138,6 +145,84 @@ public class CommodityService {
         result.append("]");
         
         return result.toString();
+    }
+    
+    /**
+     * 创建并上架商品（支持图片上传）
+     * @param request 商品创建请求
+     * @param images 商品图片文件数组
+     * @return 创建的商品信息
+     */
+    public Commodity createAndPutOnSaleWithImages(CommodityCreateRequest request, MultipartFile[] images) {
+        logger.info("尝试创建并上架商品（带图片上传）: {}", request.getCommodityName());
+        
+        try {
+            // 生成随机商品ID
+            String commodityId = UUID.randomUUID().toString();
+            
+            // 上传图片到OSS并获取URL列表
+            List<String> imageUrls = ossUtil.uploadCommodityImages(Arrays.asList(images), request.getSellerId());
+            
+            // 处理图片URL，添加https前缀
+            String mainImageUrl = null;
+            String imageListJson = null;
+            
+            if (imageUrls != null && !imageUrls.isEmpty()) {
+                // 为所有URL添加https前缀
+                List<String> httpsImageUrls = new ArrayList<>();
+                for (String url : imageUrls) {
+                    String httpsUrl = "https://" + url;
+                    httpsImageUrls.add(httpsUrl);
+                }
+                
+                // 第一张图片作为主图
+                mainImageUrl = httpsImageUrls.get(0);
+                
+                // 如果有多张图片，将所有图片URL保存到imageList
+                if (httpsImageUrls.size() > 1) {
+                    StringBuilder imageListBuilder = new StringBuilder("[");
+                    for (int i = 0; i < httpsImageUrls.size(); i++) {
+                        if (i > 0) {
+                            imageListBuilder.append(",");
+                        }
+                        imageListBuilder.append("\"").append(httpsImageUrls.get(i)).append("\"");
+                    }
+                    imageListBuilder.append("]");
+                    imageListJson = imageListBuilder.toString();
+                } else {
+                    // 只有一张图片时，imageList保存该图片URL的JSON数组格式
+                    imageListJson = "[\"" + mainImageUrl + "\"]";
+                }
+            }
+            
+            // 创建商品实体
+            Commodity commodity = new Commodity();
+            commodity.setCommodityId(commodityId);
+            commodity.setCommodityName(request.getCommodityName());
+            commodity.setCommodityDescription(request.getCommodityDescription());
+            commodity.setCategoryId(request.getCategoryId());
+            commodity.setTagsId(processTagsId(request.getTagsId()));
+            commodity.setCurrentPrice(request.getCurrentPrice());
+            commodity.setMainImageUrl(mainImageUrl);
+            commodity.setImageList(imageListJson);
+            commodity.setQuantity(request.getQuantity());
+            commodity.setSellerId(request.getSellerId());
+            commodity.setNewness(request.getNewness());
+            commodity.setCommodityStatus(Commodity.CommodityStatus.ON_SALE);
+            commodity.setCreatedAt(LocalDateTime.now());
+            commodity.setUpdatedAt(LocalDateTime.now());
+            
+            // 保存到数据库
+            Commodity savedCommodity = commodityRepository.save(commodity);
+            
+            logger.info("商品创建并上架成功（带图片上传）: commodityId={}, sellerId={}, 图片数量={}", 
+                       commodityId, request.getSellerId(), imageUrls != null ? imageUrls.size() : 0);
+            return savedCommodity;
+            
+        } catch (Exception e) {
+            logger.error("商品创建并上架异常（带图片上传）: sellerId={}, error={}", request.getSellerId(), e.getMessage(), e);
+            throw new RuntimeException("商品创建并上架失败: " + e.getMessage(), e);
+        }
     }
     
     /**

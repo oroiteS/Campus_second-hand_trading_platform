@@ -11,6 +11,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -84,11 +86,92 @@ public class GlobalExceptionHandler {
         logger.warn("参数类型不匹配: parameter={}, value={}, requiredType={}", 
                    e.getName(), e.getValue(), e.getRequiredType());
         
+        // 特殊处理 images 参数的错误
+        if ("images".equals(e.getName())) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("图片参数格式不正确，请确保使用正确的 multipart/form-data 格式上传图片文件", "IMAGES_FORMAT_ERROR"));
+        }
+        
         String errorMessage = String.format("参数 '%s' 的值 '%s' 类型不正确，期望类型: %s", 
                                            e.getName(), e.getValue(), e.getRequiredType().getSimpleName());
         
         return ResponseEntity.badRequest()
                 .body(ApiResponse.error(errorMessage, "TYPE_MISMATCH"));
+    }
+    
+    /**
+     * 处理 multipart 请求解析异常
+     */
+    @ExceptionHandler(org.springframework.web.multipart.MultipartException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMultipartException(
+            org.springframework.web.multipart.MultipartException e) {
+        
+        logger.warn("Multipart 请求解析异常: {}", e.getMessage());
+        
+        // 检查是否是图片格式相关的错误
+        if (e.getMessage() != null && 
+            (e.getMessage().contains("index0errorValue must be a string") ||
+             e.getMessage().contains("Failed to parse multipart") ||
+             e.getMessage().contains("Current request is not a multipart request"))) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("图片上传格式错误。请确保：1) 使用 multipart/form-data 格式；2) 图片参数名为 'images'；3) 每个图片文件单独添加到 FormData 中；4) 不要手动设置 Content-Type", "MULTIPART_FORMAT_ERROR"));
+        }
+        
+        return ResponseEntity.badRequest()
+                .body(ApiResponse.error("文件上传格式错误: " + e.getMessage(), "MULTIPART_ERROR"));
+    }
+    
+    /**
+     * 处理缺失的 multipart 请求部分异常
+     */
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMissingServletRequestPartException(
+            MissingServletRequestPartException e) {
+        
+        logger.warn("缺失请求部分: {}", e.getMessage());
+        
+        if ("images".equals(e.getRequestPartName())) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("商品图片不能为空，请至少上传一张图片", "IMAGES_REQUIRED"));
+        }
+        
+        return ResponseEntity.badRequest()
+                .body(ApiResponse.error("缺失必要的请求参数: " + e.getRequestPartName(), "MISSING_REQUEST_PART"));
+    }
+    
+    /**
+     * 处理缺失的请求参数异常
+     */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMissingServletRequestParameterException(
+            MissingServletRequestParameterException e) {
+        
+        logger.warn("缺失请求参数: {}", e.getMessage());
+        
+        return ResponseEntity.badRequest()
+                .body(ApiResponse.error("缺失必要的请求参数: " + e.getParameterName(), "MISSING_PARAMETER"));
+    }
+    
+    /**
+     * 处理 HTTP 消息不可读异常（通常是请求体解析失败）
+     */
+    @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiResponse<Void>> handleHttpMessageNotReadableException(
+            org.springframework.http.converter.HttpMessageNotReadableException e) {
+        
+        logger.warn("HTTP 消息不可读异常: {}", e.getMessage());
+        
+        // 检查是否是图片上传相关的错误
+        if (e.getMessage() != null && 
+            (e.getMessage().contains("index0errorValue must be a string") ||
+             e.getMessage().contains("Required request part") ||
+             e.getMessage().contains("multipart"))) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("请求格式错误。对于图片上传，请确保：1) 使用 POST 方法；2) Content-Type 为 multipart/form-data；3) 图片文件正确添加到 'images' 参数中", "REQUEST_FORMAT_ERROR"));
+        }
+        
+        return ResponseEntity.badRequest()
+                .body(ApiResponse.error("请求格式错误: " + e.getMessage(), "MESSAGE_NOT_READABLE"));
     }
     
     /**
@@ -99,6 +182,12 @@ public class GlobalExceptionHandler {
             IllegalArgumentException e) {
         
         logger.warn("非法参数异常: {}", e.getMessage());
+        
+        // 特殊处理图片相关的错误信息
+        if (e.getMessage() != null && e.getMessage().contains("index0errorValue must be a string")) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("图片上传格式错误，请确保使用正确的 FormData 格式，每个图片文件都要单独添加到 'images' 参数中", "IMAGES_FORMAT_ERROR"));
+        }
         
         return ResponseEntity.badRequest()
                 .body(ApiResponse.error("参数错误: " + e.getMessage(), "ILLEGAL_ARGUMENT"));

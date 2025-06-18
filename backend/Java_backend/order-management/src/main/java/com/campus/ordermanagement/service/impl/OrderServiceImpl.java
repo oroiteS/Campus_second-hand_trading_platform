@@ -13,6 +13,10 @@ import com.campus.ordermanagement.util.UUIDGenerator;
 // import com.campus.product_management_seller.entity.Commodity;
 // import com.campus.product_management_seller.repository.CommodityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +40,13 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(value = "ordersByBuyer", key = "#request.buyerId"),
+        @CacheEvict(value = "ordersBySeller", key = "#request.sellerId"),
+        @CacheEvict(value = "ordersByCommodity", key = "#request.commodityId"),
+        @CacheEvict(value = "orderStatistics", key = "#request.buyerId + '_buyer'"),
+        @CacheEvict(value = "orderStatistics", key = "#request.sellerId + '_seller'")
+    })
     public OrderResponse createOrder(CreateOrderRequest request) {
         // 参数验证
         validateCreateOrderRequest(request);
@@ -113,17 +124,25 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "orders", key = "#orderId", unless = "#result == null")
     public Optional<OrderResponse> getOrderById(String orderId) {
         if (orderId == null || orderId.trim().isEmpty()) {
             return Optional.empty();
         }
         
         Order order = orderRepository.selectById(orderId.trim());
-        return order != null ? Optional.of(new OrderResponse(order)) : Optional.empty();
+        if (order != null) {
+            OrderResponse response = new OrderResponse(order);
+            // 查询商品信息并设置到响应中
+            enrichOrderResponseWithCommodityInfo(response, order.getCommodityId());
+            return Optional.of(response);
+        }
+        return Optional.empty();
     }
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "ordersByBuyer", key = "#buyerId")
     public List<OrderResponse> getOrdersByBuyerId(String buyerId) {
         if (buyerId == null || buyerId.trim().isEmpty()) {
             throw new IllegalArgumentException("买家ID不能为空");
@@ -131,12 +150,17 @@ public class OrderServiceImpl implements OrderService {
         
         List<Order> orders = orderRepository.findByBuyerId(buyerId.trim());
         return orders.stream()
-                .map(OrderResponse::new)
+                .map(order -> {
+                    OrderResponse response = new OrderResponse(order);
+                    enrichOrderResponseWithCommodityInfo(response, order.getCommodityId());
+                    return response;
+                })
                 .collect(Collectors.toList());
     }
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "ordersBySeller", key = "#sellerId")
     public List<OrderResponse> getOrdersBySellerId(String sellerId) {
         if (sellerId == null || sellerId.trim().isEmpty()) {
             throw new IllegalArgumentException("卖家ID不能为空");
@@ -144,12 +168,17 @@ public class OrderServiceImpl implements OrderService {
         
         List<Order> orders = orderRepository.findBySellerId(sellerId.trim());
         return orders.stream()
-                .map(OrderResponse::new)
+                .map(order -> {
+                    OrderResponse response = new OrderResponse(order);
+                    enrichOrderResponseWithCommodityInfo(response, order.getCommodityId());
+                    return response;
+                })
                 .collect(Collectors.toList());
     }
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "ordersByCommodity", key = "#commodityId")
     public List<OrderResponse> getOrdersByCommodityId(String commodityId) {
         if (commodityId == null || commodityId.trim().isEmpty()) {
             throw new IllegalArgumentException("商品ID不能为空");
@@ -157,7 +186,11 @@ public class OrderServiceImpl implements OrderService {
         
         List<Order> orders = orderRepository.findByCommodityId(commodityId.trim());
         return orders.stream()
-                .map(OrderResponse::new)
+                .map(order -> {
+                    OrderResponse response = new OrderResponse(order);
+                    enrichOrderResponseWithCommodityInfo(response, order.getCommodityId());
+                    return response;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -170,7 +203,11 @@ public class OrderServiceImpl implements OrderService {
         
         List<Order> orders = orderRepository.findByOrderStatus(status.getCode());
         return orders.stream()
-                .map(OrderResponse::new)
+                .map(order -> {
+                    OrderResponse response = new OrderResponse(order);
+                    enrichOrderResponseWithCommodityInfo(response, order.getCommodityId());
+                    return response;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -183,7 +220,11 @@ public class OrderServiceImpl implements OrderService {
         
         List<Order> orders = orderRepository.findByUserId(userId.trim());
         return orders.stream()
-                .map(OrderResponse::new)
+                .map(order -> {
+                    OrderResponse response = new OrderResponse(order);
+                    enrichOrderResponseWithCommodityInfo(response, order.getCommodityId());
+                    return response;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -270,6 +311,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @Caching(evict = {
+        @CacheEvict(value = "orders", key = "#orderId"),
+        @CacheEvict(value = "ordersByBuyer", allEntries = true),
+        @CacheEvict(value = "ordersBySeller", allEntries = true),
+        @CacheEvict(value = "orderStatistics", allEntries = true)
+    })
     public boolean cancelOrder(String orderId) {
         try {
             // 参数验证和清理
@@ -427,4 +474,24 @@ public class OrderServiceImpl implements OrderService {
                 throw new IllegalStateException("未知的订单状态: " + currentStatus);
         }
     }
+
+    /**
+     * 为OrderResponse补充商品信息
+     * @param response 订单响应对象
+     * @param commodityId 商品ID
+     */
+    private void enrichOrderResponseWithCommodityInfo(OrderResponse response, String commodityId) {
+        try {
+            Commodity commodity = commodityRepository.selectNameAndImageById(commodityId);
+            if (commodity != null) {
+                response.setCommodityName(commodity.getCommodityName());
+                response.setMainImageUrl(commodity.getMainImageUrl());
+            }
+        } catch (Exception e) {
+            // 记录日志但不影响主要业务逻辑
+            System.err.println("查询商品信息失败，商品ID: " + commodityId + ", 错误: " + e.getMessage());
+        }
+    }
+
 }
+
