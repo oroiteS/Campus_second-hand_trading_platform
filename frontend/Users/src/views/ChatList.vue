@@ -102,12 +102,20 @@ export default {
   async mounted() {
     await this.loadCurrentUser()
     await this.loadSessions()
+
+    // 处理从商品详情页跳转过来的情况
+    await this.handleProductChat()
+
     this.connectWebSocket()
   },
 
   methods: {
     async loadCurrentUser() {
-      const userId = this.$route.params.userId || localStorage.getItem('currentUserId')
+      // 优先从路由参数获取，然后从localStorage获取
+      const userId = this.$route.query.buyerId ||
+        this.$route.params.userId ||
+        localStorage.getItem('currentUserId')
+
       if (!userId) {
         this.$router.push('/login')
         return
@@ -115,9 +123,16 @@ export default {
 
       try {
         const response = await fetch(`http://localhost:8088/api/v1/chat/user/${userId}/info`)
-        this.currentUser = await response.json()
+        if (response.ok) {
+          this.currentUser = await response.json()
+          // 保存到localStorage
+          localStorage.setItem('currentUserId', this.currentUser.user_id)
+        } else {
+          throw new Error('获取用户信息失败')
+        }
       } catch (error) {
         console.error('获取用户信息失败:', error)
+        this.$router.push('/login')
       }
     },
 
@@ -331,7 +346,45 @@ export default {
           container.scrollTop = container.scrollHeight
         }
       })
-    }
+    },
+
+    // 处理商品聊天
+    async handleProductChat() {
+      const { productId, sellerId, buyerId, autoCreate } = this.$route.query
+
+      if (autoCreate === 'true' && sellerId && buyerId) {
+        try {
+          // 1. 首先尝试创建或获取会话
+          const sessionResponse = await fetch('http://localhost:8088/api/v1/chat/sessions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              buyer_id: buyerId,
+              seller_id: sellerId
+            })
+          })
+
+          if (sessionResponse.ok) {
+            const session = await sessionResponse.json()
+
+            // 2. 重新加载会话列表
+            await this.loadSessions()
+
+            // 3. 自动选择这个会话
+            const targetSession = this.sessions.find(s => s.session_id === session.session_id)
+            if (targetSession) {
+              await this.selectSession(targetSession)
+            }
+          }
+        } catch (error) {
+          console.error('创建聊天会话失败:', error)
+          this.$message?.error('无法创建聊天会话')
+        }
+
+        // 清理URL参数
+        this.$router.replace({ path: '/chat-list' })
+      }
+    },
   }
 }
 </script>
