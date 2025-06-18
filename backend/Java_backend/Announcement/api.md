@@ -51,8 +51,7 @@ GET /announcements
     "createdAt": "2025-06-17T14:30:00",
     "content": "本周六进行系统维护，请注意。",
     "visibleStatus": false
-  },
-  ...
+  }
 ]
 ```
 
