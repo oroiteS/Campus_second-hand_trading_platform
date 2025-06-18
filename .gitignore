@@ -9,3 +9,4 @@ backend/python/.venv
 
 # 安全文件
 **/.env
+**/application-local.yml
