@@ -1,7 +1,11 @@
 package config
 
 import (
+	"log"
 	"os"
+	"strconv"
+
+	"github.com/joho/godotenv"
 )
 
 // Config 应用配置结构
@@ -36,23 +40,36 @@ type RedisConfig struct {
 
 // Load 加载配置
 func Load() *Config {
+	// 加载.env文件
+	if err := godotenv.Load(); err != nil {
+		log.Printf("警告: 无法加载.env文件: %v", err)
+	}
+
+	// 获取Redis DB配置，默认为0
+	redisDB := 0
+	if dbStr := os.Getenv("REDIS_DB"); dbStr != "" {
+		if db, err := strconv.Atoi(dbStr); err == nil {
+			redisDB = db
+		}
+	}
+
 	return &Config{
 		Server: ServerConfig{
-			Port: getEnv("SERVER_PORT", "8091"),
+			Port: getEnv("SERVER_PORT", "8088"),
 		},
 		MySQL: MySQLConfig{
-			Host:     getEnv("MYSQL_HOST", "rm-cn-smw4b7vtl0001ho.rwlb.rds.aliyuncs.com"),
+			Host:     getEnv("MYSQL_HOST", "localhost"),
 			Port:     getEnv("MYSQL_PORT", "3306"),
-			User:     getEnv("MYSQL_USER", "campus_test"),
-			Password: getEnv("MYSQL_PASSWORD", "Campus_suep2022"),
+			User:     getEnv("MYSQL_USER", "root"),
+			Password: getEnv("MYSQL_PASSWORD", ""),
 			Database: getEnv("MYSQL_DATABASE", "campus"),
 		},
 		Redis: RedisConfig{
-			Host:     getEnv("REDIS_HOST", "r-uf683p0x96aj2ht6whpd.redis.rds.aliyuncs.com"),
+			Host:     getEnv("REDIS_HOST", "localhost"),
 			Port:     getEnv("REDIS_PORT", "6379"),
-			Username: getEnv("REDIS_USERNAME", "campus_test"),
-			Password: getEnv("REDIS_PASSWORD", "Campus_suep2022"),
-			DB:       1,
+			Username: getEnv("REDIS_USERNAME", ""),
+			Password: getEnv("REDIS_PASSWORD", ""),
+			DB:       redisDB,
 		},
 	}
 }

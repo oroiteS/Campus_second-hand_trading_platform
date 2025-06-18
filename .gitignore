@@ -6,3 +6,6 @@ backend/python/.venv
 **/.idea/
 **/response.txt
 **/node_modules
+
+# 安全文件
+**/.env
