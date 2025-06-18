@@ -1,18 +1,6 @@
 -- 校园二手交易平台数据库初始化脚本
 -- 包含数据库创建、用户创建和表创建的完整流程
 
--- 1. 创建数据库
-CREATE DATABASE IF NOT EXISTS campus
-DEFAULT CHARACTER SET utf8mb4
-DEFAULT COLLATE utf8mb4_unicode_ci;
-
-
--- 2. 创建数据库用户（如果不存在）
-CREATE USER IF NOT EXISTS 'campus_test'@'%' IDENTIFIED BY 'campus_suep';
-
--- 3. 授予用户权限
-GRANT ALL PRIVILEGES ON campus.* TO 'campus_test'@'%';
-FLUSH PRIVILEGES;
 
 -- 4. 使用数据库
 USE campus;
@@ -101,19 +89,6 @@ CREATE TABLE IF NOT EXISTS `commodities` (
     
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='商品表';
 
--- 8. 插入基础商品类别数据
-INSERT INTO `categories` (`category`) VALUES
-('电子产品'),
-('图书教材'),
-('生活用品'),
-('运动器材'),
-('服装鞋帽'),
-('美妆护肤'),
-('食品饮料'),
-('家居用品'),
-('文具办公'),
-('其他')
-ON DUPLICATE KEY UPDATE `category` = VALUES(`category`);
 
 -- 9. 创建订单表
 CREATE TABLE IF NOT EXISTS `orders` (
@@ -309,3 +284,36 @@ CREATE TABLE IF NOT EXISTS `tags` (
     CONSTRAINT `fk_tags_category` FOREIGN KEY (`category_id`) REFERENCES `categories` (`category_id`) ON DELETE CASCADE ON UPDATE CASCADE
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='特征表';
+
+-- 18. 创建评论表
+CREATE TABLE IF NOT EXISTS `comments` (
+    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '评论ID，主键',
+    `message_id` CHAR(36) NOT NULL COMMENT '消息ID（UUID）',
+    `commodity_id` CHAR(36) NOT NULL COMMENT '商品ID，外键指向commodities表',
+    `user_id` CHAR(9) NOT NULL COMMENT '用户ID，外键指向users表',
+    `message` VARCHAR(2000) NOT NULL COMMENT '评论内容',
+    `reply_to_message_id` CHAR(36) DEFAULT NULL COMMENT '回复的消息ID（用于回复功能）',
+    `message_type` ENUM('comment', 'reply') NOT NULL COMMENT '消息类型：评论或回复',
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '创建时间',
+    `is_deleted` TINYINT(1) DEFAULT 0 NULL COMMENT '是否删除，0为未删除，1为已删除',
+
+    -- 创建索引
+    INDEX `idx_commodity_id` (`commodity_id`),
+    INDEX `idx_message_id` (`message_id`),
+    INDEX `idx_reply_to_message_id` (`reply_to_message_id`),
+    INDEX `idx_user_id` (`user_id`),
+    INDEX `idx_created_at` (`created_at`),
+    INDEX `idx_message_type` (`message_type`),
+    INDEX `idx_is_deleted` (`is_deleted`),
+
+    -- 复合索引（优化常用查询）
+    INDEX `idx_commodity_type` (`commodity_id`, `message_type`),
+    INDEX `idx_user_type` (`user_id`, `message_type`),
+    INDEX `idx_commodity_time` (`commodity_id`, `created_at`),
+
+    -- 外键约束
+    CONSTRAINT `fk_comments_commodity` FOREIGN KEY (`commodity_id`) REFERENCES `commodities` (`commodity_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT `fk_comments_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`User_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT `fk_comments_reply` FOREIGN KEY (`reply_to_message_id`) REFERENCES `comments` (`message_id`) ON DELETE SET NULL ON UPDATE CASCADE
+
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='评论表';
