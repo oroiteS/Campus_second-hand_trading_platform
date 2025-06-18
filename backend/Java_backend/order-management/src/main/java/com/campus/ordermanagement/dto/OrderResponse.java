@@ -92,6 +92,18 @@ public class OrderResponse {
     @JsonProperty("mainImageUrl")
     private String mainImageUrl;
 
+    /**
+     * 买家用户名
+     */
+    @JsonProperty("buyerName")
+    private String buyerName;
+
+    /**
+     * 卖家用户名
+     */
+    @JsonProperty("sellerName")
+    private String sellerName;
+
     // 默认构造函数
     public OrderResponse() {}
 
@@ -231,6 +243,22 @@ public class OrderResponse {
         this.mainImageUrl = mainImageUrl;
     }
 
+    public String getBuyerName() {
+        return buyerName;
+    }
+
+    public void setBuyerName(String buyerName) {
+        this.buyerName = buyerName;
+    }
+
+    public String getSellerName() {
+        return sellerName;
+    }
+
+    public void setSellerName(String sellerName) {
+        this.sellerName = sellerName;
+    }
+
     @Override
     public String toString() {
         return "OrderResponse{" +
@@ -247,6 +275,8 @@ public class OrderResponse {
                 ", createTime=" + createTime +
                 ", commodityName='" + commodityName + '\'' +
                 ", mainImageUrl='" + mainImageUrl + '\'' +
+                ", buyerName='" + buyerName + '\'' +
+                ", sellerName='" + sellerName + '\'' +
                 '}';
     }
 }
