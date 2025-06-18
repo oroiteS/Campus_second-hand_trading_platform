@@ -18,7 +18,7 @@ class CommodityBase(BaseModel):
     commodity_name: str
     commodity_description: Optional[str] = None
     category_id: int
-    tags: Optional[List[str]] = None
+    tags_id: Optional[List[int]] = None
     current_price: Decimal
     commodity_status: str # Was CommodityStatus = CommodityStatus.ON_SALE
     seller_id: str
@@ -36,7 +36,7 @@ class CommodityUpdate(BaseModel):
     commodity_name: Optional[str] = None
     commodity_description: Optional[str] = None
     category_id: Optional[int] = None
-    tags: Optional[List[str]] = None
+    tags_id: Optional[List[int]] = None
     current_price: Optional[Decimal] = None
     commodity_status: Optional[CommodityStatus] = None
     seller_id: Optional[str] = None

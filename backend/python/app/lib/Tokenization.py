@@ -3,7 +3,7 @@ import re
 class Tokenization:
     def __init__(self, stopwords_file):
         self.stopwords = self.load_stopwords(stopwords_file)
-        jieba.load_userdict("../stopwords/userdict.txt")
+        jieba.load_userdict("app/stopwords/customed_dict.txt")
     def load_stopwords(self,stopwords_file):
         stopwords = set()
         try:

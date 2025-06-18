@@ -6,7 +6,7 @@ from app.schemas.commodity import Commodity_username
 from sqlalchemy import select, or_, func
 from app.lib.Tokenization import Tokenization
 from app.schemas.SearchCommodityRequest import SearchCommodityRequest
-
+from app.lib.get_embedding import Embedder
 def update_commodity_status(db: Session,commodity_id:str,new_status:str) -> int:
      """更新商品状态"""
      commodity = db.query(Commodity).filter(Commodity.commodity_id == commodity_id).first()
@@ -49,17 +49,34 @@ def get_commodities_username(db: Session) -> List[Commodity_username]:
     #     Commodity_username.model_validate(row._asdict()) for row in results
     # ]
     return results
-# def get_commodity_id(db: Session,user_id: str) -> List[Commodity_id]:
-#     """获取推荐的商品id"""
+def get_commodity_id(db: Session,user_id: str) -> List[Commodity]:
+    """获取推荐的商品list"""
+    #部分1-按照用户的购买行为返回list
+    embedder = Embedder()
+    results_commendation_buy_cid = embedder.recommendation_by_buy(user_id= user_id)
+    #部分2-按照用户的喜欢行为返回list
+    results_commendation_like_cid = embedder.recommendation_by_like(user_id=user_id,limit=10)
+    #合并两个list
+    results_commendation_cid = results_commendation_buy_cid + results_commendation_like_cid
+    print('合并前',len(results_commendation_cid))
+    #去重
+    results_commendation_cid = list(set(results_commendation_cid))
+    print('合并后',len(results_commendation_cid))
+    #返回
+    query = select(Commodity).where(Commodity.commodity_id.in_(results_commendation_cid))
+    results_commendation = db.execute(query).scalars().all()
+    return results_commendation
+
 
 def get_commodities_by_search(db: Session,request: SearchCommodityRequest):
     """通过搜索获取商品信息"""
     #部分1-模糊查询
-    stopwords_file = "../stopwords/stopwords.txt"
+    stopwords_file = "app/stopwords/stopwords.txt"
     
     tokenizer = Tokenization(stopwords_file)
     #获取分词list
     token_list = tokenizer.segment_jieba(request.search_content,stopwords_file)
+    user_id = request.user_id
     #部分2-按照sql语句进行模糊查询
     # 构建所有token的OR条件列表
     token_conditions = []
@@ -73,9 +90,29 @@ def get_commodities_by_search(db: Session,request: SearchCommodityRequest):
         # 核心条件：任意一个token满足条件即可（OR组合）
         or_(*token_conditions),
         # 必选条件：商品状态为"在售"（与上述条件用AND连接）
-        Commodity.commodity_status == "on_sale"
+        Commodity.commodity_status == "on_sale",
+        # 排除条件：不显示用户自己发布的商品
+        Commodity.seller_id != user_id
     ).order_by(func.random()).limit(40)#随机取40个
     # 执行查询
-    results = db.execute(query).scalars().all()
+    results_search = db.execute(query).scalars().all()
     # 直接返回 SQLAlchemy 对象列表
+    #部分3-桶2:返回个性化推荐内容
+    embedder = Embedder()
+    results_commendation_like_cid = embedder.recommendation_by_like(user_id=user_id)
+    print(results_commendation_like_cid)
+    query = select(Commodity).where(Commodity.commodity_id.in_(results_commendation_like_cid))
+    results_commendation_like = db.execute(query).scalars().all()
+    print(results_commendation_like)
+    # 合并结果并基于commodity_id去重
+    all_results = results_search + results_commendation_like
+    
+    # 使用字典去重，保持第一次出现的商品
+    seen_ids = set()
+    results = []
+    for commodity in all_results:
+        if commodity.commodity_id not in seen_ids:
+            seen_ids.add(commodity.commodity_id)
+            results.append(commodity)
+    
     return results

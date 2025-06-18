@@ -41,9 +41,11 @@ def update_commodity_status(
         return {"message": "商品状态更新成功"}
     else:
         return {"message": "商品状态更新失败"}
-# @router.get("/recommendation/{user_id}",response_model=List[Commodity_id])
-# def get_recommendation_commodity_id(user_id:str,db: Session= Depends(get_db)):
-#     """给指定用户推送推荐的商品id"""
+@router.get("/recommendation/{user_id}",response_model=List[Commodity])
+def get_recommendation_commodity_id(user_id:str,db: Session= Depends(get_db)):
+    """给指定用户推送推荐的商品id"""
+    commodity_list = crud_commodity.get_commodity_id(db,user_id)
+    return commodity_list
     
 
 @router.post("/search",response_model=List[Commodity])

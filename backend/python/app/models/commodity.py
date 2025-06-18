@@ -15,7 +15,7 @@ class Commodity(Base):
     commodity_name = Column(String(100))
     commodity_description = Column(Text)
     category_id = Column(Integer)
-    tags = Column(JSON)
+    tags_id = Column(JSON)
     
     # 价格和状态字段
     current_price = Column(DECIMAL(10, 2))
