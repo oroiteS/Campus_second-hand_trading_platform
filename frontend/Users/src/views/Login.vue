@@ -8,7 +8,7 @@
           type="text" 
           id="username" 
           v-model="username" 
-          placeholder="请输入用户ID"
+          placeholder="请输入用户名"
         />
       </div>
       <div class="form-group">
@@ -76,20 +76,12 @@ export default {
           // 登录成功
           alert('登录成功!')
           
-          // 存储用户信息
-          const userToken = 'user-token-' + Date.now()
-          const userInfo = {
-            username: result.data.userName,
-            name: result.data.realName,
-            userId: result.data.userId,
-            avatar: result.data.avatarUrl || '/测试图片.jpg',
-            status: '在线'
-          }
-          
-          localStorage.setItem('userToken', userToken)
-          localStorage.setItem('userInfo', JSON.stringify(userInfo))
+          // 存储用户信息和token
+          const token = result.data.token
+          // 保存用户ID、token和登录状态
+          localStorage.setItem('userToken', token)
+          localStorage.setItem('userId', result.data.userId)
           localStorage.setItem('isLoggedIn', 'true')
-          localStorage.setItem('username', result.data.userName)
           
           // 跳转到首页，携带userId数据
           this.$router.push({

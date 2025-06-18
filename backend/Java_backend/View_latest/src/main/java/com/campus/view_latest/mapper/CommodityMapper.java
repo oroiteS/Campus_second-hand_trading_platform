@@ -19,7 +19,7 @@ public interface CommodityMapper extends BaseMapper<Commodity> {
      */
     @Select("SELECT commodity_id, commodity_name, commodity_description, category_id, tags_Id, " +
             "current_price, commodity_status, seller_id, main_image_url, image_list, " +
-            "created_at, updated_at, quantity " +
+            "created_at, updated_at, quantity, newness " +
             "FROM commodities WHERE commodity_status = 'on_sale' " +
             "ORDER BY created_at DESC LIMIT 6")
     List<Commodity> selectLatestOnSaleCommodities();

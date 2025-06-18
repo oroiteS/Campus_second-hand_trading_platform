@@ -1,0 +1,206 @@
+# Redis配置
+spring:
+    # 缓存配置
+  cache:
+    type: redis
+    redis:
+    time-to-live: 600000
+    cache-null-values: true
+    key-prefix: "order:"
+    use-key-prefix: true
+  profiles:
+    active: local
+  # 数据源配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://rm-cn-smw4b7vtl0001ho.rwlb.rds.aliyuncs.com:3306/campus?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    # username和password移到application-local.yml
+    # 连接池配置（开发环境优化）
+    hikari:
+      minimum-idle: 2
+      maximum-pool-size: 10
+      auto-commit: true
+      idle-timeout: 30000
+      pool-name: OrderManagementDevHikariCP
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
+      leak-detection-threshold: 60000
+      
+  devtools:
+    restart:
+      enabled: true
+      additional-paths: src/main/java
+    livereload:
+      enabled: true
+      
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+  data:
+    redis:
+      # username和password移到application-local.yml
+      host: r-uf683p0x96aj2ht6whpd.redis.rds.aliyuncs.com
+      port: 6379
+      database: 2
+      timeout: 3000ms
+      # lettuce连接池使用默认配置
+  # 添加CORS配置
+  web:
+    cors:
+      allowed-origin-patterns:
+        - "*"
+      allowed-methods:
+        - "GET"
+        - "POST"
+        - "PUT"
+        - "DELETE"
+        - "OPTIONS"
+      allowed-headers:
+        - "*"
+      allow-credentials: false
+      max-age: 3600
+
+# 服务器配置
+server:
+  port: 8095
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+  # 开发环境错误页面配置
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: on_param
+    include-exception: true
+
+# MyBatis Plus配置（开发环境）
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: com.campus.ordermanagement.pojo
+  global-config:
+    db-config:
+      id-type: INPUT
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+      update-strategy: NOT_NULL
+      insert-strategy: NOT_NULL
+      select-strategy: NOT_EMPTY
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+    call-setters-on-nulls: true
+    jdbc-type-for-null: 'null'
+    # 开发环境显示SQL
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# 日志配置（开发环境）
+
+# Swagger配置（开发环境增强）
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    operations-sorter: alpha
+    tags-sorter: alpha
+    # 开发环境显示更多信息
+    display-request-duration: true
+    show-extensions: true
+    show-common-extensions: true
+    # 默认展开所有操作
+    doc-expansion: full
+    # 显示请求体
+    default-models-expand-depth: 2
+    default-model-expand-depth: 2
+    # 启用过滤器
+    filter: true
+    # 显示Actuator端点
+  show-actuator: true
+  # 开发环境显示所有路径
+  paths-to-match: /**
+  # 包扫描路径
+  packages-to-scan: com.campus.ordermanagement.controller
+
+# 管理端点配置（开发环境）
+management:
+  endpoints:
+    web:
+      exposure:
+        # 开发环境暴露所有端点
+        include: '*'
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+    info:
+      enabled: true
+    metrics:
+      enabled: true
+    loggers:
+      enabled: true
+    env:
+      enabled: true
+    configprops:
+      enabled: true
+    beans:
+      enabled: true
+  # 健康检查配置
+  health:
+    db:
+      enabled: true
+    diskspace:
+      enabled: true
+
+# 应用信息（开发环境）
+info:
+  app:
+    name: 校园二手交易平台-订单管理（开发环境）
+    description: 订单管理微服务开发环境，用于API测试和调试
+    version: 1.0.0-DEV
+    encoding: UTF-8
+    java:
+      version: 17
+    profiles: dev
+  build:
+    time: '@maven.build.timestamp@'
+    artifact: '@project.artifactId@'
+    group: '@project.groupId@'
+    version: '@project.version@'
+
+# 自定义配置（开发环境）
+order:
+  config:
+    # 开发环境缩短超时时间便于测试
+    timeout-minutes: 5
+    # 开发环境降低限制便于测试
+    max-orders-per-user: 50
+    # 启用统计功能
+    enable-statistics: true
+    # 开发环境关闭缓存
+    enable-cache: false
+    # 开发环境启用调试模式
+    debug-mode: true
+    # 测试数据配置
+    test-data:
+      enable-test-endpoints: true
+      auto-create-test-data: false
+
+# 跨域配置（开发环境宽松设置）
+# 在spring配置下添加或修改
+
+# 移除原有的cors配置块，或者保持现有配置
+
+
+
+# 移除文件末尾错误的redis配置块
+# 确保没有重复的redis配置

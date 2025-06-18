@@ -4,8 +4,8 @@
 
 - **项目名称**: 校园二手交易平台 (Campus Second-hand Trading Platform)
 - **模块**: 登录注册服务 (Login & Register Service)
-- **文档版本**: v1.0
-- **更新时间**: 2024年12月15日
+- **文档版本**: v1.2
+- **更新时间**: 2024年12月16日
 - **技术栈**: Java 17, Spring Boot 3.3.4, MySQL 8.0, JWT
 - **服务端口**: 8080
 - **基础路径**: `/api/user`
@@ -200,7 +200,7 @@ Authorization: Bearer {token}
 ### 9. Token验证接口
 
 #### 接口信息
-- **接口路径**: `POST /api/user/verify-token`
+- **接口路径**: `POST /api/user/validate-token`
 - **接口描述**: 验证JWT Token的有效性
 - **认证方式**: Bearer Token (JWT)
 
@@ -347,7 +347,7 @@ curl -X GET http://localhost:8080/api/user/info \
 
 ### 认证机制
 - **JWT Token**: 使用JSON Web Token进行用户身份验证
-- **Token过期时间**: 24小时（可配置）
+- **Token过期时间**: 1小时（可配置）
 - **加密算法**: HS256
 - **密码加密**: BCrypt算法
 
@@ -387,7 +387,7 @@ spring:
 
 jwt:
   secret: your_jwt_secret_key
-  expiration: 86400000  # 24小时
+  expiration: 3600000  # 1小时
 ```
 
 ### 启动命令
@@ -467,14 +467,24 @@ CREATE INDEX idx_create_time ON users(Create_at);
 
 ## 版本信息
 
-### 当前版本: v1.0
-- **发布日期**: 2024年12月15日
+### 当前版本: v1.2
+- **发布日期**: 2024年12月16日
 - **主要功能**: 用户注册、登录、信息查询、头像获取
 - **技术栈**: Spring Boot 3.3.4, MyBatis-Plus, JWT, BCrypt
 - **数据库**: MySQL 8.0
 - **Java版本**: JDK 17
 
 ### 更新日志
+- **v1.2** (2024-12-16)
+  - 调整JWT Token过期时间从30分钟改为1小时
+  - 进一步优化用户体验，减少频繁登录需求
+  - 更新配置文档和技术说明
+
+- **v1.1** (2024-12-16)
+  - 调整JWT Token过期时间从24小时改为30分钟
+  - 优化用户体验，平衡安全性与便利性
+  - 更新配置文档和技术说明
+
 - **v1.0** (2024-12-15)
   - 初始版本发布
   - 实现用户注册功能（支持用户自定义userId）
@@ -499,7 +509,7 @@ CREATE INDEX idx_create_time ON users(Create_at);
 
 ---
 
-**文档版本**: v1.0  
-**最后更新**: 2024年12月15日  
+**文档版本**: v1.2  
+**最后更新**: 2024年12月16日  
 **文档状态**: ✅ 完整可用  
 **API状态**: 🚀 生产就绪

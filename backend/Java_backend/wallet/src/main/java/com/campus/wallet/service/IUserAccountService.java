@@ -1,6 +1,9 @@
 package com.campus.wallet.service;
 import com.campus.wallet.pojo.ServiceResult;
 import java.math.BigDecimal;
+import com.campus.wallet.pojo.ServiceResult;
+import java.math.BigDecimal;
+
 
 public interface IUserAccountService {
     // 确认收货，将待转入金额转入余额
@@ -17,4 +20,8 @@ public interface IUserAccountService {
 
     // 充值
     ServiceResult<Void> Recharge(String userID, BigDecimal amount);
+    
+    // 获取用户钱包余额
+    ServiceResult<BigDecimal> getBalance(String userID);
 }
+

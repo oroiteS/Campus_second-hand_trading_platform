@@ -1,0 +1,28 @@
+# THYMELEAF \u914D\u7F6E
+spring:
+  thymeleaf:
+    cache: true
+    check-template: true
+    check-template-location: true
+    content-type: text/html
+    enabled: true
+    encoding: UTF-8
+    excluded-view-names:
+    mode: HTML5
+    prefix: classpath:/templates/
+    suffix: .html
+  profiles:
+    active: local
+
+# \u5E94\u7528\u670D\u52A1 WEB \u8BBF\u95EE\u7AEF\u53E3
+server:
+  port: 8092
+
+# MyBatis \u914D\u7F6E
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.campus.announcement.pojo
+  # \u81EA\u52A8\u5C06\u6570\u636E\u5E93\u5B57\u6BB5\u4E0B\u5212\u7EBF\u547D\u540D\uFF08\u5982 commodity_id\uFF09\u6620\u5C04\u4E3A Java \u7684\u9A7C\u5CF0\u547D\u540D\uFF08\u5982 commodityId\uFF09
+  configuration:
+    map-underscore-to-camel-case: true
+

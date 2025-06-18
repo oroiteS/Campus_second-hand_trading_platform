@@ -99,6 +99,12 @@ public class Commodity {
     private Integer quantity;
 
     /**
+     * 商品新旧度
+     */
+    @TableField("newness")
+    private String newness;
+
+    /**
      * 商品类别名称（关联查询字段，不对应数据库字段）
      */
     @TableField(exist = false)

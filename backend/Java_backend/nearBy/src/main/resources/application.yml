@@ -1,0 +1,36 @@
+spring:
+  profiles:
+    active: local
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://rm-cn-smw4b7vtl0001ho.rwlb.rds.aliyuncs.com/campus?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    # username和password移到application-local.yml
+
+  thymeleaf:
+    cache: true
+    check-template: true
+    check-template-location: true
+    content-type: text/html
+    enabled: true
+    encoding: UTF-8
+    excluded-view-names:
+    mode: HTML5
+    prefix: classpath:/templates/
+    suffix: .html
+
+mybatis:
+  mapper-locations: classpath:mappers/*.xml
+  type-aliases-package: com.campus.nearby.pojo
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+server:
+  port: 8086
+  base-url: http://localhost:8086
+
+logging:
+  level:
+    com.campus.profile.dao: debug
+    com.campus.nearby.dao: debug
+    org.apache.ibatis: debug

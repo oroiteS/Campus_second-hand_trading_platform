@@ -364,6 +364,10 @@
   100% { transform: translateX(-100px) translateY(-100px); }
 }
 
+.home-banner-content {
+  text-align: center;
+}
+
 .home-banner-content h2 {
   font-size: 28px;
   margin-bottom: 10px;
@@ -384,10 +388,14 @@
   gap: 30px;
   position: relative;
   z-index: 1;
+  justify-content: center;
 }
 
 .home-stat-item {
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .home-stat-number {
@@ -395,6 +403,7 @@
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 5px;
+  text-align: center;
 }
 
 .home-stat-label {

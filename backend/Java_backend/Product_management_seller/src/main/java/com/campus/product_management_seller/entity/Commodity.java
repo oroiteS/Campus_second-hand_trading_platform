@@ -65,6 +65,10 @@ public class Commodity {
     @Column(name = "quantity", nullable = false)
     private Integer quantity = 1;
     
+    @NotBlank(message = "商品新旧度不能为空")
+    @Column(name = "newness", length = 50, nullable = false)
+    private String newness;
+    
     // 商品状态枚举
     public enum CommodityStatus {
         ON_SALE("on_sale"),
@@ -96,13 +100,14 @@ public class Commodity {
     public Commodity() {}
     
     public Commodity(String commodityId, String commodityName, String commodityDescription,
-                    Integer categoryId, BigDecimal currentPrice, String sellerId) {
+                    Integer categoryId, BigDecimal currentPrice, String sellerId, String newness) {
         this.commodityId = commodityId;
         this.commodityName = commodityName;
         this.commodityDescription = commodityDescription;
         this.categoryId = categoryId;
         this.currentPrice = currentPrice;
         this.sellerId = sellerId;
+        this.newness = newness;
         this.quantity = 1;
     }
     
@@ -211,6 +216,14 @@ public class Commodity {
         this.updatedAt = updatedAt;
     }
     
+    public String getNewness() {
+        return newness;
+    }
+    
+    public void setNewness(String newness) {
+        this.newness = newness;
+    }
+    
     @Override
     public String toString() {
         return "Commodity{" +
@@ -225,6 +238,7 @@ public class Commodity {
                 ", mainImageUrl='" + mainImageUrl + '\'' +
                 ", imageList='" + imageList + '\'' +
                 ", quantity=" + quantity +
+                ", newness='" + newness + '\'' +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';

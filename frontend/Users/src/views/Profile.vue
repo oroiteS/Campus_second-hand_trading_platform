@@ -119,20 +119,34 @@
       </div>
     </div>
   </div>
+  
+
+  <!-- 定位加载状态提示 -->
+  <div v-if="isLocating" class="location-loading">
+    <div class="loading-spinner"></div>
+    <p>正在获取您的位置...</p>
+  </div>
+
+  <!-- 定位错误提示 -->
+  <div v-if="locationError" class="location-error">
+    <p>⚠️ {{ locationError }}</p>
+    <button @click="retryLocation">重试</button>
+  </div>
 </template>
 
 <script>
+import axios from 'axios'
+import AMapLoader from '@amap/amap-jsapi-loader'
 export default {
   name: 'ProfilePage',
+  
   data() {
     return {
       activeTab: 'selling',
+      userId: '',
       userInfo: {
-        username: 'xy21675070351',
-        school: '计算机学院',
+        username: '默认用户',
         avatar: '/测试图片.jpg',
-        badge: '认证用户',
-        creditScore: '98%',
         dealCount: 47,
         favoriteCount: 23
       },
@@ -140,8 +154,9 @@ export default {
         { id: 1, name: '我的收藏', icon: '❤️', color: '#FF6B6B', action: 'favorites' },
         { id: 2, name: '订单管理', icon: '📋', color: '#4ECDC4', action: 'orders' },
         { id: 3, name: '个人信息', icon: '⚙️', color: '#45B7D1', action: 'settings' },
-        { id: 4, name: '钱包管理', icon: '💰', color: '#FFA726', action: 'wallet' },
-        { id: 5, name: '附近的人', icon: '❓', color: '#FFEAA7', action: 'help' }
+        { id: 4, name: '附近的人', icon: '❓', color: '#FFEAA7', action: 'nearby' },
+        { id: 5, name: '钱包管理', icon: '💰', color: '#FFA500', action: 'wallet' },
+        { id: 6, name: '密码修改', icon: '🔒', color: '#9370DB', action: 'password' }
       ],
       productTabs: [
         { id: 'selling', name: '在售' },
@@ -176,7 +191,48 @@ export default {
       return this.products[this.activeTab] || []
     }
   },
+  created() {
+    // 从路由参数中获取userId和name
+    if (this.$route.query.userId) {
+      console.log('Profile页面获取到的userId:', this.$route.query.userId);
+      // 保存userId以便后续使用
+      this.userId = this.$route.query.userId;
+      
+      // 获取用户头像URL
+      this.fetchUserAvatar();
+    }
+    
+    // 如果传递了name参数，更新userInfo中的username
+    if (this.$route.query.name) {
+      console.log('Profile页面获取到的name:', this.$route.query.name);
+      this.userInfo.username = this.$route.query.name;
+    }
+  },
   methods: {
+    // 获取用户头像URL
+    fetchUserAvatar() {
+      if (!this.userId) {
+        console.error('获取头像失败：用户ID不存在');
+        return;
+      }
+      
+      axios.post('http://localhost:8089/api/user/avatar/url', {
+        userId: this.userId
+      })
+      .then(response => {
+        if (response.data.success && response.data.data) {
+          // 更新用户头像URL
+          this.userInfo.avatar = response.data.data.avatarUrl;
+          console.log('成功获取用户头像URL:', this.userInfo.avatar);
+        } else {
+          console.error('获取头像URL失败:', response.data.message);
+        }
+      })
+      .catch(error => {
+        console.error('获取头像URL请求出错:', error);
+      });
+    },
+    
     goBack() {
       this.$router.go(-1)
     },
@@ -190,7 +246,7 @@ export default {
         }
       })
     },
-    handleMenuClick(action) {
+    async handleMenuClick(action) {
       console.log('点击菜单:', action)
       // 根据不同的action跳转到不同的页面
       switch(action) {
@@ -198,19 +254,38 @@ export default {
           this.$router.push('/favorites')
           break
         case 'orders':
+          // 跳转到订单管理页面
           this.$router.push('/orders')
           break
         case 'settings':
+          // 跳转到UserProfile.vue页面
           console.log('跳转到个人信息')
           this.$router.push('/userprofile')
           break
-        case 'wallet':
-          console.log('跳转到钱包管理')
-          this.$router.push('/wallet')
-          break
-        case 'help':
+        case 'nearby':
+          // 可以添加帮助中心页面
+          await this.handleNearbyClick()
           console.log('跳转到附近的人')
-          this.$router.push('/nearbyusers')
+          break
+        case 'wallet':
+          // 跳转到钱包管理页面，并传递userId
+          console.log('跳转到钱包管理，userId:', this.userId)
+          this.$router.push({
+            path: '/wallet',
+            query: {
+              userId: this.userId
+            }
+          })
+          break
+        case 'password':
+          // 跳转到密码修改页面
+          console.log('跳转到密码修改')
+          this.$router.push({
+            path: '/password-reset',
+            query: {
+              userId: this.userId
+            }
+          })
           break
         default:
           console.log('未知操作:', action)
@@ -254,6 +329,69 @@ export default {
         this.removeProductFromAllArrays(product.id)
         this.$message?.success('商品已删除')
       }
+    },
+    async handleNearbyClick() {
+      this.isLocating = true
+      this.locationError = null
+      
+      try {
+        // 1. 初始化高德地图
+        window._AMapSecurityConfig = {
+          securityJsCode: "cde9e988223d78ba64124400dbef252a",
+        }
+        
+        const AMap = await AMapLoader.load({
+          key: "514d185bcae5fedf73ec30184c598996",
+          version: "2.0",
+          plugins: ["AMap.Geolocation"],
+        })
+        
+        // 2. 获取当前位置
+        const position = await new Promise((resolve, reject) => {
+          const geolocation = new AMap.Geolocation({
+            enableHighAccuracy: true,
+            timeout: 10000,
+            showButton: false,
+          })
+          
+          geolocation.getCurrentPosition((status, result) => {
+            if (status === 'complete') {
+              console.log('定位成功，位置信息:', result) // 详细定位信息
+              console.log('经度:', result.position.lng.toFixed(6)) // 经度
+              console.log('纬度:', result.position.lat.toFixed(6)) // 纬度
+              
+          
+              resolve({
+                longitude: result.position.lng.toFixed(6),
+                latitude: result.position.lat.toFixed(6),
+              })
+            } else {
+              reject(new Error(result.message || '定位失败'))
+            }
+          }, { showMarker: false })
+        })
+        
+        // 3. 跳转并传递所有信息
+        this.$router.push({
+          path: '/nearbyusers',
+          query: {
+            userId: this.$route.query.userId, // 用户ID
+            lon: position.longitude,      // 经度
+            lat: position.latitude,       // 纬度
+            
+          }
+        })
+        
+      } catch (error) {
+        console.error('定位失败:', error)
+        this.locationError = error.message || '获取位置信息失败'
+      } finally {
+        this.isLocating = false
+      }
+    },
+    retryLocation() {
+      this.locationError = null
+      this.handleNearbyClick()
     }
   }
 }

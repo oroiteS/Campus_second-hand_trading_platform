@@ -102,28 +102,43 @@ export default {
   async mounted() {
     await this.loadCurrentUser()
     await this.loadSessions()
+
+    // 处理从商品详情页跳转过来的情况
+    await this.handleProductChat()
+
     this.connectWebSocket()
   },
 
   methods: {
     async loadCurrentUser() {
-      const userId = this.$route.params.userId || localStorage.getItem('currentUserId')
+      // 优先从路由参数获取，然后从localStorage获取
+      const userId = this.$route.query.buyerId ||
+        this.$route.params.userId ||
+        localStorage.getItem('currentUserId')
+
       if (!userId) {
         this.$router.push('/login')
         return
       }
 
       try {
-        const response = await fetch(`http://localhost:8080/api/v1/chat/user/${userId}/info`)
-        this.currentUser = await response.json()
+        const response = await fetch(`http://localhost:8088/api/v1/chat/user/${userId}/info`)
+        if (response.ok) {
+          this.currentUser = await response.json()
+          // 保存到localStorage
+          localStorage.setItem('currentUserId', this.currentUser.user_id)
+        } else {
+          throw new Error('获取用户信息失败')
+        }
       } catch (error) {
         console.error('获取用户信息失败:', error)
+        this.$router.push('/login')
       }
     },
 
     async loadSessions() {
       try {
-        const response = await fetch(`http://localhost:8080/api/v1/chat/user/${this.currentUser.user_id}/sessions`)
+        const response = await fetch(`http://localhost:8088/api/v1/chat/user/${this.currentUser.user_id}/sessions`)
         this.sessions = await response.json()
 
         // 为每个会话加载最后一条消息和未读数量
@@ -138,7 +153,7 @@ export default {
 
     async loadSessionLastMessage(session) {
       try {
-        const response = await fetch(`http://localhost:8080/api/v1/chat/session/${session.session_id}/messages?limit=1&offset=0`)
+        const response = await fetch(`http://localhost:8088/api/v1/chat/session/${session.session_id}/messages?limit=1&offset=0`)
         const messages = await response.json()
         if (messages.length > 0) {
           session.lastMessage = messages[0].content
@@ -152,7 +167,7 @@ export default {
     async loadSessionUnreadCount(session) {
       try {
         // 获取会话中当前用户未读的消息数量
-        const response = await fetch(`http://localhost:8080/api/v1/chat/session/${session.session_id}/messages?limit=100&offset=0`)
+        const response = await fetch(`http://localhost:8088/api/v1/chat/session/${session.session_id}/messages?limit=100&offset=0`)
         const messages = await response.json()
 
         // 计算当前用户作为接收者的未读消息数量
@@ -179,7 +194,7 @@ export default {
     async markSessionAsRead(session) {
       try {
         // 获取会话中当前用户未读的消息
-        const response = await fetch(`http://localhost:8080/api/v1/chat/session/${session.session_id}/messages?limit=100&offset=0`)
+        const response = await fetch(`http://localhost:8088/api/v1/chat/session/${session.session_id}/messages?limit=100&offset=0`)
         const messages = await response.json()
 
         const unreadMessages = messages.filter(msg =>
@@ -188,7 +203,7 @@ export default {
 
         // 标记所有未读消息为已读
         for (let message of unreadMessages) {
-          await fetch(`http://localhost:8080/api/v1/chat/messages/${message.message_id}/read?user_id=${this.currentUser.user_id}`, {
+          await fetch(`http://localhost:8088/api/v1/chat/messages/${message.message_id}/read?user_id=${this.currentUser.user_id}`, {
             method: 'PUT'
           })
         }
@@ -202,7 +217,7 @@ export default {
 
     async loadMessages() {
       try {
-        const response = await fetch(`http://localhost:8080/api/v1/chat/session/${this.selectedSessionId}/messages?limit=50&offset=0`)
+        const response = await fetch(`http://localhost:8088/api/v1/chat/session/${this.selectedSessionId}/messages?limit=50&offset=0`)
         this.messages = await response.json()
         this.scrollToBottom()
       } catch (error) {
@@ -272,7 +287,7 @@ export default {
       const otherUser = this.getOtherUser(this.selectedSession)
 
       try {
-        const response = await fetch('http://localhost:8080/api/v1/chat/messages', {
+        const response = await fetch('http://localhost:8088/api/v1/chat/messages', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -297,7 +312,7 @@ export default {
     },
 
     connectWebSocket() {
-      this.ws = new WebSocket(`ws://localhost:8080/api/v1/ws/${this.currentUser.user_id}`)
+      this.ws = new WebSocket(`ws://localhost:8088/api/v1/ws/${this.currentUser.user_id}`)
 
       this.ws.onmessage = (event) => {
         const data = JSON.parse(event.data)
@@ -331,7 +346,45 @@ export default {
           container.scrollTop = container.scrollHeight
         }
       })
-    }
+    },
+
+    // 处理商品聊天
+    async handleProductChat() {
+      const { productId, sellerId, buyerId, autoCreate } = this.$route.query
+
+      if (autoCreate === 'true' && sellerId && buyerId) {
+        try {
+          // 1. 首先尝试创建或获取会话
+          const sessionResponse = await fetch('http://localhost:8088/api/v1/chat/sessions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              buyer_id: buyerId,
+              seller_id: sellerId
+            })
+          })
+
+          if (sessionResponse.ok) {
+            const session = await sessionResponse.json()
+
+            // 2. 重新加载会话列表
+            await this.loadSessions()
+
+            // 3. 自动选择这个会话
+            const targetSession = this.sessions.find(s => s.session_id === session.session_id)
+            if (targetSession) {
+              await this.selectSession(targetSession)
+            }
+          }
+        } catch (error) {
+          console.error('创建聊天会话失败:', error)
+          this.$message?.error('无法创建聊天会话')
+        }
+
+        // 清理URL参数
+        this.$router.replace({ path: '/chat-list' })
+      }
+    },
   }
 }
 </script>

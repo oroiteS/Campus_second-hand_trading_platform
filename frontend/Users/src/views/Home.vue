@@ -1,4 +1,3 @@
-
 <template>
   <div class="home-container">
     <!-- 顶部导航栏 -->
@@ -28,12 +27,6 @@
             <img :src="userInfo.avatar" :alt="userInfo.name + '的头像'" class="home-user-avatar" @click="goToProfile" />
             <div class="home-user-details" @click="goToProfile">
               <span class="home-user-name">{{ userInfo.name }}</span>
-              <span class="home-user-status">{{ userInfo.status }}</span>
-            </div>
-            <!-- 消息通知按钮 -->
-            <div class="home-notification-btn" @click="showNotifications">
-              <span class="notification-icon">🔔</span>
-              <span v-if="unreadCount > 0" class="notification-badge">{{ unreadCount }}</span>
             </div>
             <!-- 悬浮菜单 -->
             <div class="home-user-dropdown">
@@ -54,7 +47,7 @@
       <aside class="home-sidebar">
         <div class="home-category-menu">
           <h3 class="home-category-title">商品分类</h3>
-          <div class="home-category-item" v-for="category in categories" :key="category.id" @click="goToCategoryBrowse(category.id)">
+          <div class="home-category-item" v-for="category in categories" :key="category.id">
             <span class="home-category-icon">{{ category.icon }}</span>
             <span class="home-category-name">{{ category.name }}</span>
           </div>
@@ -173,6 +166,8 @@
   </div>
 </template>
 <script>
+import axios from 'axios';
+
 export default {
   name: 'HomePage',
   data() {
@@ -180,17 +175,9 @@ export default {
       searchQuery: '',
       isLoggedIn: false,
       userInfo: {
-        name: 'xy21675070351',
+        name: '未知用户',
         avatar: '/测试图片.jpg',
-        status: '在线'
       },
-      // 消息通知相关数据
-      unreadCount: 3, // 未读消息数量
-      notifications: [
-        { id: 1, title: '交易提醒', content: '您的商品有新的询价', time: '2分钟前', read: false },
-        { id: 2, title: '系统通知', content: '您的商品已通过审核', time: '1小时前', read: false },
-        { id: 3, title: '订单消息', content: '买家已确认收货', time: '3小时前', read: false }
-      ],
       categories: [
         { id: 1, name: '数码电子', icon: '📱' },
         { id: 2, name: '教材书籍', icon: '📚' },
@@ -334,75 +321,143 @@ export default {
     checkLoginStatus() {
       // 检查token
       const token = localStorage.getItem('userToken');
-      this.isLoggedIn = !!token;
       
-      // 如果已登录，获取用户信息
-      if (this.isLoggedIn) {
-        const userInfoStr = localStorage.getItem('userInfo');
-        if (userInfoStr) {
-          try {
-            this.userInfo = JSON.parse(userInfoStr);
-          } catch (e) {
-            console.error('解析用户信息失败:', e);
-            // 使用默认用户信息
-            this.userInfo = {
-              name: localStorage.getItem('username') || 'xy21675070351',
-              avatar: '/测试图片.jpg',
-              status: '在线'
-            };
-          }
-        }
+      if (!token) {
+        this.isLoggedIn = false;
+        this.userInfo = {
+          name: '未知用户',
+          avatar: '/测试图片.jpg',
+        };
+        return;
       }
       
-      // 调试信息
-      console.log('登录状态检查:', {
-        token: token,
-        isLoggedIn: this.isLoggedIn,
-        userInfo: this.userInfo
+      // 验证token有效性
+      axios.post('http://localhost:8080/api/user/validate-token', {}, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      .then(response => {
+        const result = response.data;
+        if (result.code === 200 && result.data === true) {
+          // token有效，设置登录状态
+          this.isLoggedIn = true;
+          
+          // 获取用户ID并获取用户信息
+          const userId = localStorage.getItem('userId');
+          if (userId) {
+            console.log('登录成功，token有效!!!');
+            // 移除这里的日志，改为在fetchUserInfo完成后输出
+            this.fetchUserInfo(userId);
+            // 通过API请求获取最新的用户信息
+          }
+        } else {
+          // token无效，清除登录信息
+          console.log('token无效，退出登录');
+          this.logout();
+        }
+      })
+      .catch(error => {
+        console.error('验证token失败:', error);
+        // 验证失败，清除登录信息
+        this.logout();
       });
     },
     // 处理存储变化
     handleStorageChange(e) {
-      if (e.key === 'userToken' || e.key === 'userInfo') {
+      if (e.key === 'userToken' || e.key === 'userId' || e.key === 'isLoggedIn') {
         this.checkLoginStatus();
       }
     },
     // 跳转到个人资料页面
     goToProfile() {
-      this.$router.push('/profile');
+      // 从localStorage获取userId
+      const userId = localStorage.getItem('userId');
+      if (!userId) {
+        alert('请先登录');
+        return;
+      }
+      
+      this.$router.push({
+        path: '/profile',
+        query: {
+          userId: userId,
+          name: this.userInfo.name
+        }
+      });
     },
     // 手动更新登录状态
     updateLoginStatus() {
       this.checkLoginStatus();
     },
+    
+    // 从后端获取用户信息
+    fetchUserInfo(userId) {
+      // 使用axios发送请求获取用户信息
+      axios.post('http://localhost:8089/api/user/info', {
+        userId: userId
+      })
+      .then(response => {
+        if (response.data.success && response.data.code === 200) {
+          // 只获取realName进行展示
+          this.userInfo = {
+            name: response.data.data.userName || '未知用户',
+            avatar: response.data.data.avatarUrl || '/测试图片.jpg',
+          };
+          console.log('获取用户信息成功:', this.userInfo);
+          
+          // 在获取用户信息成功后输出完整的登录状态
+          console.log('登录成功状态检查:', {
+            token: localStorage.getItem('userToken'),
+            isLoggedIn: this.isLoggedIn,
+            userInfo: this.userInfo
+          });
+        } else {
+          console.error('获取用户信息失败:', response.data.message);
+          // 使用默认值
+          this.userInfo = {
+            name: '未知用户',
+            avatar: '/测试图片.jpg',
+          };
+        }
+      })
+      .catch(error => {
+        console.error('获取用户信息请求失败:', error);
+        // 使用默认值
+        this.userInfo = {
+          name: '未知用户',
+          avatar: '/测试图片.jpg',
+        };
+      });
+    },
     // 跳转到商品详情页
     goToProductDetail(productId) {
-      this.$router.push(`/product/${productId}`);
+      // 获取当前用户ID
+      const userId = localStorage.getItem('userId');
+      this.$router.push({
+        path: `/product/${productId}`,
+        query: {
+          userId: userId
+        }
+      });
     },
     // 退出登录
     logout() {
-      // 清除本地存储的用户信息
+      // 清除登录信息
       localStorage.removeItem('userToken');
-      localStorage.removeItem('userInfo');
+      localStorage.removeItem('userId');
       localStorage.removeItem('isLoggedIn');
-      localStorage.removeItem('username');
       
       // 更新登录状态
       this.isLoggedIn = false;
       this.userInfo = {
-        name: 'xy21675070351',
+        name: '未知用户',
         avatar: '/测试图片.jpg',
-        status: '在线'
       };
       
       // 跳转到首页
       this.$router.push('/');
     },
-    // 跳转到分类浏览页面
-    goToCategoryBrowse(categoryId) {
-      this.$router.push(`/browse/${categoryId}`);
-    },
-    
     // 跳转到发布页面
     goToPublish() {
       // 检查是否已登录
@@ -416,18 +471,7 @@ export default {
     // 跳转到公告详情页面
     goToNoticeDetail(noticeId) {
       this.$router.push(`/notice/${noticeId}`);
-    },
-    // 显示消息通知
-    showNotifications() {
-      // 这里可以显示消息列表弹窗或跳转到消息页面
-      alert(`您有 ${this.unreadCount} 条未读消息\n\n${this.notifications.map(n => `${n.title}: ${n.content}`).join('\n')}`);
-      
-      // 标记所有消息为已读
-      this.notifications.forEach(notification => {
-        notification.read = true;
-      });
-      this.unreadCount = 0;
-    },
+    }
   }
 }
 </script>

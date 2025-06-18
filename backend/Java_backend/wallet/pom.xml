@@ -47,10 +47,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+        <!-- 移除这个Spring Security依赖
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
+        -->
 
         <dependency>
             <groupId>com.mysql</groupId>
@@ -106,5 +108,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

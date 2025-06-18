@@ -10,6 +10,8 @@
         <div class="header-placeholder"></div>
       </div>
     </header>
+    
+    <div class="wallet-content">
 
     <div class="wallet-container">
       <!-- 钱包余额卡片 -->
@@ -29,54 +31,35 @@
           <span class="currency">¥</span>
           <span class="amount">{{ walletInfo.balance.toFixed(2) }}</span>
         </div>
-        <div class="balance-info">
-          <div class="info-item">
-            <span class="label">冻结金额：</span>
-            <span class="value">¥{{ walletInfo.frozenAmount.toFixed(2) }}</span>
-          </div>
-          <div class="info-item">
-            <span class="label">可用余额：</span>
-            <span class="value available">¥{{ (walletInfo.balance - walletInfo.frozenAmount).toFixed(2) }}</span>
-          </div>
-        </div>
       </div>
-
-      <!-- 快捷功能 -->
-      <div class="quick-actions">
-        <div class="action-item" @click="goToTransactionHistory">
-          <div class="action-icon" style="background-color: #4ECDC4;">
-            📊
-          </div>
-          <span class="action-name">交易记录</span>
-          <span class="action-arrow">→</span>
-        </div>
-        <!-- 删除银行卡管理功能 -->
-        <!-- 删除安全设置功能 -->
-      </div>
-
     </div>
 
-    <!-- 最近交易 -->
+    <!-- 交易记录 -->
     <div class="recent-transactions">
       <div class="section-header">
-        <h3>最近交易</h3>
-        <button @click="goToTransactionHistory" class="view-all-btn">查看全部</button>
+        <h3>交易记录</h3>
       </div>
       <div class="transaction-list">
         <div v-if="recentTransactions.length === 0" class="empty-state">
           <div class="empty-icon">💰</div>
           <p>暂无交易记录</p>
         </div>
-        <div v-for="transaction in recentTransactions" :key="transaction.id" class="transaction-item">
-          <div class="transaction-icon" :class="transaction.type">
-            {{ getTransactionIcon(transaction.type) }}
+        <div v-for="transaction in recentTransactions" :key="transaction.orderId" class="transaction-item">
+          <div class="transaction-icon">
+            💰
           </div>
           <div class="transaction-info">
-            <div class="transaction-title">{{ transaction.title }}</div>
-            <div class="transaction-time">{{ formatTime(transaction.time) }}</div>
+            <div class="transaction-title">{{ transaction.commodityName }}</div>
+            <div class="transaction-details">
+              <div class="transaction-detail"><span class="detail-label">买家:</span> {{ transaction.buyerName }}</div>
+              <div class="transaction-detail"><span class="detail-label">卖家:</span> {{ transaction.sellerName }}</div>
+              <div class="transaction-detail"><span class="detail-label">状态:</span> {{ transaction.orderStatusDescription }}</div>
+              <div class="transaction-detail"><span class="detail-label">时间:</span> {{ transaction.saleTime }}</div>
+              <div class="transaction-detail"><span class="detail-label">数量:</span> {{ transaction.buyQuantity || 1 }}</div>
+            </div>
           </div>
-          <div class="transaction-amount" :class="transaction.type">
-            {{ transaction.type === 'income' ? '+' : '-' }}¥{{ Math.abs(transaction.amount).toFixed(2) }}
+          <div class="transaction-amount">
+            ¥{{ transaction.money.toFixed(2) }}
           </div>
         </div>
       </div>
@@ -125,31 +108,33 @@
           <div class="amount-input">
             <label>提现金额</label>
             <input v-model="withdrawAmount" type="number" placeholder="请输入提现金额" class="amount-field" />
-            <div class="available-balance">可用余额：¥{{ (walletInfo.balance - walletInfo.frozenAmount).toFixed(2) }}</div>
+            <div class="available-balance">余额：¥{{ walletInfo.balance.toFixed(2) }}</div>
           </div>
           <div class="withdraw-info">
-            <p>• 提现手续费：2元/笔</p>
             <p>• 到账时间：1-3个工作日</p>
-            <p>• 单笔最低提现金额：10元</p>
           </div>
         </div>
         <div class="modal-footer">
           <button @click="closeWithdrawModal" class="cancel-btn">取消</button>
-          <button @click="confirmWithdraw" :disabled="!withdrawAmount || withdrawAmount < 10 || withdrawAmount > (walletInfo.balance - walletInfo.frozenAmount)" class="confirm-btn">确认提现</button>
+          <button @click="confirmWithdraw" :disabled="!withdrawAmount || withdrawAmount <= 0 || withdrawAmount > walletInfo.balance" class="confirm-btn">确认提现</button>
         </div>
       </div>
     </div>
+    
+    </div> <!-- 结束wallet-content -->
   </div>
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   name: 'WalletManagement',
   data() {
     return {
+      userId: '',
       walletInfo: {
-        balance: 1250.80,
-        frozenAmount: 50.00
+        balance: 0.00
       },
       showRechargeModal: false,
       showWithdrawModal: false,
@@ -161,41 +146,101 @@ export default {
         { id: 2, name: '支付宝', icon: '💙' },
         { id: 3, name: '银行卡', icon: '💳' }
       ],
-      recentTransactions: [
-        {
-          id: 1,
-          type: 'income',
-          title: '出售商品收入',
-          amount: 350.00,
-          time: new Date('2024-01-15 14:30:00')
-        },
-        {
-          id: 2,
-          type: 'expense',
-          title: '购买商品支出',
-          amount: 120.00,
-          time: new Date('2024-01-14 10:20:00')
-        },
-        {
-          id: 3,
-          type: 'income',
-          title: '充值',
-          amount: 500.00,
-          time: new Date('2024-01-13 16:45:00')
-        }
-      ]
+      recentTransactions: [],
+      isLoading: false,
+      errorMessage: '',
+      transactionType: 'all' // 只显示全部交易
+    }
+  },
+  created() {
+    // 从路由参数中获取userId
+    if (this.$route.query.userId) {
+      console.log('钱包管理页面获取到的userId:', this.$route.query.userId);
+      this.userId = this.$route.query.userId;
+      // 获取钱包余额
+      this.fetchWalletBalance();
+      // 获取交易记录（根据当前选择的类型）
+      this.fetchTransactions();
+    } else {
+      console.error('未获取到用户ID');
+      alert('未获取到用户ID，请重新登录');
     }
   },
   methods: {
     goBack() {
       this.$router.go(-1)
     },
-    goToTransactionHistory() {
-      // 跳转到交易记录页面
-      this.$message?.info('交易记录功能开发中')
+    // 获取交易记录（统一方法）
+    fetchTransactions() {
+      this.fetchAllTransactions();
     },
-    // 删除 goToBankCards 方法
-    // 删除 goToSecuritySettings 方法
+    
+    // 获取钱包余额
+    fetchWalletBalance() {
+      if (!this.userId) {
+        console.error('获取钱包余额失败：用户ID不存在');
+        return;
+      }
+      
+      this.isLoading = true;
+      
+      // 调用后端API获取钱包余额
+      axios.post('http://localhost:8081/user/account/balance', {
+        userId: this.userId
+      })
+      .then(response => {
+        if (response.data.code === 200) {
+          // 更新钱包余额 - 直接使用data字段的值作为余额
+          this.walletInfo.balance = response.data.data || 0;
+          console.log('成功获取钱包余额:', this.walletInfo.balance);
+        } else {
+          console.error('获取钱包余额失败:', response.data.message);
+          this.errorMessage = response.data.message || '获取钱包余额失败';
+          alert(this.errorMessage);
+        }
+      })
+      .catch(error => {
+        console.error('获取钱包余额请求出错:', error);
+        this.errorMessage = '网络错误，请稍后重试';
+        alert(this.errorMessage);
+      })
+      .finally(() => {
+        this.isLoading = false;
+      });
+    },
+    
+    // 获取全部交易记录
+    fetchAllTransactions() {
+      if (!this.userId) {
+        console.error('获取交易记录失败：用户ID不存在');
+        return;
+      }
+      
+      this.isLoading = true;
+      
+      // 调用后端API获取全部交易记录
+      axios.post('http://localhost:8095/api/orders/query/by-user', {
+        user_id: this.userId
+      })
+      .then(response => {
+        if (response.data.code === 200 && response.data.success) {
+          // 更新交易记录
+          this.recentTransactions = response.data.data || [];
+          console.log('成功获取全部交易记录:', this.recentTransactions);
+        } else {
+          console.error('获取交易记录失败:', response.data.message);
+          alert(response.data.message || '获取交易记录失败');
+        }
+      })
+      .catch(error => {
+        console.error('获取交易记录请求出错:', error);
+        alert('网络错误，请稍后重试');
+      })
+      .finally(() => {
+        this.isLoading = false;
+      });
+    },
+    
     closeRechargeModal() {
       this.showRechargeModal = false
       this.rechargeAmount = ''
@@ -207,53 +252,93 @@ export default {
     },
     confirmRecharge() {
       if (!this.rechargeAmount || this.rechargeAmount <= 0) {
-        this.$message?.error('请输入有效的充值金额')
+        alert('请输入有效的充值金额')
         return
       }
       
-      // 模拟充值成功
-      this.walletInfo.balance += parseFloat(this.rechargeAmount)
-      this.$message?.success(`充值成功！金额：¥${this.rechargeAmount}`)
+      if (!this.userId) {
+        alert('用户ID不存在，请重新登录')
+        return
+      }
       
-      // 添加交易记录
-      this.recentTransactions.unshift({
-        id: Date.now(),
-        type: 'income',
-        title: '充值',
+      this.isLoading = true;
+      
+      // 调用后端API进行充值
+      axios.post('http://localhost:8081/user/account/recharge', {
+        userId: this.userId,
         amount: parseFloat(this.rechargeAmount),
-        time: new Date()
+        paymentMethod: this.selectedPaymentMethod
       })
-      
-      this.closeRechargeModal()
+      .then(response => {
+        if (response.data.code === 200) {
+          // 充值成功
+          alert(`充值成功！金额：¥${this.rechargeAmount}`)
+          
+          // 重新获取钱包余额和交易记录
+          this.fetchWalletBalance();
+          this.fetchTransactions();
+          
+          this.closeRechargeModal();
+        } else {
+          console.error('充值失败:', response.data.message);
+          alert(response.data.message || '充值失败，请稍后重试');
+        }
+      })
+      .catch(error => {
+        console.error('充值请求出错:', error);
+        alert('网络错误，请稍后重试');
+      })
+      .finally(() => {
+        this.isLoading = false;
+      });
     },
     confirmWithdraw() {
       const amount = parseFloat(this.withdrawAmount)
-      const availableBalance = this.walletInfo.balance - this.walletInfo.frozenAmount
       
-      if (!amount || amount < 10) {
-        this.$message?.error('最低提现金额为10元')
+      if (!amount || amount <= 0) {
+        alert('请输入有效的提现金额')
         return
       }
       
-      if (amount > availableBalance) {
-        this.$message?.error('提现金额不能超过可用余额')
+      if (amount > this.walletInfo.balance) {
+        alert('提现金额不能超过余额')
         return
       }
       
-      // 模拟提现成功
-      this.walletInfo.balance -= amount
-      this.$message?.success(`提现申请已提交！金额：¥${amount}，预计1-3个工作日到账`)
+      if (!this.userId) {
+        this.$message?.error('用户ID不存在，请重新登录')
+        return
+      }
       
-      // 添加交易记录
-      this.recentTransactions.unshift({
-        id: Date.now(),
-        type: 'expense',
-        title: '提现',
-        amount: amount,
-        time: new Date()
+      this.isLoading = true;
+      
+      // 调用后端API进行提现
+      axios.post('http://localhost:8081/user/account/withdraw', {
+        userId: this.userId,
+        amount: amount
       })
-      
-      this.closeWithdrawModal()
+      .then(response => {
+        if (response.data.code === 200) {
+          // 提现成功
+          alert(`提现申请已提交！金额：¥${amount}，预计1-3个工作日到账`)
+          
+          // 重新获取钱包余额和交易记录
+          this.fetchWalletBalance();
+          this.fetchTransactions();
+          
+          this.closeWithdrawModal();
+        } else {
+          console.error('提现失败:', response.data.message);
+          alert(response.data.message || '提现失败，请稍后重试');
+        }
+      })
+      .catch(error => {
+        console.error('提现请求出错:', error);
+        alert('网络错误，请稍后重试');
+      })
+      .finally(() => {
+        this.isLoading = false;
+      });
     },
     getTransactionIcon(type) {
       return type === 'income' ? '💰' : '💸'
@@ -279,6 +364,19 @@ export default {
 .wallet-page {
   min-height: 100vh;
   background-color: #f5f5f5;
+  position: relative;
+  overflow-x: hidden;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.wallet-content {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* 增强iOS滚动体验 */
+  position: relative;
+  z-index: 1;
 }
 
 .wallet-header {
@@ -288,6 +386,7 @@ export default {
   position: sticky;
   top: 0;
   z-index: 100;
+  width: 100%;
 }
 
 .header-content {
@@ -479,12 +578,30 @@ export default {
   color: #333;
 }
 
-.view-all-btn {
-  background: none;
-  border: none;
-  color: #007bff;
-  cursor: pointer;
+.transaction-filter {
+  display: flex;
+  align-items: center;
+}
+
+.transaction-select {
+  padding: 6px 12px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  background-color: #f8f9fa;
+  color: #333;
   font-size: 14px;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.transaction-select:hover {
+  border-color: #007bff;
+}
+
+.transaction-select:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
 
 .transaction-list {
@@ -549,6 +666,24 @@ export default {
   color: #999;
 }
 
+.transaction-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 14px;
+  color: #666;
+}
+
+.transaction-detail {
+  margin-right: 10px;
+}
+
+.detail-label {
+  font-weight: 500;
+  color: #555;
+  margin-right: 4px;
+}
+
 .transaction-amount {
   font-size: 16px;
   font-weight: 600;
@@ -574,6 +709,7 @@ export default {
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  touch-action: none; /* 防止触摸事件穿透 */
 }
 
 .modal {
@@ -583,6 +719,9 @@ export default {
   max-width: 400px;
   max-height: 80vh;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* 增强iOS滚动体验 */
+  position: relative;
+  z-index: 1001;
 }
 
 .modal-header {
@@ -749,5 +888,20 @@ export default {
     flex-direction: column;
     gap: 15px;
   }
+  
+  .transaction-details {
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .transaction-detail {
+    margin-right: 0;
+    margin-bottom: 3px;
+  }
+}
+
+/* 修复触摸事件 */
+* {
+  touch-action: manipulation; /* 优化触摸操作 */
 }
 </style>

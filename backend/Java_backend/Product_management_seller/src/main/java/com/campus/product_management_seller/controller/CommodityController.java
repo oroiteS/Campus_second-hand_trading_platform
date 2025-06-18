@@ -3,8 +3,15 @@ package com.campus.product_management_seller.controller;
 import com.campus.product_management_seller.dto.ApiResponse;
 import com.campus.product_management_seller.dto.CommodityDescriptionUpdateRequest;
 import com.campus.product_management_seller.dto.CommodityStatusUpdateRequest;
+import com.campus.product_management_seller.dto.CommodityCreateRequest;
+import com.campus.product_management_seller.dto.CommodityUpdateRequest;
 import com.campus.product_management_seller.service.CommodityService;
 import com.campus.product_management_seller.entity.Commodity;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,13 +20,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/api/commodity")
 @CrossOrigin(originPatterns = "*", maxAge = 3600, allowCredentials = "true")
+@Tag(name = "商品管理", description = "商品管理相关接口")
 public class CommodityController {
     
     private static final Logger logger = LoggerFactory.getLogger(CommodityController.class);
@@ -28,7 +41,144 @@ public class CommodityController {
     private CommodityService commodityService;
     
     /**
-     * 上架商品
+     * 创建并上架商品接口
+     * @param commodityName 商品名称
+     * @param commodityDescription 商品描述
+     * @param categoryId 分类ID
+     * @param tagsId 标签ID
+     * @param currentPrice 当前价格
+     * @param quantity 数量
+     * @param sellerId 卖家ID
+     * @param newness 新旧度
+     * @param images 商品图片
+     * @return 响应结果
+     */
+    @Operation(summary = "创建并上架商品", description = "创建新商品并直接上架销售")
+    @PostMapping(value = "/create-and-put-on-sale", consumes = "multipart/form-data")
+    public ResponseEntity<ApiResponse<Commodity>> createAndPutOnSale(
+            @Parameter(description = "商品名称", required = true)
+            @RequestParam("commodityName") String commodityName,
+            @Parameter(description = "商品描述", required = true)
+            @RequestParam("commodityDescription") String commodityDescription,
+            @Parameter(description = "商品分类ID", required = true)
+            @RequestParam("categoryId") Integer categoryId,
+            @Parameter(description = "商品标签ID，多个标签用逗号分隔", required = true)
+            @RequestParam("tagsId") String tagsId,
+            @Parameter(description = "商品价格", required = true)
+            @RequestParam("currentPrice") BigDecimal currentPrice,
+            @Parameter(description = "商品数量", required = true)
+            @RequestParam("quantity") Integer quantity,
+            @Parameter(description = "卖家ID", required = true)
+            @RequestParam("sellerId") String sellerId,
+            @Parameter(description = "商品新旧度", required = true)
+            @RequestParam("newness") String newness,
+            @Parameter(description = "商品图片文件，支持多张图片上传", required = true)
+            @RequestParam(value = "images", required = true) MultipartFile[] images) {
+        
+        logger.info("收到创建并上架商品请求: {}", commodityName);
+        
+        try {
+            // 详细记录接收到的参数信息
+            logger.info("接收到的参数 - commodityName: {}, categoryId: {}, currentPrice: {}, quantity: {}, sellerId: {}, newness: {}", 
+                       commodityName, categoryId, currentPrice, quantity, sellerId, newness);
+            
+            // 验证图片参数
+            if (images == null) {
+                logger.warn("images 参数为 null - 可能是前端未正确发送multipart数据");
+                return ResponseEntity.badRequest()
+                        .body(ApiResponse.error("商品图片不能为空，请确保使用正确的 multipart/form-data 格式上传图片", "IMAGES_REQUIRED"));
+            }
+            
+            // 记录图片数组信息
+            logger.info("接收到的图片数量: {}", images.length);
+            
+            // 过滤掉空的文件项（前端可能发送空的文件字段）
+            List<MultipartFile> validImages = new ArrayList<>();
+            for (int i = 0; i < images.length; i++) {
+                MultipartFile img = images[i];
+                if (img != null && !img.isEmpty()) {
+                    logger.info("有效图片 {}: 文件名={}, 大小={}, 类型={}", 
+                               validImages.size(), img.getOriginalFilename(), img.getSize(), img.getContentType());
+                    validImages.add(img);
+                } else {
+                    logger.warn("跳过空图片文件 {} (可能是前端发送的空字段)", i);
+                }
+            }
+            
+            // 检查是否有有效的图片文件
+            if (validImages.isEmpty()) {
+                logger.warn("没有接收到有效的图片文件");
+                return ResponseEntity.badRequest()
+                        .body(ApiResponse.error("请至少上传一张商品图片", "NO_VALID_IMAGES"));
+            }
+            
+            // 将有效图片转换回数组
+            images = validImages.toArray(new MultipartFile[0]);
+            logger.info("过滤后的有效图片数量: {}", images.length);
+            
+            // 手动验证必填参数
+            if (commodityName == null || commodityName.trim().isEmpty()) {
+                return ResponseEntity.badRequest()
+                        .body(ApiResponse.error("商品名称不能为空", "VALIDATION_ERROR"));
+            }
+            if (categoryId == null) {
+                return ResponseEntity.badRequest()
+                        .body(ApiResponse.error("商品类别不能为空", "VALIDATION_ERROR"));
+            }
+            if (currentPrice == null || currentPrice.compareTo(BigDecimal.ZERO) <= 0) {
+                return ResponseEntity.badRequest()
+                        .body(ApiResponse.error("商品价格必须大于0", "VALIDATION_ERROR"));
+            }
+            if (quantity == null || quantity <= 0) {
+                return ResponseEntity.badRequest()
+                        .body(ApiResponse.error("商品数量必须大于0", "VALIDATION_ERROR"));
+            }
+            if (sellerId == null || sellerId.trim().isEmpty()) {
+                return ResponseEntity.badRequest()
+                        .body(ApiResponse.error("卖家ID不能为空", "VALIDATION_ERROR"));
+            }
+            if (newness == null || newness.trim().isEmpty()) {
+                return ResponseEntity.badRequest()
+                        .body(ApiResponse.error("商品新旧度不能为空", "VALIDATION_ERROR"));
+            }
+            
+            // 验证图片文件格式（此时images已经过滤了空文件）
+            for (int i = 0; i < images.length; i++) {
+                MultipartFile image = images[i];
+                // 验证文件类型
+                String contentType = image.getContentType();
+                if (contentType == null || !contentType.startsWith("image/")) {
+                    logger.warn("第{}张文件格式不正确: {}", (i + 1), contentType);
+                    return ResponseEntity.badRequest()
+                            .body(ApiResponse.error("第" + (i + 1) + "张文件不是有效的图片格式，支持的格式：jpg, jpeg, png, gif, webp", "INVALID_IMAGE_FORMAT"));
+                }
+                
+                // 验证文件大小（可选，防止过大文件）
+                if (image.getSize() > 10 * 1024 * 1024) { // 10MB限制
+                    logger.warn("第{}张图片文件过大: {} bytes", (i + 1), image.getSize());
+                    return ResponseEntity.badRequest()
+                            .body(ApiResponse.error("第" + (i + 1) + "张图片文件过大，请上传小于10MB的图片", "IMAGE_TOO_LARGE"));
+                }
+            }
+            
+            // 创建请求对象
+            CommodityCreateRequest request = new CommodityCreateRequest(
+                    commodityName, commodityDescription, categoryId, tagsId,
+                    currentPrice, null, null, quantity, sellerId, newness
+            );
+            
+            Commodity commodity = commodityService.createAndPutOnSaleWithImages(request, images);
+            logger.info("商品创建并上架成功，商品ID: {}", commodity.getCommodityId());
+            return ResponseEntity.ok(ApiResponse.success("商品创建并上架成功", commodity));
+        } catch (Exception e) {
+            logger.error("商品创建并上架异常: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("商品创建并上架失败: " + e.getMessage(), "CREATE_FAILED"));
+        }
+    }
+    
+    /**
+     * 上架商品（原有功能，用于已存在商品的状态更新）
      * @param request 上架请求
      * @param bindingResult 验证结果
      * @return 响应结果
@@ -124,11 +274,54 @@ public class CommodityController {
     }
     
     /**
+     * 更新商品信息（名称、描述、价格、新旧度）
+     * @param request 更新请求
+     * @param bindingResult 验证结果
+     * @return 响应结果
+     */
+    @PostMapping("/update-info")
+    public ResponseEntity<ApiResponse<Void>> updateCommodityInfo(
+            @Valid @RequestBody CommodityUpdateRequest request,
+            BindingResult bindingResult) {
+        
+        logger.info("收到更新商品信息请求: {}", request);
+        
+        // 参数验证
+        if (bindingResult.hasErrors()) {
+            String errorMessage = bindingResult.getFieldErrors().get(0).getDefaultMessage();
+            logger.warn("更新商品信息参数验证失败: {}", errorMessage);
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("参数验证失败: " + errorMessage, "VALIDATION_ERROR"));
+        }
+        
+        try {
+            boolean success = commodityService.updateCommodityInfo(request);
+            
+            if (success) {
+                logger.info("商品信息更新成功: commodityId={}, sellerId={}", 
+                           request.getCommodityId(), request.getSellerId());
+                return ResponseEntity.ok(ApiResponse.success("商品信息更新成功"));
+            } else {
+                logger.warn("商品信息更新失败，商品不存在或无权限: commodityId={}, sellerId={}", 
+                           request.getCommodityId(), request.getSellerId());
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(ApiResponse.error("商品不存在或您无权限操作此商品", "COMMODITY_NOT_FOUND"));
+            }
+        } catch (Exception e) {
+            logger.error("商品信息更新异常: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("服务器内部错误: " + e.getMessage(), "INTERNAL_ERROR"));
+        }
+    }
+    
+    /**
      * 修改商品描述
+     * @deprecated 此接口已废弃，请使用 /update-info 接口进行商品信息更新
      * @param request 修改请求
      * @param bindingResult 验证结果
      * @return 响应结果
      */
+    @Deprecated
     @PostMapping("/update-description")
     public ResponseEntity<ApiResponse<Void>> updateDescription(
             @Valid @RequestBody CommodityDescriptionUpdateRequest request,

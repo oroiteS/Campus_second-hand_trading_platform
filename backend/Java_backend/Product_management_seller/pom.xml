@@ -47,6 +47,18 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.aliyun.oss</groupId>
+            <artifactId>aliyun-sdk-oss</artifactId>
+            <version>3.17.4</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.aliyun.oss</groupId>
+            <artifactId>aliyun-sdk-oss</artifactId>
+            <version>3.17.4</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>
@@ -71,6 +83,8 @@
                     <target>17</target>
                     <encoding>UTF-8</encoding>
                     <parameters>true</parameters>
+                    <executable>C:\Users\ASUS\.jdks\jbr-17.0.9\bin\javac.exe</executable>
+                    <fork>true</fork>
                 </configuration>
             </plugin>
             <plugin>
