@@ -1,0 +1,170 @@
+# MyBatis Plus 配置
+mybatis-plus:
+  # 配置 Mapper XML 文件位置
+  mapper-locations: classpath*:/mapper/**/*.xml
+  # 配置实体类别名包路径
+  type-aliases-package: com.campus.ordermanagement.pojo
+  # 全局配置
+  global-config:
+    # 数据库配置
+    db-config:
+      # 主键类型（INPUT 为手动输入，适用于UUID）
+      id-type: INPUT
+      # 逻辑删除字段名
+      logic-delete-field: deleted
+      # 逻辑删除值（删除时设置的值）
+      logic-delete-value: 1
+      # 逻辑未删除值（正常时的值）
+      logic-not-delete-value: 0
+      # 更新策略
+      update-strategy: NOT_NULL
+      # 插入策略
+      insert-strategy: NOT_NULL
+      # 查询策略
+      select-strategy: NOT_EMPTY
+  # 配置
+  configuration:
+    # 开启驼峰命名转换
+    map-underscore-to-camel-case: true
+    # 关闭缓存（开发环境）
+    cache-enabled: false
+    # 当查询结果为null时调用setter方法
+    call-setters-on-nulls: true
+    # null值的JDBC类型
+    jdbc-type-for-null: 'null'
+    # 日志实现
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# Spring应用配置
+spring:
+  application:
+    name: order-management
+  profiles:
+    active: dev
+  
+  # 数据源配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/campus?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: campus_test
+    password: campus_suep
+    
+    # 连接池配置
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      auto-commit: true
+      idle-timeout: 30000
+      pool-name: OrderManagementHikariCP
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
+  
+  # JPA 配置（如果需要混合使用）
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+  
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 5MB
+      max-request-size: 10MB
+      file-size-threshold: 2KB
+
+# 服务器配置
+server:
+  port: 8081
+  servlet:
+    context-path: /order-management
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+# 日志配置
+logging:
+  level:
+    com.campus.ordermanagement: DEBUG
+    org.springframework.web: INFO
+    org.mybatis: DEBUG
+    com.campus.profile.dao: debug
+    org.apache.ibatis: debug
+  pattern:
+    console: '%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n'
+    file: '%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n'
+  file:
+    name: logs/order-management.log
+    max-size: 10MB
+    max-history: 30
+
+# Swagger配置（已移至下方统一配置）
+
+# 管理端点配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+
+# 应用信息
+info:
+  app:
+    name: 校园二手交易平台-订单管理
+    description: 订单管理微服务
+    version: 1.0.0
+    encoding: UTF-8
+    java:
+      version: 17
+
+# 自定义配置
+order:
+  config:
+    # 订单超时时间（分钟）
+    timeout-minutes: 30
+    # 最大订单数量限制
+    max-orders-per-user: 100
+    # 是否启用订单统计
+    enable-statistics: true
+    # 是否启用订单缓存
+    enable-cache: false
+
+# Swagger 配置
+springdoc:
+  api-docs:
+    # 启用 API 文档
+    enabled: true
+    # API 文档路径
+    path: /v3/api-docs
+  swagger-ui:
+    # 启用 Swagger UI
+    enabled: true
+    # Swagger UI 路径
+    path: /swagger-ui.html
+    # 操作排序
+    operations-sorter: alpha
+    # 标签排序
+    tags-sorter: alpha
+    # 尝试请求
+    try-it-out-enabled: true
+  show-actuator: true
+
+# 文件上传配置
+# 自定义文件上传配置
+file:
+  upload:
+    avatar-path: e:/Compus_Sencond_Hand/Campus/Campus_second-hand_trading_platform/backend/Java_backend/uploads/avatars/
+
+# 服务器基础URL配置
+# server:
+#   base-url: http://localhost:8080
+
+# 日志配置已合并到上方

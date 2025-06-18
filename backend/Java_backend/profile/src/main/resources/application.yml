@@ -73,7 +73,6 @@ springdoc:
     try-it-out-enabled: true
 
 
-# 服务器配置
 
 # 日志配置
 logging:
