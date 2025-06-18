@@ -268,9 +268,14 @@ export default {
           console.log('跳转到附近的人')
           break
         case 'wallet':
-          // 跳转到钱包管理页面
-          console.log('跳转到钱包管理')
-          this.$router.push('/wallet')
+          // 跳转到钱包管理页面，并传递userId
+          console.log('跳转到钱包管理，userId:', this.userId)
+          this.$router.push({
+            path: '/wallet',
+            query: {
+              userId: this.userId
+            }
+          })
           break
         case 'password':
           // 跳转到密码修改页面
