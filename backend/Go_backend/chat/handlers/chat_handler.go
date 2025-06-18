@@ -60,7 +60,7 @@ func (h *ChatHandler) CreateSession(c *gin.Context) {
 		return
 	}
 
-	session, err := h.chatService.CreateSession(req.BuyerID, req.SellerID)
+	session, err := h.chatService.CreateSession(req.FirstID, req.SecondID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

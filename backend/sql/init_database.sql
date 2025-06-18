@@ -146,26 +146,26 @@ CREATE TABLE IF NOT EXISTS `wallet` (
 -- 11. 聊天会话表
 CREATE TABLE IF NOT EXISTS `chat_sessions` (
     `session_id` CHAR(36) NOT NULL PRIMARY KEY COMMENT '会话ID（UUID）',
-    `buyer_id` CHAR(9) NOT NULL COMMENT '买家ID',
-    `seller_id` CHAR(9) NOT NULL COMMENT '卖家ID',
-    `session_status` ENUM('active', 'closed') NOT NULL DEFAULT 'active' COMMENT '会话状态',
+    `first_id` CHAR(9) NOT NULL COMMENT '第一个用户ID',
+    `second_id` CHAR(9) NOT NULL COMMENT '第二个用户ID',
+    -- `session_status` ENUM('active', 'closed') NOT NULL DEFAULT 'active' COMMENT '会话状态',
     `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
 
     -- 索引
-    INDEX `idx_buyer_id` (`buyer_id`),
-    INDEX `idx_seller_id` (`seller_id`),
-    INDEX `idx_session_status` (`session_status`),
+    INDEX `idx_first_id` (`first_id`),
+    INDEX `idx_second_id` (`second_id`),
+    -- INDEX `idx_session_status` (`session_status`),
     INDEX `idx_created_at` (`created_at`),
 
 
     -- 外键约束
-    CONSTRAINT `fk_chat_sessions_buyer` FOREIGN KEY (`buyer_id`) REFERENCES `users` (`User_ID`) ON DELETE CASCADE,
-    CONSTRAINT `fk_chat_sessions_seller` FOREIGN KEY (`seller_id`) REFERENCES `users` (`User_ID`) ON DELETE CASCADE,
+    CONSTRAINT `fk_chat_sessions_first` FOREIGN KEY (`first_id`) REFERENCES `users` (`User_ID`) ON DELETE CASCADE,
+    CONSTRAINT `fk_chat_sessions_second` FOREIGN KEY (`second_id`) REFERENCES `users` (`User_ID`) ON DELETE CASCADE,
 
 
     -- 唯一约束：同一买家和卖家只能有一个会话
-    UNIQUE KEY `uk_buyer_seller_commodity` (`buyer_id`, `seller_id`)
+    UNIQUE KEY `uk_first_second_commodity` (`first_id`, `second_id`)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='聊天会话表';
 

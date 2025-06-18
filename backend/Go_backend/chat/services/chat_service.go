@@ -31,7 +31,14 @@ func NewChatService(db *gorm.DB, rdb *redis.Client) *ChatService {
 func (s *ChatService) CreateSession(buyerID, sellerID string) (*models.ChatSession, error) {
 	// 检查是否已存在会话
 	var existingSession models.ChatSession
-	err := s.db.Where("buyer_id = ? AND seller_id = ?", buyerID, sellerID).First(&existingSession).Error
+	err := s.db.Where("first_id = ? AND second_id = ?", buyerID, sellerID).First(&existingSession).Error
+	if err == nil {
+		// 买家和卖家都存在会话，返回现有会话
+		return &existingSession, nil
+	}
+
+	// 检查是否已存在反向会话
+	err = s.db.Where("first_id = ? AND second_id = ?", sellerID, buyerID).First(&existingSession).Error
 	if err == nil {
 		// 会话已存在，返回现有会话
 		return &existingSession, nil
@@ -39,12 +46,12 @@ func (s *ChatService) CreateSession(buyerID, sellerID string) (*models.ChatSessi
 
 	// 创建新会话
 	session := &models.ChatSession{
-		SessionID:     uuid.New().String(),
-		BuyerID:       buyerID,
-		SellerID:      sellerID,
-		SessionStatus: "active",
-		CreatedAt:     time.Now(),
-		UpdatedAt:     time.Now(),
+		SessionID: uuid.New().String(),
+		FirstID:   buyerID,
+		SecondID:  sellerID,
+		// SessionStatus: "active",
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 
 	err = s.db.Create(session).Error
@@ -58,8 +65,8 @@ func (s *ChatService) CreateSession(buyerID, sellerID string) (*models.ChatSessi
 // GetUserSessions 获取用户的所有会话
 func (s *ChatService) GetUserSessions(userID string) ([]models.ChatSession, error) {
 	var sessions []models.ChatSession
-	err := s.db.Preload("Buyer").Preload("Seller").
-		Where("buyer_id = ? OR seller_id = ?", userID, userID).
+	err := s.db.Preload("First").Preload("Second").
+		Where("first_id = ? OR second_id = ?", userID, userID).
 		Order("updated_at DESC").
 		Find(&sessions).Error
 
