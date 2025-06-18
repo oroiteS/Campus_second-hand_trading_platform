@@ -25,7 +25,7 @@ mybatis-plus:
 # JWT配置
 jwt:
   secret: campus-secondhand-platform-secret-key-2024
-  expiration: 3600000  # 24小时
+  expiration: 3600000  # 1小时
 
 # 日志配置
 logging:
