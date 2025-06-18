@@ -135,7 +135,7 @@
 </template>
 
 <script>
-
+import axios from 'axios'
 import AMapLoader from '@amap/amap-jsapi-loader'
 export default {
   name: 'ProfilePage',
@@ -145,7 +145,7 @@ export default {
       activeTab: 'selling',
       userId: '',
       userInfo: {
-        username: 'xy21675070351',
+        username: '默认用户',
         avatar: '/测试图片.jpg',
         dealCount: 47,
         favoriteCount: 23
@@ -197,6 +197,9 @@ export default {
       console.log('Profile页面获取到的userId:', this.$route.query.userId);
       // 保存userId以便后续使用
       this.userId = this.$route.query.userId;
+      
+      // 获取用户头像URL
+      this.fetchUserAvatar();
     }
     
     // 如果传递了name参数，更新userInfo中的username
@@ -206,6 +209,30 @@ export default {
     }
   },
   methods: {
+    // 获取用户头像URL
+    fetchUserAvatar() {
+      if (!this.userId) {
+        console.error('获取头像失败：用户ID不存在');
+        return;
+      }
+      
+      axios.post('http://localhost:8089/api/user/avatar/url', {
+        userId: this.userId
+      })
+      .then(response => {
+        if (response.data.success && response.data.data) {
+          // 更新用户头像URL
+          this.userInfo.avatar = response.data.data.avatarUrl;
+          console.log('成功获取用户头像URL:', this.userInfo.avatar);
+        } else {
+          console.error('获取头像URL失败:', response.data.message);
+        }
+      })
+      .catch(error => {
+        console.error('获取头像URL请求出错:', error);
+      });
+    },
+    
     goBack() {
       this.$router.go(-1)
     },

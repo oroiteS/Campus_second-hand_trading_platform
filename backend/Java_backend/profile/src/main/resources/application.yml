@@ -72,11 +72,6 @@ springdoc:
     # 尝试请求
     try-it-out-enabled: true
 
-# 文件上传配置
-# 自定义文件上传配置
-file:
-  upload:
-    avatar-path: e:/Compus_Sencond_Hand/Campus/Campus_second-hand_trading_platform/backend/Java_backend/uploads/avatars/
 
 # 服务器配置
 
@@ -85,3 +80,4 @@ logging:
   level:
     com.campus.profile.dao: debug
     org.apache.ibatis: debug
+

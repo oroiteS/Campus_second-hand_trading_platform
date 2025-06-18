@@ -2,7 +2,6 @@
   <div class="user-profile-container">
     <div class="user-profile-box">
       <h2>修改个人信息</h2>
-      
       <!-- 头像放在最上方 -->
     <div class="user-profile-avatar-section">
         <img :src="avatarPreview || avatarUrl" class="user-profile-avatar-preview-large" />
@@ -203,8 +202,41 @@ export default {
       return isValid;
     },
     
+    // 上传头像
+    async uploadAvatar() {
+      if (!this.avatarFile) {
+        return Promise.resolve(null); // 如果没有选择新头像，直接返回
+      }
+
+      // 创建FormData对象
+      const formData = new FormData();
+      formData.append('file', this.avatarFile);
+      formData.append('userId', this.userId);
+
+      try {
+        // 调用头像上传API
+        const response = await axios.post('http://localhost:8089/api/user/avatar/upload', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+
+        if (response.data.success) {
+          console.log('头像上传成功:', response.data);
+          // 更新头像URL
+          this.avatarUrl = response.data.data.avatarUrl;
+          return response.data;
+        } else {
+          throw new Error(response.data.message || '头像上传失败');
+        }
+      } catch (error) {
+        console.error('头像上传出错:', error);
+        throw error;
+      }
+    },
+    
     // 保存个人信息
-    saveProfile() {
+    async saveProfile() {
       this.isLoading = true;
       this.errorMessage = '';
       
@@ -214,34 +246,39 @@ export default {
         return;
       }
       
-      // 准备用户信息更新数据
-      const userUpdateData = {
-        userId: this.userId,
-        userName: this.username,
-        telephone: this.telephone
-      };
-      
-      // 调用API更新用户信息
-      axios.post('http://localhost:8089/api/user/update', userUpdateData)
-        .then(response => {
-          if (response.data.success) {
-            console.log('用户信息更新成功:', response.data);
-            this.isLoading = false;
-            alert('个人信息保存成功！');
-            this.$router.push('/');
-          } else {
-            throw new Error(response.data.message || '用户信息更新失败');
-          }
-        })
-        .catch(error => {
-          console.error('保存用户信息出错:', error);
-          this.errorMessage = error.message || '保存信息时发生错误，请稍后再试';
-          this.isLoading = false;
-        });
+      try {
+        // 如果有新头像，先上传头像
+        if (this.avatarFile) {
+          await this.uploadAvatar();
+        }
+        
+        // 准备用户信息更新数据
+        const userUpdateData = {
+          userId: this.userId,
+          userName: this.username,
+          telephone: this.telephone
+        };
+        
+        // 调用API更新用户信息
+        const response = await axios.post('http://localhost:8089/api/user/update', userUpdateData);
+        
+        if (response.data.success) {
+          console.log('用户信息更新成功:', response.data);
+          alert('个人信息保存成功！');
+          this.$router.push('/');
+        } else {
+          throw new Error(response.data.message || '用户信息更新失败');
+        }
+      } catch (error) {
+        console.error('保存用户信息出错:', error);
+        this.errorMessage = error.message || '保存信息时发生错误，请稍后再试';
+      } finally {
+        this.isLoading = false;
+      }
     },
     
     cancel() {
-      this.$router.push('/');
+      this.$router.push('/profile');
     }
   }
 }
