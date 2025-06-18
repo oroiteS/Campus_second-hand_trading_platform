@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多文件上传测试页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        input[type="file"] {
+            padding: 5px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .debug-btn {
+            background-color: #28a745;
+        }
+        .debug-btn:hover {
+            background-color: #1e7e34;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        .file-preview {
+            margin-top: 10px;
+        }
+        .file-item {
+            display: inline-block;
+            margin: 5px;
+            padding: 5px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>商品创建多文件上传测试</h1>
+        
+        <form id="commodityForm">
+            <div class="form-group">
+                <label for="commodityName">商品名称 *</label>
+                <input type="text" id="commodityName" name="commodityName" value="测试商品" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="commodityDescription">商品描述</label>
+                <textarea id="commodityDescription" name="commodityDescription" rows="3">这是一个测试商品的描述</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="categoryId">商品类别ID *</label>
+                <input type="number" id="categoryId" name="categoryId" value="1" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="tagsId">标签ID</label>
+                <input type="number" id="tagsId" name="tagsId" value="1">
+            </div>
+            
+            <div class="form-group">
+                <label for="currentPrice">当前价格 *</label>
+                <input type="number" id="currentPrice" name="currentPrice" step="0.01" value="99.99" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="quantity">数量 *</label>
+                <input type="number" id="quantity" name="quantity" value="1" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="sellerId">卖家ID *</label>
+                <input type="text" id="sellerId" name="sellerId" value="seller123" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="newness">新旧度 *</label>
+                <select id="newness" name="newness" required>
+                    <option value="全新">全新</option>
+                    <option value="几乎全新">几乎全新</option>
+                    <option value="轻微使用">轻微使用</option>
+                    <option value="明显使用">明显使用</option>
+                    <option value="重度使用">重度使用</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="images">商品图片 * (支持多选)</label>
+                <input type="file" id="images" name="images" multiple accept="image/*" required>
+                <div class="file-preview" id="filePreview"></div>
+            </div>
+            
+            <button type="button" onclick="submitForm()">创建商品</button>
+            <button type="button" class="debug-btn" onclick="testDebugUpload()">测试调试接口</button>
+        </form>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8084/api';
+        
+        // 文件预览
+        document.getElementById('images').addEventListener('change', function(e) {
+            const preview = document.getElementById('filePreview');
+            preview.innerHTML = '';
+            
+            for (let i = 0; i < e.target.files.length; i++) {
+                const file = e.target.files[i];
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.textContent = `${file.name} (${(file.size / 1024).toFixed(1)}KB)`;
+                preview.appendChild(fileItem);
+            }
+        });
+        
+        function showResult(message, type = 'info') {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = `result ${type}`;
+            resultDiv.textContent = message;
+        }
+        
+        async function submitForm() {
+            const form = document.getElementById('commodityForm');
+            const formData = new FormData();
+            
+            // 添加所有表单字段
+            formData.append('commodityName', document.getElementById('commodityName').value);
+            formData.append('commodityDescription', document.getElementById('commodityDescription').value);
+            formData.append('categoryId', document.getElementById('categoryId').value);
+            formData.append('tagsId', document.getElementById('tagsId').value);
+            formData.append('currentPrice', document.getElementById('currentPrice').value);
+            formData.append('quantity', document.getElementById('quantity').value);
+            formData.append('sellerId', document.getElementById('sellerId').value);
+            formData.append('newness', document.getElementById('newness').value);
+            
+            // 添加图片文件
+            const files = document.getElementById('images').files;
+            if (files.length === 0) {
+                showResult('请选择至少一张图片', 'error');
+                return;
+            }
+            
+            for (let i = 0; i < files.length; i++) {
+                formData.append('images', files[i]);
+            }
+            
+            showResult('正在上传...', 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE}/commodity/create-and-put-on-sale`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.text();
+                
+                if (response.ok) {
+                    showResult(`成功！\n响应状态: ${response.status}\n响应内容: ${result}`, 'success');
+                } else {
+                    showResult(`失败！\n响应状态: ${response.status}\n错误信息: ${result}`, 'error');
+                }
+            } catch (error) {
+                showResult(`网络错误: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testDebugUpload() {
+            const files = document.getElementById('images').files;
+            if (files.length === 0) {
+                showResult('请选择至少一张图片进行调试测试', 'error');
+                return;
+            }
+            
+            const formData = new FormData();
+            for (let i = 0; i < files.length; i++) {
+                formData.append('files', files[i]);
+            }
+            
+            showResult('正在测试调试接口...', 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE}/debug/upload-multiple-array`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.text();
+                
+                if (response.ok) {
+                    showResult(`调试测试成功！\n响应状态: ${response.status}\n响应内容: ${result}`, 'success');
+                } else {
+                    showResult(`调试测试失败！\n响应状态: ${response.status}\n错误信息: ${result}`, 'error');
+                }
+            } catch (error) {
+                showResult(`调试测试网络错误: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>
