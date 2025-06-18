@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
+
 @Service
 public class AnnouncementServiceImpl implements AnnouncementService {
 
@@ -24,5 +26,22 @@ public class AnnouncementServiceImpl implements AnnouncementService {
         }
     }
 
+    @Override
+    public boolean addAnnouncement(Announcement announcement) {
+        if (announcement.getAnnouncementId() == null || announcement.getAnnouncementId().isEmpty()) {
+            // 你也可以使用 UUID 或自定义生成策略
+            announcement.setAnnouncementId(UUID.randomUUID().toString().substring(0, 10));
+        }
+        // 默认值：可见
+        if (announcement.getVisibleStatus() == false) {
+            announcement.setVisibleStatus(false);
+        }
+        return announcementMapper.insertAnnouncement(announcement) > 0;
+    }
+
+    @Override
+    public boolean updateAnnouncement(Announcement announcement) {
+        return announcementMapper.updateAnnouncement(announcement) > 0;
+    }
 }
 
