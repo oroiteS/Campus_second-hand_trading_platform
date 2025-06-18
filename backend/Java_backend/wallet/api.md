@@ -3,7 +3,6 @@
 ## 基础信息
 
 - **基础路径**: `/user/account`
-- **认证方式**: Spring Security (需要用户登录)
 - **内容类型**: `application/json`
 - **运行端口**: `8081`
 
