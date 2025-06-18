@@ -32,9 +32,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import jakarta.servlet.http.HttpServletRequest;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 
 /**
  * 订单API控制器
@@ -89,10 +94,24 @@ public class OrderApiController {
     }
 
     private ResponseEntity<?> handleException(Exception e) {
+        String errorMessage;
+        
         if (e instanceof IllegalArgumentException || e instanceof IllegalStateException) {
-            return errorResponse(e.getMessage(), 400);
+            errorMessage = e.getMessage() != null ? e.getMessage() : "请求参数错误";
+            return errorResponse(errorMessage, 400);
+        } else if (e instanceof RuntimeException) {
+            errorMessage = e.getMessage() != null ? e.getMessage() : "服务器处理异常";
+            // 记录详细错误日志
+            System.err.println("服务异常: " + errorMessage);
+            e.printStackTrace();
+            return errorResponse("服务暂时不可用，请稍后重试", 500);
+        } else {
+            errorMessage = e.getMessage() != null ? e.getMessage() : "系统内部错误";
+            // 记录详细错误日志
+            System.err.println("系统异常: " + errorMessage);
+            e.printStackTrace();
+            return errorResponse("系统异常，请联系管理员", 500);
         }
-        return errorResponse("服务器内部错误: " + e.getMessage(), 500);
     }
 
     // ==================== API接口定义 ====================
@@ -274,24 +293,145 @@ public class OrderApiController {
      * 取消订单
      */
     @PostMapping("/cancel")
-    @Operation(summary = "取消订单", description = "取消指定的订单")
+    @Operation(
+        summary = "取消订单", 
+        description = "取消指定的订单，只有待付款状态的订单才能取消"
+    )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "订单取消成功"),
-        @ApiResponse(responseCode = "400", description = "请求参数错误")
+        @ApiResponse(responseCode = "400", description = "请求参数错误或订单状态不允许取消"),
+        @ApiResponse(responseCode = "404", description = "订单不存在"),
+        @ApiResponse(responseCode = "500", description = "服务器内部错误")
     })
     public ResponseEntity<?> cancelOrder(
         @Parameter(description = "取消订单请求体，包含订单ID")
-        @Valid @RequestBody CancelOrderRequest request) {
-        try {
-            boolean result = orderService.cancelOrder(request.getOrderId());
-            if (result) {
-                return successResponse("订单取消成功", null);
-            } else {
-                return errorResponse("订单不存在或无法取消", 404);
-            }
-        } catch (Exception e) {
-            return handleException(e);
+        @Valid @RequestBody CancelOrderRequest request,
+        HttpServletRequest httpRequest) throws UnsupportedEncodingException {
+        
+        // 设置响应编码
+        httpRequest.setCharacterEncoding("UTF-8");
+        
+        // 参数验证和编码清理
+        if (request == null || request.getOrderId() == null || request.getOrderId().trim().isEmpty()) {
+            return createSafeErrorResponse("订单ID不能为空", 400);
         }
+        
+        try {
+            // 清理和验证订单ID，确保只包含安全字符
+            String orderId = sanitizeString(request.getOrderId().trim());
+            
+            if (orderId.isEmpty()) {
+                return createSafeErrorResponse("订单ID格式无效", 400);
+            }
+            
+            boolean result = orderService.cancelOrder(orderId);
+            
+            if (result) {
+                return createSafeSuccessResponse("订单取消成功", Map.of("orderId", orderId, "status", "cancelled"));
+            } else {
+                return createSafeErrorResponse("订单不存在或无法取消", 404);
+            }
+            
+        } catch (IllegalArgumentException e) {
+            String message = sanitizeString(e.getMessage() != null ? e.getMessage() : "参数错误");
+            return createSafeErrorResponse(message, 400);
+        } catch (IllegalStateException e) {
+            String message = sanitizeString(e.getMessage() != null ? e.getMessage() : "订单状态不允许取消");
+            return createSafeErrorResponse(message, 400);
+        } catch (Exception e) {
+            // 记录详细错误日志，但返回安全的错误信息
+            System.err.println("取消订单时发生异常: " + e.getClass().getSimpleName());
+            if (e.getMessage() != null) {
+                System.err.println("错误详情: " + e.getMessage());
+            }
+            e.printStackTrace();
+            return createSafeErrorResponse("订单取消失败，请稍后重试", 500);
+        }
+    }
+    
+    /**
+     * 创建安全的成功响应，确保所有字符串都是UTF-8编码
+     */
+    private ResponseEntity<?> createSafeSuccessResponse(String message, Object data) {
+        try {
+            Map<String, Object> response = Map.of(
+                "success", true,
+                "message", sanitizeString(message),
+                "code", 200,
+                "data", sanitizeData(data)
+            );
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return createSafeErrorResponse("响应生成失败", 500);
+        }
+    }
+    
+    /**
+     * 创建安全的错误响应，确保所有字符串都是UTF-8编码
+     */
+    private ResponseEntity<?> createSafeErrorResponse(String message, int code) {
+        try {
+            Map<String, Object> response = Map.of(
+                "success", false,
+                "message", sanitizeString(message),
+                "code", code
+            );
+            return ResponseEntity.status(code).body(response);
+        } catch (Exception e) {
+            // 最后的安全网，返回最基本的错误响应
+            Map<String, Object> fallbackResponse = Map.of(
+                "success", false,
+                "message", "Internal Server Error",
+                "code", 500
+            );
+            return ResponseEntity.status(500).body(fallbackResponse);
+        }
+    }
+    
+    /**
+     * 清理字符串，移除可能导致编码问题的字符
+     */
+    private String sanitizeString(String input) {
+        if (input == null) {
+            return "";
+        }
+        
+        try {
+            // 转换为UTF-8字节数组再转回字符串，过滤无效字符
+            byte[] bytes = input.getBytes(StandardCharsets.UTF_8);
+            String result = new String(bytes, StandardCharsets.UTF_8);
+            
+            // 移除控制字符（除了常见的空白字符）
+            result = result.replaceAll("[\\p{Cntrl}&&[^\\r\\n\\t]]", "");
+            
+            return result;
+        } catch (Exception e) {
+            return "编码转换失败";
+        }
+    }
+    
+    /**
+     * 清理数据对象，确保其中的字符串都是安全的
+     */
+    private Object sanitizeData(Object data) {
+        if (data == null) {
+            return null;
+        }
+        
+        if (data instanceof String) {
+            return sanitizeString((String) data);
+        }
+        
+        if (data instanceof Map) {
+            Map<String, Object> map = (Map<String, Object>) data;
+            Map<String, Object> sanitizedMap = new HashMap<>();
+            for (Map.Entry<String, Object> entry : map.entrySet()) {
+                sanitizedMap.put(sanitizeString(entry.getKey()), sanitizeData(entry.getValue()));
+            }
+            return sanitizedMap;
+        }
+        
+        return data;
     }
 
     /**

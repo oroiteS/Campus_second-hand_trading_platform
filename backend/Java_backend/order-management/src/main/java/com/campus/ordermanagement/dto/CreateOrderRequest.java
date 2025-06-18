@@ -50,17 +50,26 @@ public class CreateOrderRequest {
     @JsonProperty("saleLocation")
     private String saleLocation;
 
+    /**
+     * 购买数量
+     */
+    @NotNull(message = "购买数量不能为空")
+    @Min(value = 1, message = "购买数量必须大于0")
+    @JsonProperty("buyQuantity")
+    private Integer buyQuantity;
+
     // 默认构造函数
     public CreateOrderRequest() {}
 
     // 带参构造函数
     public CreateOrderRequest(String commodityId, String buyerId, String sellerId, 
-                            BigDecimal money, String saleLocation) {
+                            BigDecimal money, String saleLocation, Integer buyQuantity) {
         this.commodityId = commodityId;
         this.buyerId = buyerId;
         this.sellerId = sellerId;
         this.money = money;
         this.saleLocation = saleLocation;
+        this.buyQuantity = buyQuantity;
     }
 
     // Getter和Setter方法
@@ -102,6 +111,14 @@ public class CreateOrderRequest {
 
     public void setSaleLocation(String saleLocation) {
         this.saleLocation = saleLocation;
+    }
+
+    public Integer getBuyQuantity() {
+        return buyQuantity;
+    }
+
+    public void setBuyQuantity(Integer buyQuantity) {
+        this.buyQuantity = buyQuantity;
     }
 
     @Override

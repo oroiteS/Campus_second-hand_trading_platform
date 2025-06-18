@@ -18,10 +18,10 @@ import java.util.List;
 @Configuration
 public class SwaggerConfig {
 
-    @Value("${server.port:8081}")
+    @Value("${server.port:8095}")
     private String serverPort;
 
-    @Value("${server.servlet.context-path:/order-management}")
+    @Value("${server.servlet.context-path:}")
     private String contextPath;
 
     @Bean

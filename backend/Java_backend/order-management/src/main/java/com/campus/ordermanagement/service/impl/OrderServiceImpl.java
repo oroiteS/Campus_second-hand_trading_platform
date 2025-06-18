@@ -1,12 +1,17 @@
 package com.campus.ordermanagement.service.impl;
 
 import com.campus.ordermanagement.dao.OrderRepository;
+import com.campus.ordermanagement.dao.CommodityRepository;
+import com.campus.ordermanagement.pojo.Commodity;
 import com.campus.ordermanagement.dto.CreateOrderRequest;
 import com.campus.ordermanagement.dto.OrderResponse;
 import com.campus.ordermanagement.dto.UpdateOrderStatusRequest;
 import com.campus.ordermanagement.pojo.Order;
 import com.campus.ordermanagement.service.OrderService;
 import com.campus.ordermanagement.util.UUIDGenerator;
+// 移除重复的商品相关导入
+// import com.campus.product_management_seller.entity.Commodity;
+// import com.campus.product_management_seller.repository.CommodityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,8 +30,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private OrderRepository orderRepository;
+    
+    @Autowired
+    private CommodityRepository commodityRepository;
 
     @Override
+    @Transactional
     public OrderResponse createOrder(CreateOrderRequest request) {
         // 参数验证
         validateCreateOrderRequest(request);
@@ -34,6 +43,36 @@ public class OrderServiceImpl implements OrderService {
         // 检查买家和卖家不能是同一人
         if (request.getBuyerId().equals(request.getSellerId())) {
             throw new IllegalArgumentException("买家和卖家不能是同一人");
+        }
+        
+        // 检查商品是否存在
+        Commodity commodity = commodityRepository.selectById(request.getCommodityId());
+        if (commodity == null) {
+            throw new IllegalArgumentException("商品不存在");
+        }
+        
+        // 检查商品状态是否为在售
+        if (!Commodity.STATUS_ON_SALE.equals(commodity.getCommodityStatus())) {
+            String statusDesc = getStatusDescription(commodity.getCommodityStatus());
+            throw new IllegalArgumentException("商品当前不可购买，商品状态：" + statusDesc);
+        }
+        
+        // 检查购买数量是否超过库存
+        if (request.getBuyQuantity() > commodity.getQuantity()) {
+            throw new IllegalArgumentException(
+                String.format("购买数量超过商品库存。当前库存：%d，请求数量：%d", 
+                    commodity.getQuantity(), request.getBuyQuantity())
+            );
+        }
+        
+        // 使用原子操作减少库存并在必要时更新状态
+        int updateResult = commodityRepository.decreaseQuantityAndUpdateStatus(
+            request.getCommodityId(), 
+            request.getBuyQuantity()
+        );
+        
+        if (updateResult <= 0) {
+            throw new RuntimeException("库存更新失败，可能是库存不足或商品已被其他用户购买");
         }
         
         // 创建订单实体
@@ -45,6 +84,7 @@ public class OrderServiceImpl implements OrderService {
         order.setOrderStatus(Order.OrderStatus.PENDING_PAYMENT);
         order.setMoney(request.getMoney());
         order.setSaleLocation(request.getSaleLocation());
+        order.setBuyQuantity(request.getBuyQuantity());
         
         // 保存订单
         int result = orderRepository.insert(order);
@@ -53,6 +93,22 @@ public class OrderServiceImpl implements OrderService {
         }
         
         return new OrderResponse(order);
+    }
+    
+    /**
+     * 获取商品状态的中文描述
+     */
+    private String getStatusDescription(String status) {
+        switch (status) {
+            case Commodity.STATUS_ON_SALE:
+                return "在售";
+            case Commodity.STATUS_SOLD:
+                return "已售出";
+            case Commodity.STATUS_OFF_SALE:
+                return "已下架";
+            default:
+                return "未知状态";
+        }
     }
 
     @Override
@@ -213,25 +269,76 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean cancelOrder(String orderId) {
+        try {
+            // 参数验证和清理
             if (orderId == null || orderId.trim().isEmpty()) {
                 throw new IllegalArgumentException("订单ID不能为空");
             }
             
-            Order order = orderRepository.selectById(orderId.trim());
+            String trimmedOrderId = sanitizeOrderId(orderId.trim());
+            
+            if (trimmedOrderId.isEmpty()) {
+                throw new IllegalArgumentException("订单ID格式无效");
+            }
+            
+            // 查询订单
+            Order order = null;
+            try {
+                order = orderRepository.selectById(trimmedOrderId);
+            } catch (Exception e) {
+                throw new RuntimeException("查询订单失败", e);
+            }
+            
+            // 检查订单是否存在
             if (order == null) {
                 return false;
             }
             
-            // 只有待付款状态的订单才能取消
+            // 检查订单状态
+            if (order.getOrderStatus() == null) {
+                throw new IllegalStateException("订单状态异常，无法取消");
+            }
+            
             if (!order.isPendingPayment()) {
                 throw new IllegalStateException("只有待付款状态的订单才能取消");
             }
             
-            // 删除订单
-            int result = orderRepository.deleteById(orderId.trim());
-            return result > 0;
-
+            // 执行删除操作
+            int deleteResult = 0;
+            try {
+                deleteResult = orderRepository.deleteById(trimmedOrderId);
+            } catch (Exception e) {
+                throw new RuntimeException("删除订单失败", e);
+            }
+            
+            // 检查删除结果
+            if (deleteResult <= 0) {
+                throw new RuntimeException("订单删除失败，可能已被其他操作删除");
+            }
+            
+            return true;
+            
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            // 重新抛出业务异常，让控制器处理
+            throw e;
+        } catch (Exception e) {
+            // 包装其他异常，确保错误信息是安全的
+            throw new RuntimeException("取消订单操作失败", e);
+        }
+    }
+    
+    /**
+     * 清理订单ID，确保只包含安全字符
+     */
+    private String sanitizeOrderId(String orderId) {
+        if (orderId == null) {
+            return "";
+        }
+        
+        // 只保留字母、数字、连字符和下划线
+        return orderId.replaceAll("[^a-zA-Z0-9\\-_]", "");
     }
 
     @Override
@@ -276,7 +383,7 @@ public class OrderServiceImpl implements OrderService {
      */
     private void validateCreateOrderRequest(CreateOrderRequest request) {
         if (request == null) {
-            throw new IllegalArgumentException("创建订单请求不能为空");
+            throw new IllegalArgumentException("请求参数不能为空");
         }
         if (request.getCommodityId() == null || request.getCommodityId().trim().isEmpty()) {
             throw new IllegalArgumentException("商品ID不能为空");
@@ -289,6 +396,9 @@ public class OrderServiceImpl implements OrderService {
         }
         if (request.getMoney() == null || request.getMoney().compareTo(java.math.BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("交易金额必须大于0");
+        }
+        if (request.getBuyQuantity() == null || request.getBuyQuantity() <= 0) {
+            throw new IllegalArgumentException("购买数量必须大于0");
         }
     }
 

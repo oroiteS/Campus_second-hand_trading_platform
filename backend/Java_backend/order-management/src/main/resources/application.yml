@@ -1,47 +1,4 @@
-# MyBatis Plus 配置
-mybatis-plus:
-  # 配置 Mapper XML 文件位置
-  mapper-locations: classpath*:/mapper/**/*.xml
-  # 配置实体类别名包路径
-  type-aliases-package: com.campus.ordermanagement.pojo
-  # 全局配置
-  global-config:
-    # 数据库配置
-    db-config:
-      # 主键类型（INPUT 为手动输入，适用于UUID）
-      id-type: INPUT
-      # 逻辑删除字段名
-      logic-delete-field: deleted
-      # 逻辑删除值（删除时设置的值）
-      logic-delete-value: 1
-      # 逻辑未删除值（正常时的值）
-      logic-not-delete-value: 0
-      # 更新策略
-      update-strategy: NOT_NULL
-      # 插入策略
-      insert-strategy: NOT_NULL
-      # 查询策略
-      select-strategy: NOT_EMPTY
-  # 配置
-  configuration:
-    # 开启驼峰命名转换
-    map-underscore-to-camel-case: true
-    # 关闭缓存（开发环境）
-    cache-enabled: false
-    # 当查询结果为null时调用setter方法
-    call-setters-on-nulls: true
-    # null值的JDBC类型
-    jdbc-type-for-null: 'null'
-    # 日志实现
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-
-# Spring应用配置
 spring:
-  application:
-    name: order-management
-  profiles:
-    active: dev
-  
   # 数据源配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -49,122 +6,184 @@ spring:
     username: campus_test
     password: campus_suep
     
-    # 连接池配置
+    # 连接池配置（开发环境优化）
     hikari:
-      minimum-idle: 5
-      maximum-pool-size: 20
+      minimum-idle: 2
+      maximum-pool-size: 10
       auto-commit: true
       idle-timeout: 30000
-      pool-name: OrderManagementHikariCP
+      pool-name: OrderManagementDevHikariCP
       max-lifetime: 1800000
       connection-timeout: 30000
       connection-test-query: SELECT 1
-  
-  # JPA 配置（如果需要混合使用）
+      leak-detection-threshold: 60000
+      
+  devtools:
+    restart:
+      enabled: true
+      additional-paths: src/main/java
+    livereload:
+      enabled: true
+      
   jpa:
-    hibernate:
-      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
         format_sql: true
-  
-  servlet:
-    multipart:
-      enabled: true
-      max-file-size: 5MB
-      max-request-size: 10MB
-      file-size-threshold: 2KB
+        use_sql_comments: true
 
 # 服务器配置
 server:
-  port: 8081
+  port: 8095
   servlet:
-    context-path: /order-management
     encoding:
       charset: UTF-8
       enabled: true
       force: true
+  # 开发环境错误页面配置
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: on_param
+    include-exception: true
 
-# 日志配置
+# MyBatis Plus配置（开发环境）
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: com.campus.ordermanagement.pojo
+  global-config:
+    db-config:
+      id-type: INPUT
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+      update-strategy: NOT_NULL
+      insert-strategy: NOT_NULL
+      select-strategy: NOT_EMPTY
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+    call-setters-on-nulls: true
+    jdbc-type-for-null: 'null'
+    # 开发环境显示SQL
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# 日志配置（开发环境）
 logging:
   level:
+    root: INFO
     com.campus.ordermanagement: DEBUG
-    org.springframework.web: INFO
+    org.springframework.web: DEBUG
     org.mybatis: DEBUG
-    com.campus.profile.dao: debug
-    org.apache.ibatis: debug
+    org.springframework.jdbc: DEBUG
+    # SQL日志
+    org.springframework.jdbc.core.JdbcTemplate: DEBUG
+    org.springframework.jdbc.core.StatementCreatorUtils: TRACE
   pattern:
     console: '%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n'
     file: '%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n'
   file:
-    name: logs/order-management.log
+    name: logs/order-management-dev.log
     max-size: 10MB
-    max-history: 30
+    max-history: 7
 
-# Swagger配置（已移至下方统一配置）
+# Swagger配置（开发环境增强）
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    operations-sorter: alpha
+    tags-sorter: alpha
+    # 开发环境显示更多信息
+    display-request-duration: true
+    show-extensions: true
+    show-common-extensions: true
+    # 默认展开所有操作
+    doc-expansion: full
+    # 显示请求体
+    default-models-expand-depth: 2
+    default-model-expand-depth: 2
+    # 启用过滤器
+    filter: true
+    # 显示Actuator端点
+  show-actuator: true
+  # 开发环境显示所有路径
+  paths-to-match: /**
+  # 包扫描路径
+  packages-to-scan: com.campus.ordermanagement.controller
 
-# 管理端点配置
+# 管理端点配置（开发环境）
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        # 开发环境暴露所有端点
+        include: '*'
+      base-path: /actuator
   endpoint:
     health:
-      show-details: when-authorized
+      show-details: always
+      show-components: always
+    info:
+      enabled: true
+    metrics:
+      enabled: true
+    loggers:
+      enabled: true
+    env:
+      enabled: true
+    configprops:
+      enabled: true
+    beans:
+      enabled: true
+  # 健康检查配置
+  health:
+    db:
+      enabled: true
+    diskspace:
+      enabled: true
 
-# 应用信息
+# 应用信息（开发环境）
 info:
   app:
-    name: 校园二手交易平台-订单管理
-    description: 订单管理微服务
-    version: 1.0.0
+    name: 校园二手交易平台-订单管理（开发环境）
+    description: 订单管理微服务开发环境，用于API测试和调试
+    version: 1.0.0-DEV
     encoding: UTF-8
     java:
       version: 17
+    profiles: dev
+  build:
+    time: '@maven.build.timestamp@'
+    artifact: '@project.artifactId@'
+    group: '@project.groupId@'
+    version: '@project.version@'
 
-# 自定义配置
+# 自定义配置（开发环境）
 order:
   config:
-    # 订单超时时间（分钟）
-    timeout-minutes: 30
-    # 最大订单数量限制
-    max-orders-per-user: 100
-    # 是否启用订单统计
+    # 开发环境缩短超时时间便于测试
+    timeout-minutes: 5
+    # 开发环境降低限制便于测试
+    max-orders-per-user: 50
+    # 启用统计功能
     enable-statistics: true
-    # 是否启用订单缓存
+    # 开发环境关闭缓存
     enable-cache: false
+    # 开发环境启用调试模式
+    debug-mode: true
+    # 测试数据配置
+    test-data:
+      enable-test-endpoints: true
+      auto-create-test-data: false
 
-# Swagger 配置
-springdoc:
-  api-docs:
-    # 启用 API 文档
-    enabled: true
-    # API 文档路径
-    path: /v3/api-docs
-  swagger-ui:
-    # 启用 Swagger UI
-    enabled: true
-    # Swagger UI 路径
-    path: /swagger-ui.html
-    # 操作排序
-    operations-sorter: alpha
-    # 标签排序
-    tags-sorter: alpha
-    # 尝试请求
-    try-it-out-enabled: true
-  show-actuator: true
-
-# 文件上传配置
-# 自定义文件上传配置
-file:
-  upload:
-    avatar-path: e:/Compus_Sencond_Hand/Campus/Campus_second-hand_trading_platform/backend/Java_backend/uploads/avatars/
-
-# 服务器基础URL配置
-# server:
-#   base-url: http://localhost:8080
-
-# 日志配置已合并到上方
+# 跨域配置（开发环境宽松设置）
+cors:
+  allowed-origins: '*'
+  allowed-methods: '*'
+  allowed-headers: '*'
+  allow-credentials: false
+  max-age: 3600

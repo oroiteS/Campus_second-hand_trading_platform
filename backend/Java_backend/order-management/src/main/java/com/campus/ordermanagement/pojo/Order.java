@@ -111,6 +111,14 @@ public class Order {
     @Size(max = 250, message = "交易地址长度不能超过250位")
     private String saleLocation;
 
+    /**
+     * 购买数量
+     */
+    @TableField("buy_quantity")
+    @NotNull(message = "购买数量不能为空")
+    @Min(value = 1, message = "购买数量必须大于0")
+    private Integer buyQuantity;
+
     // 默认构造函数
     public Order() {}
 
@@ -191,6 +199,14 @@ public class Order {
         this.saleLocation = saleLocation;
     }
 
+    public Integer getBuyQuantity() {
+        return buyQuantity;
+    }
+
+    public void setBuyQuantity(Integer buyQuantity) {
+        this.buyQuantity = buyQuantity;
+    }
+
     // toString方法
     @Override
     public String toString() {
@@ -203,6 +219,7 @@ public class Order {
                 ", saleTime=" + saleTime +
                 ", money=" + money +
                 ", saleLocation='" + saleLocation + '\'' +
+                ", buyQuantity=" + buyQuantity +
                 '}';
     }
 

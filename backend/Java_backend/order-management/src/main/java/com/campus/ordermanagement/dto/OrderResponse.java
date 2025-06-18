@@ -68,6 +68,12 @@ public class OrderResponse {
     private String saleLocation;
 
     /**
+     * 购买数量
+     */
+    @JsonProperty("buyQuantity")
+    private Integer buyQuantity;
+
+    /**
      * 创建时间（可选，用于排序）
      */
     @JsonProperty("createTime")
@@ -88,13 +94,14 @@ public class OrderResponse {
         this.saleTime = order.getSaleTime();
         this.money = order.getMoney();
         this.saleLocation = order.getSaleLocation();
+        this.buyQuantity = order.getBuyQuantity();
         this.createTime = LocalDateTime.now(); // 可以根据实际需求调整
     }
 
     // 带参构造函数
     public OrderResponse(String orderId, String commodityId, String buyerId, String sellerId,
                         String orderStatus, String orderStatusDescription, LocalDateTime saleTime,
-                        BigDecimal money, String saleLocation) {
+                        BigDecimal money, String saleLocation, Integer buyQuantity) {
         this.orderId = orderId;
         this.commodityId = commodityId;
         this.buyerId = buyerId;
@@ -104,7 +111,7 @@ public class OrderResponse {
         this.saleTime = saleTime;
         this.money = money;
         this.saleLocation = saleLocation;
-        this.createTime = LocalDateTime.now();
+        this.buyQuantity = buyQuantity;
     }
 
     // Getter和Setter方法
@@ -178,6 +185,14 @@ public class OrderResponse {
 
     public void setSaleLocation(String saleLocation) {
         this.saleLocation = saleLocation;
+    }
+
+    public Integer getBuyQuantity() {
+        return buyQuantity;
+    }
+
+    public void setBuyQuantity(Integer buyQuantity) {
+        this.buyQuantity = buyQuantity;
     }
 
     public LocalDateTime getCreateTime() {
