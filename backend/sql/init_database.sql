@@ -317,3 +317,18 @@ CREATE TABLE IF NOT EXISTS `comments` (
     CONSTRAINT `fk_comments_reply` FOREIGN KEY (`reply_to_message_id`) REFERENCES `comments` (`message_id`) ON DELETE SET NULL ON UPDATE CASCADE
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='评论表';
+
+
+-- ... existing code ...
+
+-- 19. 创建触发器：当插入新用户时自动创建钱包记录
+DELIMITER //
+CREATE TRIGGER `tr_create_wallet_after_user_insert`
+AFTER INSERT ON `users`
+FOR EACH ROW
+BEGIN
+    -- 为新用户创建钱包记录，初始余额为0.00
+    INSERT INTO `wallet` (`User_ID`, `money`, `created_at`, `updated_at`)
+    VALUES (NEW.User_ID, 0.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+END//
+DELIMITER ;
