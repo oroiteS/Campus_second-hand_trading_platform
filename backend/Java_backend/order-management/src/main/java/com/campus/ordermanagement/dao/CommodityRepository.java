@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.campus.ordermanagement.pojo.Commodity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Param;
 
 /**
@@ -48,6 +49,14 @@ public interface CommodityRepository extends BaseMapper<Commodity> {
      * @param decreaseAmount 减少的数量
      * @return 更新的行数
      */
-    @Update("UPDATE commodities SET quantity = quantity - #{decreaseAmount}, commodity_status = CASE WHEN (quantity - #{decreaseAmount}) = 0 THEN 'sold' ELSE commodity_status END, updated_at = CURRENT_TIMESTAMP WHERE commodity_id = #{commodityId} AND quantity >= #{decreaseAmount}")
+    @Update("UPDATE commodities SET quantity = quantity - #{decreaseAmount}, commodity_status = CASE WHEN quantity = #{decreaseAmount} THEN 'sold' ELSE commodity_status END, updated_at = CURRENT_TIMESTAMP WHERE commodity_id = #{commodityId} AND quantity >= #{decreaseAmount}")
     int decreaseQuantityAndUpdateStatus(@Param("commodityId") String commodityId, @Param("decreaseAmount") Integer decreaseAmount);
+
+    /**
+     * 根据商品ID查询商品名称和主图URL
+     * @param commodityId 商品ID
+     * @return 商品信息（只包含名称和主图URL）
+     */
+    @Select("SELECT commodity_name, main_image_url FROM commodities WHERE commodity_id = #{commodityId}")
+    Commodity selectNameAndImageById(@Param("commodityId") String commodityId);
 }

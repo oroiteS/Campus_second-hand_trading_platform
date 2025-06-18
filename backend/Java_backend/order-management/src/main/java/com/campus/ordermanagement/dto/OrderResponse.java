@@ -80,6 +80,18 @@ public class OrderResponse {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
 
+    /**
+     * 商品名称
+     */
+    @JsonProperty("commodityName")
+    private String commodityName;
+
+    /**
+     * 商品主图URL
+     */
+    @JsonProperty("mainImageUrl")
+    private String mainImageUrl;
+
     // 默认构造函数
     public OrderResponse() {}
 
@@ -203,6 +215,22 @@ public class OrderResponse {
         this.createTime = createTime;
     }
 
+    public String getCommodityName() {
+        return commodityName;
+    }
+
+    public void setCommodityName(String commodityName) {
+        this.commodityName = commodityName;
+    }
+
+    public String getMainImageUrl() {
+        return mainImageUrl;
+    }
+
+    public void setMainImageUrl(String mainImageUrl) {
+        this.mainImageUrl = mainImageUrl;
+    }
+
     @Override
     public String toString() {
         return "OrderResponse{" +
@@ -215,7 +243,10 @@ public class OrderResponse {
                 ", saleTime=" + saleTime +
                 ", money=" + money +
                 ", saleLocation='" + saleLocation + '\'' +
+                ", buyQuantity=" + buyQuantity +
                 ", createTime=" + createTime +
+                ", commodityName='" + commodityName + '\'' +
+                ", mainImageUrl='" + mainImageUrl + '\'' +
                 '}';
     }
 }

@@ -131,7 +131,13 @@ public class OrderServiceImpl implements OrderService {
         }
         
         Order order = orderRepository.selectById(orderId.trim());
-        return order != null ? Optional.of(new OrderResponse(order)) : Optional.empty();
+        if (order != null) {
+            OrderResponse response = new OrderResponse(order);
+            // 查询商品信息并设置到响应中
+            enrichOrderResponseWithCommodityInfo(response, order.getCommodityId());
+            return Optional.of(response);
+        }
+        return Optional.empty();
     }
 
     @Override
@@ -144,7 +150,11 @@ public class OrderServiceImpl implements OrderService {
         
         List<Order> orders = orderRepository.findByBuyerId(buyerId.trim());
         return orders.stream()
-                .map(OrderResponse::new)
+                .map(order -> {
+                    OrderResponse response = new OrderResponse(order);
+                    enrichOrderResponseWithCommodityInfo(response, order.getCommodityId());
+                    return response;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -158,7 +168,11 @@ public class OrderServiceImpl implements OrderService {
         
         List<Order> orders = orderRepository.findBySellerId(sellerId.trim());
         return orders.stream()
-                .map(OrderResponse::new)
+                .map(order -> {
+                    OrderResponse response = new OrderResponse(order);
+                    enrichOrderResponseWithCommodityInfo(response, order.getCommodityId());
+                    return response;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -172,7 +186,11 @@ public class OrderServiceImpl implements OrderService {
         
         List<Order> orders = orderRepository.findByCommodityId(commodityId.trim());
         return orders.stream()
-                .map(OrderResponse::new)
+                .map(order -> {
+                    OrderResponse response = new OrderResponse(order);
+                    enrichOrderResponseWithCommodityInfo(response, order.getCommodityId());
+                    return response;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -185,7 +203,11 @@ public class OrderServiceImpl implements OrderService {
         
         List<Order> orders = orderRepository.findByOrderStatus(status.getCode());
         return orders.stream()
-                .map(OrderResponse::new)
+                .map(order -> {
+                    OrderResponse response = new OrderResponse(order);
+                    enrichOrderResponseWithCommodityInfo(response, order.getCommodityId());
+                    return response;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -198,7 +220,11 @@ public class OrderServiceImpl implements OrderService {
         
         List<Order> orders = orderRepository.findByUserId(userId.trim());
         return orders.stream()
-                .map(OrderResponse::new)
+                .map(order -> {
+                    OrderResponse response = new OrderResponse(order);
+                    enrichOrderResponseWithCommodityInfo(response, order.getCommodityId());
+                    return response;
+                })
                 .collect(Collectors.toList());
     }
 
@@ -448,4 +474,24 @@ public class OrderServiceImpl implements OrderService {
                 throw new IllegalStateException("未知的订单状态: " + currentStatus);
         }
     }
+
+    /**
+     * 为OrderResponse补充商品信息
+     * @param response 订单响应对象
+     * @param commodityId 商品ID
+     */
+    private void enrichOrderResponseWithCommodityInfo(OrderResponse response, String commodityId) {
+        try {
+            Commodity commodity = commodityRepository.selectNameAndImageById(commodityId);
+            if (commodity != null) {
+                response.setCommodityName(commodity.getCommodityName());
+                response.setMainImageUrl(commodity.getMainImageUrl());
+            }
+        } catch (Exception e) {
+            // 记录日志但不影响主要业务逻辑
+            System.err.println("查询商品信息失败，商品ID: " + commodityId + ", 错误: " + e.getMessage());
+        }
+    }
+
 }
+

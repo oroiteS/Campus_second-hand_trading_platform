@@ -1,5 +1,13 @@
 # Redis配置
 spring:
+    # 缓存配置
+  cache:
+    type: redis
+    redis:
+    time-to-live: 600000
+    cache-null-values: true
+    key-prefix: "order:"
+    use-key-prefix: true
   profiles:
     active: local
   # 数据源配置
@@ -32,6 +40,30 @@ spring:
       hibernate:
         format_sql: true
         use_sql_comments: true
+  data:
+    redis:
+      username: "campus_test"
+      host: r-uf683p0x96aj2ht6whpd.redis.rds.aliyuncs.com
+      port: 6379
+      database: 2
+      password: "Campus_suep2022"
+      timeout: 3000ms
+      # lettuce连接池使用默认配置
+  # 添加CORS配置
+  web:
+    cors:
+      allowed-origin-patterns:
+        - "*"
+      allowed-methods:
+        - "GET"
+        - "POST"
+        - "PUT"
+        - "DELETE"
+        - "OPTIONS"
+      allowed-headers:
+        - "*"
+      allow-credentials: false
+      max-age: 3600
 
 # 服务器配置
 server:
@@ -70,23 +102,6 @@ mybatis-plus:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 # 日志配置（开发环境）
-logging:
-  level:
-    root: INFO
-    com.campus.ordermanagement: DEBUG
-    org.springframework.web: DEBUG
-    org.mybatis: DEBUG
-    org.springframework.jdbc: DEBUG
-    # SQL日志
-    org.springframework.jdbc.core.JdbcTemplate: DEBUG
-    org.springframework.jdbc.core.StatementCreatorUtils: TRACE
-  pattern:
-    console: '%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n'
-    file: '%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n'
-  file:
-    name: logs/order-management-dev.log
-    max-size: 10MB
-    max-history: 7
 
 # Swagger配置（开发环境增强）
 springdoc:
@@ -182,32 +197,11 @@ order:
       auto-create-test-data: false
 
 # 跨域配置（开发环境宽松设置）
-cors:
-  allowed-origins: '*'
-  allowed-methods: '*'
-  allowed-headers: '*'
-  allow-credentials: false
-  max-age: 3600
+# 在spring配置下添加或修改
 
-  redis:
-    host: localhost
-    port: 6379
-    password: 123456
-    database: 1  # 使用数据库1，避免与其他模块冲突
-    timeout: 3000ms
-    lettuce:
-      pool:
-        max-active: 8
-        max-wait: -1ms
-        max-idle: 8
-        min-idle: 0
-        time-between-eviction-runs: 60s
-  
-  # 缓存配置
-  cache:
-    type: redis
-    redis:
-      time-to-live: 600000  # 10分钟过期时间
-      cache-null-values: true  # 缓存空值，防止缓存穿透
-      key-prefix: "order:"  # 缓存key前缀
-      use-key-prefix: true
+# 移除原有的cors配置块，或者保持现有配置
+
+
+
+# 移除文件末尾错误的redis配置块
+# 确保没有重复的redis配置
