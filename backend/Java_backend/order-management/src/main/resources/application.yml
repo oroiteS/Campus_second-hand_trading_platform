@@ -1,11 +1,20 @@
+# Redis配置
 spring:
+    # 缓存配置
+  cache:
+    type: redis
+    redis:
+    time-to-live: 600000
+    cache-null-values: true
+    key-prefix: "order:"
+    use-key-prefix: true
+  profiles:
+    active: local
   # 数据源配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/campus?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
-    username: campus_test
-    password: campus_suep
-    
+    url: jdbc:mysql://rm-cn-smw4b7vtl0001ho.rwlb.rds.aliyuncs.com:3306/campus?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    # username和password移到application-local.yml
     # 连接池配置（开发环境优化）
     hikari:
       minimum-idle: 2
@@ -31,6 +40,29 @@ spring:
       hibernate:
         format_sql: true
         use_sql_comments: true
+  data:
+    redis:
+      # username和password移到application-local.yml
+      host: r-uf683p0x96aj2ht6whpd.redis.rds.aliyuncs.com
+      port: 6379
+      database: 2
+      timeout: 3000ms
+      # lettuce连接池使用默认配置
+  # 添加CORS配置
+  web:
+    cors:
+      allowed-origin-patterns:
+        - "*"
+      allowed-methods:
+        - "GET"
+        - "POST"
+        - "PUT"
+        - "DELETE"
+        - "OPTIONS"
+      allowed-headers:
+        - "*"
+      allow-credentials: false
+      max-age: 3600
 
 # 服务器配置
 server:
@@ -69,23 +101,6 @@ mybatis-plus:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 # 日志配置（开发环境）
-logging:
-  level:
-    root: INFO
-    com.campus.ordermanagement: DEBUG
-    org.springframework.web: DEBUG
-    org.mybatis: DEBUG
-    org.springframework.jdbc: DEBUG
-    # SQL日志
-    org.springframework.jdbc.core.JdbcTemplate: DEBUG
-    org.springframework.jdbc.core.StatementCreatorUtils: TRACE
-  pattern:
-    console: '%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n'
-    file: '%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n'
-  file:
-    name: logs/order-management-dev.log
-    max-size: 10MB
-    max-history: 7
 
 # Swagger配置（开发环境增强）
 springdoc:
@@ -181,9 +196,11 @@ order:
       auto-create-test-data: false
 
 # 跨域配置（开发环境宽松设置）
-cors:
-  allowed-origins: '*'
-  allowed-methods: '*'
-  allowed-headers: '*'
-  allow-credentials: false
-  max-age: 3600
+# 在spring配置下添加或修改
+
+# 移除原有的cors配置块，或者保持现有配置
+
+
+
+# 移除文件末尾错误的redis配置块
+# 确保没有重复的redis配置

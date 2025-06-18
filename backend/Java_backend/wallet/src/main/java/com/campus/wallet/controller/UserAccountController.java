@@ -23,6 +23,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import com.campus.wallet.pojo.BalanceRequest;
 
 @Tag(name = "用户钱包管理", description = "用户钱包相关接口")
 @RestController
@@ -207,6 +208,44 @@ public class UserAccountController {
             response.put("code", result.getCode());
             
             if (result.getCode() == 200) {
+                return ResponseEntity.ok(response);
+            } else {
+                return ResponseEntity.status(result.getCode()).body(response);
+            }
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", "服务器内部错误: " + e.getMessage());
+            errorResponse.put("code", 500);
+            return ResponseEntity.status(500).body(errorResponse);
+        }
+    }
+
+    @Operation(summary = "获取钱包余额", description = "获取用户钱包余额")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "查询成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误"),
+        @ApiResponse(responseCode = "404", description = "用户钱包不存在"),
+        @ApiResponse(responseCode = "500", description = "服务器内部错误")
+    })
+    @PostMapping("/balance")
+    public ResponseEntity<Map<String, Object>> getBalance(
+            @Parameter(description = "余额查询请求体，包含用户ID", required = true)
+            @Valid @RequestBody BalanceRequest request) {
+        try {
+            // 从请求体中获取用户ID
+            String userID = request.getUserId();
+            
+            ServiceResult<BigDecimal> result = userAccountService.getBalance(userID);
+            
+            // 构建响应
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", result.getCode() == 200);
+            response.put("message", result.getMessage());
+            response.put("code", result.getCode());
+            
+            if (result.getCode() == 200) {
+                response.put("data", result.getData());
                 return ResponseEntity.ok(response);
             } else {
                 return ResponseEntity.status(result.getCode()).body(response);

@@ -165,4 +165,32 @@ public class UserAccountService implements IUserAccountService{
         
         return ServiceResult.success("充值成功", null);
     }
+
+
+   @Override
+public ServiceResult<BigDecimal> getBalance(String userID) {
+    try {
+        // 参数验证
+        if (userID == null || userID.trim().isEmpty()) {
+            return new ServiceResult<>(400, "用户ID不能为空", null);
+        }
+        
+        // 查询用户钱包信息
+        UserAccount userAccount = userAccountRepository.selectById(userID);
+        
+        if (userAccount == null) {
+            return new ServiceResult<>(404, "用户钱包不存在", null);
+        }
+        
+        BigDecimal balance = userAccount.getMoney();
+        if (balance == null) {
+            balance = BigDecimal.ZERO;
+        }
+        
+        return new ServiceResult<>(200, "查询成功", balance);
+        
+    } catch (Exception e) {
+        return new ServiceResult<>(500, "查询钱包余额失败: " + e.getMessage(), null);
+    }
+}
 }
