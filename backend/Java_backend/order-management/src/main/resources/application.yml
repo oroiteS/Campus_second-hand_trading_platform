@@ -42,11 +42,10 @@ spring:
         use_sql_comments: true
   data:
     redis:
-      username: "campus_test"
+      # username和password移到application-local.yml
       host: r-uf683p0x96aj2ht6whpd.redis.rds.aliyuncs.com
       port: 6379
       database: 2
-      password: "Campus_suep2022"
       timeout: 3000ms
       # lettuce连接池使用默认配置
   # 添加CORS配置
