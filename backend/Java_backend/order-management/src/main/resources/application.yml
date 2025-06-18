@@ -1,11 +1,11 @@
+# Redis配置
 spring:
   # 数据源配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/campus?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://rm-cn-smw4b7vtl0001ho.rwlb.rds.aliyuncs.com:3306/campus?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
     username: campus_test
-    password: campus_suep
-    
+    password: Campus_suep2022
     # 连接池配置（开发环境优化）
     hikari:
       minimum-idle: 2
@@ -187,3 +187,26 @@ cors:
   allowed-headers: '*'
   allow-credentials: false
   max-age: 3600
+
+  redis:
+    host: localhost
+    port: 6379
+    password: 123456
+    database: 1  # 使用数据库1，避免与其他模块冲突
+    timeout: 3000ms
+    lettuce:
+      pool:
+        max-active: 8
+        max-wait: -1ms
+        max-idle: 8
+        min-idle: 0
+        time-between-eviction-runs: 60s
+  
+  # 缓存配置
+  cache:
+    type: redis
+    redis:
+      time-to-live: 600000  # 10分钟过期时间
+      cache-null-values: true  # 缓存空值，防止缓存穿透
+      key-prefix: "order:"  # 缓存key前缀
+      use-key-prefix: true
