@@ -359,8 +359,8 @@ public class UserController {
             // 上传新头像文件到OSS
             String fileKey = ossUtil.uploadAvatar(file, userId.trim());
             
-            // 生成完整的访问URL
-            String fullAvatarUrl = ossUtil.generatePresignedUrl(fileKey);
+            // 生成公共访问URL（永久有效）
+            String fullAvatarUrl = ossUtil.generatePublicUrl(fileKey);
             
             // 如果生成URL失败，删除已上传的文件并返回错误
             if (fullAvatarUrl == null) {
