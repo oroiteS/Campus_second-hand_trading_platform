@@ -3,6 +3,8 @@ from dotenv import load_dotenv
 import os
 from datetime import datetime
 import chromadb
+from app.lib.text_embedding import get_embedding
+import numpy as np
 
 class Embedder:
     def __init__(self):
@@ -39,6 +41,8 @@ class Embedder:
             # 按时间倒序查询，并限制结果数量
             cursor = self.mongo_collection.find(query).sort("time", pymongo.DESCENDING).limit(limit)
             results_data = list(cursor)
+            if cursor is None:
+                return result_id
             for data in results_data:
                 results_buy_recommendation = self.chroma_collection_commodity.query(
                     query_embeddings=[data['embedding']],
@@ -55,7 +59,7 @@ class Embedder:
             print(f"查询错误: {e}")
         return result_id
         
-    def recommendation_by_like(self, user_id,limit = 15):
+    def recommendation_by_like(self, user_id,limit = 8):
         query = {"user_id": user_id, "action": "like"}
         cursor = self.mongo_collection.find(query)    
         # 获取所有用户喜欢的商品的embedding
@@ -77,7 +81,21 @@ class Embedder:
         if results['ids'] and len(results['ids']) > 0:
             return results['ids'][0]  # 取第一个查询结果的ids列表
         return []
-
+    def recommendation_by_token(self,token_list,user_id,limit = 15):
+        embedding_sum = np.zeros(2560)
+        for token in token_list:
+            token_embedding = get_embedding(token)
+            if token_embedding is not None:
+                embedding_sum += token_embedding
+        results = self.chroma_collection_commodity.query(
+            query_embeddings=embedding_sum,
+            n_results=limit,
+            where={"seller_id": {"$ne": user_id}},
+            include=['documents','metadatas']
+        )
+        if results['ids'] and len(results['ids']) > 0:
+            return results['ids'][0]  # 取第一个查询结果的ids列表
+        return []
     def close(self):
         """关闭MongoDB连接"""
         if hasattr(self, 'mongo_client'):
