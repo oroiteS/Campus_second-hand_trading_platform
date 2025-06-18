@@ -200,7 +200,7 @@ Authorization: Bearer {token}
 ### 9. Token验证接口
 
 #### 接口信息
-- **接口路径**: `POST /api/user/verify-token`
+- **接口路径**: `POST /api/user/validate-token`
 - **接口描述**: 验证JWT Token的有效性
 - **认证方式**: Bearer Token (JWT)
 
