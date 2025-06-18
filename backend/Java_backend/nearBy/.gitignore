@@ -32,6 +32,6 @@ build/
 ### VS Code ###
 .vscode/
 
-# 忽略本地配置文件
-src/main/resources/application-local.yml
-src/main/resources/application-local.properties
+# 忽略所有本地环境配置
+application-*.yml
+!application.yml
