@@ -327,7 +327,13 @@ export default {
     },
 
     getOtherUser(session) {
-      return session.buyer_id === this.currentUser.user_id ? session.seller : session.buyer
+      // 检查session对象是否存在以及是否有必要的字段
+      if (!session || !session.first || !session.second) {
+        return { user_name: '未知用户', avatar_url: null }
+      }
+
+      // 根据当前用户ID判断返回另一个用户
+      return session.first_id === this.currentUser.user_id ? session.second : session.first
     },
 
     formatTime(time) {
@@ -348,7 +354,7 @@ export default {
 
     // 处理商品聊天
     async handleProductChat() {
-      const { productId, sellerId, buyerId, autoCreate } = this.$route.query
+      const { sellerId, buyerId, autoCreate } = this.$route.query
 
       if (autoCreate === 'true' && sellerId && buyerId) {
         try {
@@ -357,8 +363,8 @@ export default {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              buyer_id: buyerId,
-              seller_id: sellerId
+              first_id: buyerId,
+              second_id: sellerId
             })
           })
 
