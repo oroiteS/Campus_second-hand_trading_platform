@@ -321,22 +321,46 @@ export default {
     checkLoginStatus() {
       // 检查token
       const token = localStorage.getItem('userToken');
-      this.isLoggedIn = !!token;
       
-      // 如果已登录，获取用户ID
-      if (this.isLoggedIn) {
-        const userId = localStorage.getItem('userId');
-        if (userId) {
-          console.log('登录成功!!!')
-          // 通过API请求获取最新的用户信息
-          this.fetchUserInfo(userId);
-        }
+      if (!token) {
+        this.isLoggedIn = false;
+        this.userInfo = {
+          name: '未知用户',
+          avatar: '/测试图片.jpg',
+        };
+        return;
       }
-      // 调试信息
-      console.log('登录状态检查:', {
-        token: token,
-        isLoggedIn: this.isLoggedIn,
-        userInfo: this.userInfo
+      
+      // 验证token有效性
+      axios.post('http://localhost:8080/api/user/validate-token', {}, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      .then(response => {
+        const result = response.data;
+        if (result.code === 200 && result.data === true) {
+          // token有效，设置登录状态
+          this.isLoggedIn = true;
+          
+          // 获取用户ID并获取用户信息
+          const userId = localStorage.getItem('userId');
+          if (userId) {
+            console.log('登录成功，token有效!!!');
+            // 移除这里的日志，改为在fetchUserInfo完成后输出
+            this.fetchUserInfo(userId);
+            // 通过API请求获取最新的用户信息
+          }
+        } else {
+          // token无效，清除登录信息
+          console.log('token无效，退出登录');
+          this.logout();
+        }
+      })
+      .catch(error => {
+        console.error('验证token失败:', error);
+        // 验证失败，清除登录信息
+        this.logout();
       });
     },
     // 处理存储变化
@@ -381,6 +405,13 @@ export default {
             avatar: response.data.data.avatarUrl || '/测试图片.jpg',
           };
           console.log('获取用户信息成功:', this.userInfo);
+          
+          // 在获取用户信息成功后输出完整的登录状态
+          console.log('登录成功状态检查:', {
+            token: localStorage.getItem('userToken'),
+            isLoggedIn: this.isLoggedIn,
+            userInfo: this.userInfo
+          });
         } else {
           console.error('获取用户信息失败:', response.data.message);
           // 使用默认值

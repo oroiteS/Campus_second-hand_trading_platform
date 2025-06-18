@@ -13,6 +13,10 @@ import com.campus.ordermanagement.util.UUIDGenerator;
 // import com.campus.product_management_seller.entity.Commodity;
 // import com.campus.product_management_seller.repository.CommodityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +40,13 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(value = "ordersByBuyer", key = "#request.buyerId"),
+        @CacheEvict(value = "ordersBySeller", key = "#request.sellerId"),
+        @CacheEvict(value = "ordersByCommodity", key = "#request.commodityId"),
+        @CacheEvict(value = "orderStatistics", key = "#request.buyerId + '_buyer'"),
+        @CacheEvict(value = "orderStatistics", key = "#request.sellerId + '_seller'")
+    })
     public OrderResponse createOrder(CreateOrderRequest request) {
         // 参数验证
         validateCreateOrderRequest(request);
@@ -113,6 +124,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "orders", key = "#orderId", unless = "#result == null")
     public Optional<OrderResponse> getOrderById(String orderId) {
         if (orderId == null || orderId.trim().isEmpty()) {
             return Optional.empty();
@@ -124,6 +136,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "ordersByBuyer", key = "#buyerId")
     public List<OrderResponse> getOrdersByBuyerId(String buyerId) {
         if (buyerId == null || buyerId.trim().isEmpty()) {
             throw new IllegalArgumentException("买家ID不能为空");
@@ -137,6 +150,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "ordersBySeller", key = "#sellerId")
     public List<OrderResponse> getOrdersBySellerId(String sellerId) {
         if (sellerId == null || sellerId.trim().isEmpty()) {
             throw new IllegalArgumentException("卖家ID不能为空");
@@ -150,6 +164,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "ordersByCommodity", key = "#commodityId")
     public List<OrderResponse> getOrdersByCommodityId(String commodityId) {
         if (commodityId == null || commodityId.trim().isEmpty()) {
             throw new IllegalArgumentException("商品ID不能为空");
@@ -270,6 +285,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @Caching(evict = {
+        @CacheEvict(value = "orders", key = "#orderId"),
+        @CacheEvict(value = "ordersByBuyer", allEntries = true),
+        @CacheEvict(value = "ordersBySeller", allEntries = true),
+        @CacheEvict(value = "orderStatistics", allEntries = true)
+    })
     public boolean cancelOrder(String orderId) {
         try {
             // 参数验证和清理

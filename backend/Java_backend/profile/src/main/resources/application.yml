@@ -32,9 +32,9 @@ mybatis-plus:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/campus_trading?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://rm-cn-smw4b7vtl0001ho.rwlb.rds.aliyuncs.com/campus_trading?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
     username: campus_test
-    password: campus_suep
+    password: Campus_suep2022
 
   # JPA 配置（如果需要混合使用）
   jpa:

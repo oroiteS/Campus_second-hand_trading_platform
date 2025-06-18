@@ -361,6 +361,7 @@ public class UserController {
             
             // 生成公共访问URL（永久有效）
             String fullAvatarUrl = ossUtil.generatePublicUrl(fileKey);
+            fullAvatarUrl = "https://"+fullAvatarUrl;
             
             // 如果生成URL失败，删除已上传的文件并返回错误
             if (fullAvatarUrl == null) {

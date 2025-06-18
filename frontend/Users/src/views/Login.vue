@@ -76,10 +76,10 @@ export default {
           // 登录成功
           alert('登录成功!')
           
-          // 存储用户信息
-          const userToken = 'user-token-' + Date.now()
-          // 只保存用户ID和userToken
-          localStorage.setItem('userToken', userToken)
+          // 存储用户信息和token
+          const token = result.data.token
+          // 保存用户ID、token和登录状态
+          localStorage.setItem('userToken', token)
           localStorage.setItem('userId', result.data.userId)
           localStorage.setItem('isLoggedIn', 'true')
           
