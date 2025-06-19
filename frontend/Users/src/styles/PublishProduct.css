@@ -217,6 +217,87 @@
   color: #667eea;
 }
 
+/* 标签样式 */
+.tags-container {
+  margin-top: 5px;
+}
+
+.tag-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-height: 120px;
+  overflow-y: auto;
+  padding: 5px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: #667eea #f0f0f0;
+}
+
+/* 滚动条样式 */
+.tag-options::-webkit-scrollbar {
+  width: 6px;
+}
+
+.tag-options::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 10px;
+}
+
+.tag-options::-webkit-scrollbar-thumb {
+  background: #667eea;
+  border-radius: 10px;
+}
+
+.tag-options::-webkit-scrollbar-thumb:hover {
+  background: #764ba2;
+}
+
+.tag-checkbox {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.tag-checkbox input[type="checkbox"] {
+  display: none;
+}
+
+.tag-checkbox span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 30px;
+  border-radius: 15px;
+  background-color: #f0f0f0;
+  color: #666;
+  font-size: 12px;
+  transition: all 0.3s ease;
+  text-align: center;
+  padding: 0 10px;
+}
+
+.tag-checkbox input[type="checkbox"]:checked + span {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  transform: scale(1.05);
+}
+
+.tag-checkbox:hover span {
+  background-color: #e0e0e0;
+}
+
+.tag-checkbox input[type="checkbox"]:checked:hover + span {
+  background: linear-gradient(135deg, #5a71d5 0%, #6a4292 100%);
+}
+
+.tags-container.disabled .tag-checkbox {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 /* 提交按钮 */
 .publish-submit-section {
   display: flex;
