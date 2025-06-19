@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * 商品创建请求DTO
@@ -19,7 +20,7 @@ public class CommodityCreateRequest {
     @NotNull(message = "商品类别不能为空")
     private Integer categoryId;
     
-    private String tagsId;
+    private List<Integer> tagsId;
     
     @NotNull(message = "商品价格不能为空")
     @Positive(message = "商品价格必须大于0")
@@ -42,7 +43,7 @@ public class CommodityCreateRequest {
     public CommodityCreateRequest() {}
     
     public CommodityCreateRequest(String commodityName, String commodityDescription, 
-                                 Integer categoryId, String tagsId, BigDecimal currentPrice,
+                                 Integer categoryId, List<Integer> tagsId, BigDecimal currentPrice,
                                  String mainImageUrl, String imageList, Integer quantity, String sellerId, String newness) {
         this.commodityName = commodityName;
         this.commodityDescription = commodityDescription;
@@ -80,11 +81,11 @@ public class CommodityCreateRequest {
         this.categoryId = categoryId;
     }
     
-    public String getTagsId() {
+    public List<Integer> getTagsId() {
         return tagsId;
     }
     
-    public void setTagsId(String tagsId) {
+    public void setTagsId(List<Integer> tagsId) {
         this.tagsId = tagsId;
     }
     

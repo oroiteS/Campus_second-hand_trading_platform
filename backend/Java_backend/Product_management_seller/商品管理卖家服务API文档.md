@@ -111,7 +111,7 @@ http://localhost:8084/swagger-ui.html
 | commodityName       | string  | 是   | 商品名称     | 不能为空                    |
 | commodityDescription| string  | 是   | 商品描述     | 不能为空                    |
 | categoryId          | integer | 是   | 商品类别ID   | 不能为空                    |
-| tagsId              | string  | 是   | 标签ID列表   | 多个标签用逗号分隔          |
+| tagsId              | List<Integer> | 是   | 标签ID列表   | 整数数组格式，如[1,2,3]     |
 | currentPrice        | decimal | 是   | 商品价格     | 必须大于0                   |
 | quantity            | integer | 是   | 商品数量     | 必须大于0                   |
 | sellerId            | string  | 是   | 卖家ID       | 不能为空                    |
@@ -136,7 +136,7 @@ http://localhost:8084/swagger-ui.html
     "commodityName": "二手iPhone 13",
     "commodityDescription": "9成新，无划痕，配件齐全",
     "categoryId": 1,
-    "tagsId": "[1,2,3]",
+    "tagsId": [1,2,3],
     "currentPrice": 4500.00,
     "quantity": 1,
     "newness": "九成新",
@@ -359,7 +359,7 @@ http://localhost:8084/swagger-ui.html
     "commodityName": "二手iPhone 13",
     "commodityDescription": "9成新，无划痕，配件齐全",
     "categoryId": 1,
-    "tagsId": "[1,2,3]",
+    "tagsId": [1,2,3],
     "currentPrice": 4500.00,
     "newness": "九成新",
     "commodityStatus": "ON_SALE",
@@ -616,6 +616,12 @@ mvn verify
   - 新增 `/api/commodity/tags` 接口，根据类别ID获取标签列表
   - 支持标签与商品类别的关联查询
   - 完善了商品创建时的标签ID验证和存储
+- **重要更新**：
+  - **tagsId字段类型优化**: 将前端传入的tagsId字段类型从String改为List<Integer>
+    - 前端现在可以直接传入整数数组格式，如[1,2,3]
+    - 后端自动将List<Integer>转换为JSON格式存储到数据库
+    - 更新了相关DTO类、Service层和Controller层的处理逻辑
+    - 使用Jackson ObjectMapper进行JSON序列化，提高数据处理的可靠性
 
 ## 联系方式
 

@@ -12,12 +12,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 @Transactional
@@ -77,32 +79,22 @@ public class CommodityService {
     }
     
     /**
-     * 处理标签ID，将字符串转换为JSON数组格式
-     * @param tagsId 原始标签字符串（逗号分隔）
+     * 处理标签ID，将List<Integer>转换为JSON数组格式
+     * @param tagsId 标签ID列表
      * @return JSON格式的标签数组
      */
-    private String processTagsId(String tagsId) {
-        if (tagsId == null || tagsId.trim().isEmpty()) {
+    private String processTagsId(List<Integer> tagsId) {
+        if (tagsId == null || tagsId.isEmpty()) {
             return null;
         }
         
-        // 如果已经是JSON格式，直接返回
-        if (tagsId.startsWith("[") && tagsId.endsWith("]")) {
-            return tagsId;
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.writeValueAsString(tagsId);
+        } catch (Exception e) {
+            logger.error("转换标签ID列表为JSON失败: {}", e.getMessage());
+            return null;
         }
-        
-        // 将逗号分隔的字符串转换为JSON数组
-        String[] tags = tagsId.split(",");
-        StringBuilder result = new StringBuilder("[");
-        for (int i = 0; i < tags.length; i++) {
-            if (i > 0) {
-                result.append(",");
-            }
-            result.append("\"").append(tags[i].trim()).append("\"");
-        }
-        result.append("]");
-        
-        return result.toString();
     }
     
     /**

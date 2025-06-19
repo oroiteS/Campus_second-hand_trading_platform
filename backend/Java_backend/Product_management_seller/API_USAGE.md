@@ -14,7 +14,7 @@
 | commodityName | String | 是 | 商品名称 |
 | commodityDescription | String | 是 | 商品描述 |
 | categoryId | Integer | 是 | 分类ID |
-| tagsId | String | 是 | 标签ID（逗号分隔） |
+| tagsId | List<Integer> | 是 | 标签ID列表 |
 | currentPrice | BigDecimal | 是 | 当前价格 |
 | quantity | Integer | 是 | 商品数量 |
 | sellerId | String | 是 | 卖家ID |
@@ -32,7 +32,7 @@ const formData = new FormData();
 formData.append('commodityName', '商品名称');
 formData.append('commodityDescription', '商品描述');
 formData.append('categoryId', '1');
-formData.append('tagsId', '1,2,3');
+formData.append('tagsId', [1,2,3]);
 formData.append('currentPrice', '99.99');
 formData.append('quantity', '10');
 formData.append('sellerId', 'seller123');
@@ -65,7 +65,7 @@ fetch('/api/commodity/create-and-put-on-sale', {
     <input type="text" name="commodityName" placeholder="商品名称" required>
     <textarea name="commodityDescription" placeholder="商品描述" required></textarea>
     <input type="number" name="categoryId" placeholder="分类ID" required>
-    <input type="text" name="tagsId" placeholder="标签ID（逗号分隔）" required>
+    <input type="text" name="tagsId" placeholder="标签ID列表，如[1,2,3]" required>
     <input type="number" step="0.01" name="currentPrice" placeholder="价格" required>
     <input type="number" name="quantity" placeholder="数量" required>
     <input type="text" name="sellerId" placeholder="卖家ID" required>
@@ -87,7 +87,7 @@ fetch('/api/commodity/create-and-put-on-sale', {
         "commodityName": "商品名称",
         "commodityDescription": "商品描述",
         "categoryId": 1,
-        "tagsId": "[\"1\",\"2\",\"3\"]",
+        "tagsId": [1,2,3],
         "currentPrice": 99.99,
         "mainImageUrl": "https://oss-url/commodity/sellerId_timestamp_random.jpg",
         "imageList": "[\"https://oss-url/image1.jpg\",\"https://oss-url/image2.jpg\"]",
