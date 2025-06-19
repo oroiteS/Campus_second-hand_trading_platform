@@ -246,14 +246,14 @@ CREATE TABLE IF NOT EXISTS `announcements` (
 
 -- 16. 创建申诉表
 CREATE TABLE IF NOT EXISTS `appeals` (
-    `Argument_Id` VARCHAR(10) NOT NULL PRIMARY KEY COMMENT '申诉ID，主键',
-    `Argue1_id` CHAR(9) NOT NULL COMMENT '外键指向Root表的User_ID，申诉发起者',
-    `Argue2_id` CHAR(9) NOT NULL COMMENT '外键指向Root表的User_ID，被申诉者',
-    `order_id` CHAR(36) NOT NULL COMMENT 'UUID v7，作为外键指向orders表',
+    `Argument_Id` CHAR(36) NOT NULL PRIMARY KEY COMMENT 'UUID v7，申诉ID，主键',
+    `Argue1_id` CHAR(9) NOT NULL COMMENT '外键指向user表的User_ID，申诉发起者',
+    `Argue2_id` CHAR(9) COMMENT '外键指向user表的User_ID，被申诉者，可以为空',
+    `order_id` CHAR(36) COMMENT 'UUID v7，作为外键指向orders表，可以为空',
     `Reason` TEXT NOT NULL COMMENT '申诉理由',
     `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '申诉发起（创建）时间',
     `Root_id` CHAR(9) DEFAULT NULL COMMENT '外键指向Root表',
-    `status` BOOLEAN DEFAULT FALSE comment '是否通过，通过代表完成',
+    `status` ENUM('finish', 'refuse','process') DEFAULT 'process' COMMENT '申诉状态，finish代表完成，refuse代表拒绝，process代表处理中，默认值为process',
 
     -- 创建索引
     INDEX `idx_appeal_argue1_id` (`Argue1_id`),

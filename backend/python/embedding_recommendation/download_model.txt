@@ -1,0 +1,1 @@
+在命令行输入 modelscope download --model Qwen/Qwen3-4B-Base --local_dir ./model/Qwen3-4B-Base
