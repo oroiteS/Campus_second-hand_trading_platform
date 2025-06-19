@@ -186,8 +186,8 @@ public class CommodityController {
     }
     
     /**
-     * 上架商品（原有功能，用于已存在商品的状态更新）
-     * @param request 上架请求
+     * 上架商品
+     * @param request 上架请求（只需要商品ID和卖家ID）
      * @param bindingResult 验证结果
      * @return 响应结果
      */
@@ -204,13 +204,6 @@ public class CommodityController {
             logger.warn("上架商品参数验证失败: {}", errorMessage);
             return ResponseEntity.badRequest()
                     .body(ApiResponse.error("参数验证失败: " + errorMessage, "VALIDATION_ERROR"));
-        }
-        
-        // 验证状态参数
-        if (!"on_sale".equals(request.getStatus())) {
-            logger.warn("上架商品状态参数错误: {}", request.getStatus());
-            return ResponseEntity.badRequest()
-                    .body(ApiResponse.error("状态参数错误，上架操作状态应为on_sale", "INVALID_STATUS"));
         }
         
         try {
@@ -235,7 +228,7 @@ public class CommodityController {
     
     /**
      * 下架商品
-     * @param request 下架请求
+     * @param request 下架请求（只需要商品ID和卖家ID）
      * @param bindingResult 验证结果
      * @return 响应结果
      */
@@ -252,13 +245,6 @@ public class CommodityController {
             logger.warn("下架商品参数验证失败: {}", errorMessage);
             return ResponseEntity.badRequest()
                     .body(ApiResponse.error("参数验证失败: " + errorMessage, "VALIDATION_ERROR"));
-        }
-        
-        // 验证状态参数
-        if (!"off_sale".equals(request.getStatus())) {
-            logger.warn("下架商品状态参数错误: {}", request.getStatus());
-            return ResponseEntity.badRequest()
-                    .body(ApiResponse.error("状态参数错误，下架操作状态应为off_sale", "INVALID_STATUS"));
         }
         
         try {

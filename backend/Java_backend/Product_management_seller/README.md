@@ -14,8 +14,8 @@
 
 ## 功能特性
 
-- ✅ 商品上架 (将商品状态设置为 `on_sale`)
-- ✅ 商品下架 (将商品状态设置为 `off_sale`)
+- ✅ 商品上架 (只需提供商品ID和卖家ID)
+- ✅ 商品下架 (只需提供商品ID和卖家ID)
 - ✅ 修改商品描述
 - ✅ 查询卖家商品列表
 - ✅ 根据状态查询商品
@@ -93,8 +93,7 @@ Content-Type: application/json
 
 {
   "commodityId": "商品ID",
-  "sellerId": "卖家ID", 
-  "status": "on_sale"
+  "sellerId": "卖家ID"
 }
 ```
 
@@ -105,8 +104,7 @@ Content-Type: application/json
 
 {
   "commodityId": "商品ID",
-  "sellerId": "卖家ID",
-  "status": "off_sale"
+  "sellerId": "卖家ID"
 }
 ```
 
@@ -188,8 +186,8 @@ src/main/java/com/example/product_management_seller/
 - `seller_id`: 卖家ID
 
 ### 业务逻辑
-1. **上架**: 将 `commodity_status` 设置为 `on_sale`
-2. **下架**: 将 `commodity_status` 设置为 `off_sale`
+1. **上架**: 系统自动将 `commodity_status` 设置为 `on_sale`
+2. **下架**: 系统自动将 `commodity_status` 设置为 `off_sale`
 3. **修改描述**: 更新 `commodity_description` 字段
 4. **权限控制**: 只能操作属于自己的商品 (通过 `seller_id` 验证)
 

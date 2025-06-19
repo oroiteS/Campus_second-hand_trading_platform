@@ -162,8 +162,7 @@ http://localhost:8084/swagger-ui.html
 ```json
 {
   "commodityId": "string",
-  "sellerId": "string",
-  "status": "on_sale"
+  "sellerId": "string"
 }
 ```
 
@@ -171,7 +170,6 @@ http://localhost:8084/swagger-ui.html
 |-------------|--------|------|----------|----------|
 | commodityId | string | 是   | 商品ID   | 不能为空 |
 | sellerId    | string | 是   | 卖家ID   | 不能为空 |
-| status      | string | 是   | 商品状态 | 必须为 "on_sale" |
 
 **响应示例**:
 
@@ -194,8 +192,7 @@ http://localhost:8084/swagger-ui.html
 ```json
 {
   "commodityId": "string",
-  "sellerId": "string",
-  "status": "off_sale"
+  "sellerId": "string"
 }
 ```
 
@@ -203,7 +200,6 @@ http://localhost:8084/swagger-ui.html
 |-------------|--------|------|----------|----------|
 | commodityId | string | 是   | 商品ID   | 不能为空 |
 | sellerId    | string | 是   | 卖家ID   | 不能为空 |
-| status      | string | 是   | 商品状态 | 必须为 "off_sale" |
 
 **响应示例**:
 
@@ -597,6 +593,32 @@ mvn verify
 ## 更新日志
 
 ### v0.0.1-SNAPSHOT (2024年12月)
+
+#### 最新更新：商品上架下架接口简化
+- **修改内容**: 简化商品上架和下架接口，移除 `status` 参数
+- **影响范围**: 
+  - 接口参数：只需要传入 `commodityId` 和 `sellerId`
+  - 业务逻辑：系统自动判断上架或下架操作
+- **涉及接口**:
+  - `POST /api/commodity/put-on-sale` - 商品上架
+  - `POST /api/commodity/put-off-sale` - 商品下架
+- **DTO更新**: `CommodityStatusUpdateRequest.java` 移除 `status` 字段
+- **优势**: 简化接口调用，减少参数验证，提高易用性
+
+#### 重要更新：tagsId字段类型优化
+- **修改内容**: 将 `tagsId` 字段类型从 `String` 改为 `List<Integer>`
+- **影响范围**: 
+  - 前端传入格式：从字符串格式改为整数数组格式
+  - 后端存储方式：保持JSON格式不变
+- **涉及代码层级**:
+  - DTO层：`CommodityCreateRequest.java` 中 `tagsId` 字段类型更新
+  - Service层：`CommodityService.java` 中 `processTagsId` 方法重构
+  - Controller层：`CommodityController.java` 中参数类型调整
+- **技术实现**: 使用 `ObjectMapper` 将 `List<Integer>` 转换为JSON字符串存储
+- **优势**: 提高类型安全性，简化前端处理逻辑，保持数据一致性
+- **前端使用示例**: `"tagsId": [1, 2, 3]` 替代 `"tagsId": "1,2,3"`
+
+#### 其他功能更新
 - 新增商品信息统一更新接口 `/update-info`
 - 添加商品新旧度字段支持
 - 废弃原有的 `/update-description` 接口
@@ -616,12 +638,6 @@ mvn verify
   - 新增 `/api/commodity/tags` 接口，根据类别ID获取标签列表
   - 支持标签与商品类别的关联查询
   - 完善了商品创建时的标签ID验证和存储
-- **重要更新**：
-  - **tagsId字段类型优化**: 将前端传入的tagsId字段类型从String改为List<Integer>
-    - 前端现在可以直接传入整数数组格式，如[1,2,3]
-    - 后端自动将List<Integer>转换为JSON格式存储到数据库
-    - 更新了相关DTO类、Service层和Controller层的处理逻辑
-    - 使用Jackson ObjectMapper进行JSON序列化，提高数据处理的可靠性
 
 ## 联系方式
 
