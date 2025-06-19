@@ -33,5 +33,5 @@ build/
 .vscode/
 
 # 忽略所有本地环境配置
-application-*.yml
+application_*.yml
 !application.yml
