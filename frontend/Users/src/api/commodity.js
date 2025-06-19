@@ -1,3 +1,5 @@
+import axios from "axios";
+
 // 商品相关API
 const API_BASE_URL = 'http://localhost:8087';
 
@@ -396,5 +398,39 @@ export const getSellerProducts = async (sellerId, page = 1, size = 6) => {
   } catch (error) {
     console.error('获取卖家商品列表失败:', error);
     throw error;
+  }
+};
+/***  
+ * 获取热门推荐的商品 
+ * @param {string} commodity_name 商品名称
+ * @param {string} commodity_description 商品描述
+ * @param {int}category_id 商品分类id
+ * @param {list[int]} tags_id 标签列表
+ * @param {string} current_price 现在的商品价格，前端要转换为float类型
+ * @param {string} commodity_status 商品状态
+ * @param {string} main_image_url 图片主图链接
+ * @param {list[string]} image_list 图片列表信息
+ * @param {int} quantity 商品数量
+ * @param {string} newness 商品新旧程度
+ * @param {string} commodity_id 商品id
+ * @param {dateTime} created_at 商品创建时间
+ * @param {dateTime} updated_at 商品更新时间
+ * @param {string} user_name
+ * @param {string} avatar_url
+ * */
+export const get_commodities_recommendation = async (user_id) => {
+  if (!user_id) {
+    return [];
+  }
+  try {
+    const response = await axios.get(`http://localhost:8000/api/v1/commodities/recommendation/${user_id}`);
+    if (response.data) {
+      return response.data;
+    } else {
+      return [];
+    }
+  } catch (error) {
+    console.error('获取推荐商品失败:', error);
+    return [];
   }
 };

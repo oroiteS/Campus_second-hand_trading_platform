@@ -109,26 +109,26 @@
         <section class="home-section">
           <div class="home-section-header">
             <h3 class="home-section-title">🔥 热门推荐</h3>
-            <a href="#" class="home-more-link">查看更多 →</a>
+            <router-link to="/recommended" class="home-more-link">查看更多 →</router-link>
           </div>
           <div class="home-products-grid">
-            <div class="home-product-card" v-for="product in hotProducts" :key="product.id" @click="goToProductDetail(product.id)">
+            <div class="home-product-card" v-for="product in recommendedProducts" :key="product.id" @click="goToProductDetail(product.id)">
               <div class="home-product-image-container">
-                <img :src="product.image" :alt="product.name" class="home-product-image" />
+                <img :src="product.main_image_url || '/测试图片.jpg'" :alt="product.commodity_name" class="home-product-image" />
                 <div class="home-product-badge" v-if="product.badge">{{ product.badge }}</div>
               </div>
               <div class="home-product-info">
-                <h4 class="home-product-title">{{ product.name }}</h4>
+                <h4 class="home-product-title">{{ product.commodity_name }}</h4>
                 <div class="home-product-meta">
-                  <span class="home-product-price">¥{{ product.price }}</span>
-                  <span class="home-product-original-price" v-if="product.originalPrice">¥{{ product.originalPrice }}</span>
+                  <span class="home-product-price">¥{{ product.current_price }}</span>
+                  
                 </div>
                 <div class="home-product-details">
-                  <span class="home-product-condition">{{ product.condition }}</span>
+                  <span class="home-product-condition">{{ product.newness }}</span>
                 </div>
                 <div class="home-seller-info">
-                  <img :src="product.sellerAvatar" class="home-seller-avatar" />
-                  <span class="home-seller-name">{{ product.sellerName }}</span>
+                                    <img :src="product.avatar_url || 'https://via.placeholder.com/30x30/4CAF50/FFFFFF?text=U'" class="home-seller-avatar" />
+                  <span class="home-seller-name">{{ product.user_name }}</span>
                 </div>
               </div>
             </div>
@@ -177,11 +177,13 @@
 <script>
 import axios from 'axios';
 // 导入API函数
-import { getLatestCommodities, getAllUsers, transformCommodityData } from '../api/commodity.js';
+import { getLatestCommodities, getAllUsers, transformCommodityData,get_commodities_recommendation } from '../api/commodity.js';
 
 export default {
   name: 'HomePage',
   data() {
+    
+    
     return {
       searchQuery: '',
       isLoggedIn: false,
@@ -189,6 +191,8 @@ export default {
         name: '未知用户',
         avatar: '/测试图片.jpg',
       },
+      unreadCount: 0, // 初始化未读消息数量
+      quickCategories: [], // 初始化快速分类
       categories: [
         { id: 1, name: '数码电子', icon: '📱' },
         { id: 2, name: '教材书籍', icon: '📚' },
@@ -199,59 +203,13 @@ export default {
         { id: 7, name: '美妆护肤', icon: '💄' },
         { id: 8, name: '其他物品', icon: '📦' }
       ],
-      notices: [],
-      hotProducts: [
-        {
-          id: 1,
-          name: 'iPhone 13 Pro 128G',
-          price: 4999,
-          originalPrice: 6999,
-          condition: '9成新',
-          location: '东校区',
-          image: '/测试图片.jpg',
-          badge: '热销',
-          sellerName: '张同学',
-          sellerSchool: '计算机学院',
-          sellerAvatar: 'https://via.placeholder.com/30x30/4CAF50/FFFFFF?text=张'
-        },
-        {
-          id: 2,
-          name: '高等数学教材（第七版）',
-          price: 25,
-          originalPrice: 45,
-          condition: '8成新',
-          location: '西校区',
-          image: 'https://via.placeholder.com/200x150/F0F0F0/666666?text=教材',
-          badge: '推荐',
-          sellerName: '李同学',
-          sellerSchool: '数学学院',
-          sellerAvatar: 'https://via.placeholder.com/30x30/2196F3/FFFFFF?text=李'
-        },
-        {
-          id: 3,
-          name: 'MacBook Air M1',
-          price: 6500,
-          originalPrice: 8999,
-          condition: '9成新',
-          location: '南校区',
-          image: 'https://via.placeholder.com/200x150/F0F0F0/666666?text=MacBook',
-          sellerName: '王同学',
-          sellerSchool: '设计学院',
-          sellerAvatar: 'https://via.placeholder.com/30x30/FF9800/FFFFFF?text=王'
-        },
-        {
-          id: 4,
-          name: '小米台灯护眼版',
-          price: 89,
-          originalPrice: 129,
-          condition: '全新',
-          location: '北校区',
-          image: 'https://via.placeholder.com/200x150/F0F0F0/666666?text=台灯',
-          sellerName: '赵同学',
-          sellerSchool: '物理学院',
-          sellerAvatar: 'https://via.placeholder.com/30x30/E91E63/FFFFFF?text=赵'
-        }
+      notices: [
+        { id: 1, text: '新用户注册送积分', date: '12-20' },
+        { id: 2, text: '期末教材回收活动', date: '12-18' },
+        { id: 3, text: '诚信交易倡议书', date: '12-15' }
       ],
+      recommendedProducts: [],
+      isLoadingHotProducts: false,
       // 将newProducts改为从API获取
       newProducts: [],
       // 添加加载状态
@@ -269,6 +227,8 @@ export default {
     await this.loadLatestProducts();
     // 获取校园公告
     await this.fetchAnnouncements();
+    // 加载推荐商品
+    await this.loadRecommendedProducts();
     // 添加存储监听器，当localStorage发生变化时更新状态
     window.addEventListener('storage', this.handleStorageChange);
   },
@@ -475,6 +435,34 @@ export default {
       
       // 可选：清除未读消息数量
       this.unreadCount = 0;
+    },
+
+        async loadRecommendedProducts() {
+      this.isLoadingHotProducts = true;
+      const userId = localStorage.getItem('userId');
+      if (!userId) {
+        console.log('用户未登录，无法加载推荐商品');
+        this.isLoadingHotProducts = false;
+        return;
+      }
+
+      try {
+        const recommendedData = await get_commodities_recommendation(userId);
+        if (recommendedData && recommendedData.length > 0) {
+          this.recommendedProducts = recommendedData.slice(0, 12).map(product => ({
+            ...product,
+            id: product.commodity_id, // 确保有唯一的key
+          }));
+          console.log('加载推荐商品成功:', this.recommendedProducts);
+        } else {
+          this.recommendedProducts = []; // 清空或使用默认
+        }
+      } catch (error) {
+        console.error('加载推荐商品失败:', error);
+        this.recommendedProducts = []; // 清空或使用默认
+      } finally {
+        this.isLoadingHotProducts = false;
+      }
     },
     
     /**

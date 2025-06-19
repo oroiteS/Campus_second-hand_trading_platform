@@ -10,6 +10,7 @@ class CommodityStatus(str, Enum):
     ON_SALE = "on_sale"
     SOLD = "sold"
     OFF_SALE = "off_sale"
+    TO_SALE = "to_sale"
 class Commodity_id(BaseModel):
     commodity_id:str
 
@@ -63,3 +64,6 @@ class Commodity(CommodityInDB):
 class Commodity_username(CommodityInDB):
     """有用户名字段的商品模型"""
     user_name:str
+class Commodity_username_avatar(Commodity_username):
+    """有用户名和头像的商品模型"""
+    avatar_url:str
