@@ -33,13 +33,8 @@
           <img :src="currentImage" :alt="product.name" class="main-img" />
         </div>
         <div class="thumbnail-list">
-          <div 
-            v-for="(image, index) in product.images" 
-            :key="index"
-            class="thumbnail"
-            :class="{ active: currentImageIndex === index }"
-            @click="selectImage(index)"
-          >
+          <div v-for="(image, index) in product.images" :key="index" class="thumbnail"
+            :class="{ active: currentImageIndex === index }" @click="selectImage(index)">
             <img :src="image" :alt="`商品图片${index + 1}`" />
           </div>
         </div>
@@ -60,7 +55,7 @@
         </div>
 
         <h2 class="product-title">{{ product.name }}</h2>
-        
+
         <!-- 删除商品描述部分 -->
         <!-- <div class="product-description">
           <p>{{ product.description }}</p>
@@ -147,26 +142,17 @@
     <!-- 评论区域 -->
     <div class="comments-section">
       <h3 class="section-title">评论 ({{ comments.length }})</h3>
-      
+
       <!-- 发表评论 -->
       <div class="comment-form">
         <div class="comment-input-area">
           <img :src="currentUser.avatar" class="user-avatar" />
           <div class="input-container">
-            <textarea 
-              v-model="newComment" 
-              placeholder="写下你的评论..." 
-              class="comment-input"
-              rows="3"
-              maxlength="500"
-            ></textarea>
+            <textarea v-model="newComment" placeholder="写下你的评论..." class="comment-input" rows="3"
+              maxlength="500"></textarea>
             <div class="input-footer">
               <span class="char-count">{{ newComment.length }}/500</span>
-              <button 
-                @click="submitComment" 
-                :disabled="!newComment.trim()" 
-                class="submit-btn"
-              >
+              <button @click="submitComment" :disabled="!newComment.trim()" class="submit-btn">
                 发表评论
               </button>
             </div>
@@ -180,7 +166,7 @@
           <div class="no-comments-icon">💬</div>
           <p>暂无评论，快来发表第一条评论吧！</p>
         </div>
-        
+
         <div v-for="comment in comments" :key="comment.id" class="comment-item">
           <img :src="comment.user.avatar" class="comment-avatar" />
           <div class="comment-content">
@@ -191,47 +177,32 @@
             </div>
             <div class="comment-text">{{ comment.content }}</div>
             <div class="comment-actions">
-              <button 
-                @click="toggleLike(comment)" 
-                :class="['action-btn', { liked: comment.isLiked }]"
-              >
+              <button @click="toggleLike(comment)" :class="['action-btn', { liked: comment.isLiked }]">
                 {{ comment.isLiked ? '❤️' : '🤍' }} {{ comment.likeCount }}
               </button>
-              <button 
-                @click="showReplyInput(comment.id)" 
-                class="action-btn"
-              >
+              <button @click="showReplyInput(comment.id)" class="action-btn">
                 💬 回复
               </button>
             </div>
-            
+
             <!-- 回复输入框 -->
             <div v-if="replyingTo === comment.id" class="reply-input-area">
               <img :src="currentUser.avatar" class="user-avatar small" />
               <div class="input-container">
-                <textarea 
-                  v-model="replyContent" 
-                  :placeholder="`回复 ${comment.user.name}...`" 
-                  class="reply-input"
-                  rows="2"
-                  maxlength="300"
-                ></textarea>
+                <textarea v-model="replyContent" :placeholder="`回复 ${comment.user.name}...`" class="reply-input"
+                  rows="2" maxlength="300"></textarea>
                 <div class="input-footer">
                   <span class="char-count">{{ replyContent.length }}/300</span>
                   <div class="reply-actions">
                     <button @click="cancelReply" class="cancel-btn">取消</button>
-                    <button 
-                      @click="submitReply(comment.id)" 
-                      :disabled="!replyContent.trim()" 
-                      class="submit-btn"
-                    >
+                    <button @click="submitReply(comment.id)" :disabled="!replyContent.trim()" class="submit-btn">
                       回复
                     </button>
                   </div>
                 </div>
               </div>
             </div>
-            
+
             <!-- 回复列表 -->
             <div v-if="comment.replies && comment.replies.length > 0" class="replies-list">
               <div v-for="reply in comment.replies" :key="reply.id" class="reply-item">
@@ -247,16 +218,10 @@
                     {{ reply.content }}
                   </div>
                   <div class="reply-actions">
-                    <button 
-                      @click="toggleReplyLike(reply)" 
-                      :class="['action-btn', { liked: reply.isLiked }]"
-                    >
+                    <button @click="toggleReplyLike(reply)" :class="['action-btn', { liked: reply.isLiked }]">
                       {{ reply.isLiked ? '❤️' : '🤍' }} {{ reply.likeCount }}
                     </button>
-                    <button 
-                      @click="replyToReply(comment.id, reply)" 
-                      class="action-btn"
-                    >
+                    <button @click="replyToReply(comment.id, reply)" class="action-btn">
                       💬 回复
                     </button>
                   </div>
@@ -272,12 +237,7 @@
     <div class="related-section">
       <h3 class="section-title">相关推荐</h3>
       <div class="related-products">
-        <div 
-          v-for="item in relatedProducts" 
-          :key="item.id"
-          class="related-item"
-          @click="viewProduct(item.id)"
-        >
+        <div v-for="item in relatedProducts" :key="item.id" class="related-item" @click="viewProduct(item.id)">
           <img :src="item.image" :alt="item.name" />
           <div class="related-info">
             <h4>{{ item.name }}</h4>
@@ -339,7 +299,8 @@
           </div>
           <div class="form-group">
             <label>详细描述</label>
-            <textarea v-model="editingProduct.detailDescription" class="form-textarea large" placeholder="请输入详细描述，每行一段" rows="6"></textarea>
+            <textarea v-model="editingProduct.detailDescription" class="form-textarea large" placeholder="请输入详细描述，每行一段"
+              rows="6"></textarea>
           </div>
         </div>
         <div class="modal-footer">
@@ -472,7 +433,7 @@ export default {
   },
   computed: {
     currentImage() {
-      return this.product.images && this.product.images.length > 0 ? 
+      return this.product.images && this.product.images.length > 0 ?
         this.product.images[this.currentImageIndex] : '/测试图片.jpg'
     }
   },
@@ -480,10 +441,10 @@ export default {
     // 获取路由参数中的商品ID
     const productId = this.$route.params.id
     console.log('商品ID:', productId)
-    
+
     // 检查是否从个人资料页面进入
     this.isEditable = this.$route.query.from === 'profile' && this.$route.query.editable === 'true'
-    
+
     // 获取商品详情
     if (productId) {
       await this.fetchProductDetail(productId)
@@ -498,19 +459,19 @@ export default {
       try {
         this.loading = true
         this.error = null
-        
+
         // 调用API获取商品详情
         const commodityData = await getCommodityDetail(commodityId)
-        
+
         // 转换数据格式（现在是异步的）
         this.product = await transformCommodityDetailData(commodityData)
-        
+
         console.log('获取到的商品详情:', this.product)
-        
+
       } catch (error) {
         console.error('获取商品详情失败:', error)
         this.error = error.message || '获取商品详情失败'
-        
+
         // 如果是404错误，显示商品不存在
         if (error.message.includes('404')) {
           this.error = '商品不存在或已被删除'
@@ -519,7 +480,7 @@ export default {
         this.loading = false
       }
     },
-    
+
     goBack() {
       this.$router.go(-1); // 返回上一页
     },
@@ -529,17 +490,17 @@ export default {
     contactSeller() {
       // 获取当前用户ID
       const userId = localStorage.getItem('userId');
-      
+
       if (!userId) {
         // 如果用户未登录，提示登录
         alert('请先登录后联系卖家');
         this.$router.push('/login');
         return;
       }
-      
+
       // 跳转到聊天列表页面
-      this.$router.push(`/chat-list/${userId}`);
-      
+      // this.$router.push(`/chat-list/${userId}`);
+
       // 可选：如果需要直接创建与卖家的会话，可以在ChatList页面中处理
       // 或者可以传递卖家信息作为query参数
       // this.$router.push({
@@ -550,6 +511,15 @@ export default {
       //     productId: this.product.id
       //   }
       // });
+      // 跳转到聊天页面
+      this.$router.push({
+        path: '/chat-list',
+        query: {
+          sellerId: this.product.sellerId,
+          buyerId: userId,
+          autoCreate: 'true'
+        }
+      })
     },
     buyNow() {
       alert('立即购买功能')
@@ -562,7 +532,7 @@ export default {
     viewProduct(productId) {
       this.$router.push(`/product/${productId}`)
     },
-    
+
     // 编辑商品
     editProduct() {
       this.editingProduct = {
@@ -578,13 +548,13 @@ export default {
       }
       this.showEditModal = true
     },
-    
+
     // 关闭编辑弹窗
     closeEditModal() {
       this.showEditModal = false
       this.editingProduct = {}
     },
-    
+
     // 保存商品信息
     saveProductChanges() {
       // 更新商品信息
@@ -596,19 +566,19 @@ export default {
       this.product.brand = this.editingProduct.brand
       this.product.location = this.editingProduct.location
       this.product.detailDescription = this.editingProduct.detailDescription.split('\n').filter(line => line.trim())
-      
+
       this.closeEditModal()
-      
+
       // 实际项目中这里会调用API保存到后端
       alert('商品信息已更新！')
     },
-    
+
     // 添加formatTime方法
     formatTime(time) {
       const now = new Date()
       const diff = now - new Date(time)
       const days = Math.floor(diff / 86400000)
-      
+
       if (days === 0) {
         return '今天 ' + new Date(time).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
       } else if (days === 1) {
