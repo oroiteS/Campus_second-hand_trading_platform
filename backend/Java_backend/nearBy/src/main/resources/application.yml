@@ -2,8 +2,7 @@ spring:
   # 🚀 数据库连接配置（根据图片信息更新）
   datasource:
     url: jdbc:mysql://rm-cn-smw4b7vtl0001ho.rwlb.rds.aliyuncs.com:3306/campus?useSSL=false&serverTimezone=Asia/Shanghai
-    username: campus_test
-    password: Campus_suep2022  # 请替换为实际密码
+
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       connection-timeout: 30000
