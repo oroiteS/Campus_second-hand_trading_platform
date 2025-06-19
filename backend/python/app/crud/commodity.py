@@ -10,7 +10,7 @@ import numpy as np
 load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), '.env'))
 from app.models.commodity import Commodity
 from app.models.user import User
-from app.schemas.commodity import Commodity_username,Commodity_id
+from app.schemas.commodity import Commodity_username,Commodity_id,Commodity_username_avatar
 from sqlalchemy import select, or_, func
 from app.lib.Tokenization import Tokenization
 from app.schemas.SearchCommodityRequest import SearchCommodityRequest
@@ -54,9 +54,9 @@ def get_commodities_username(db: Session) -> List[Commodity_username]:
             Commodity.updated_at,
             Commodity.newness,
             Commodity.quantity,
-            User.user_name
+            users.user_name
         )
-        .join(User, Commodity.seller_id == User.user_id)
+        .join(users, Commodity.seller_id == users.user_id)
     )
     results = db.execute(stmt).all() # SQLAlchemy 2.0 风格的执行
 
@@ -67,7 +67,7 @@ def get_commodities_username(db: Session) -> List[Commodity_username]:
     #     Commodity_username.model_validate(row._asdict()) for row in results
     # ]
     return results
-def get_commodity_recommendation(db: Session,user_id: str) -> List[Commodity]:
+def get_commodity_recommendation(db: Session,user_id: str) -> List[Commodity_username_avatar]:
     """获取推荐的商品list"""
     #部分1-按照用户的购买行为返回list
     embedder = Embedder()
@@ -77,18 +77,25 @@ def get_commodity_recommendation(db: Session,user_id: str) -> List[Commodity]:
 
     #合并两个list
     results_commendation_cid = results_commendation_buy_cid + results_commendation_like_cid
-    print('推荐结果',results_commendation_buy_cid)
     #去重
     results_commendation_cid = list(set(results_commendation_cid))
     #返回
-    query = select(Commodity).where(Commodity.commodity_id.in_(results_commendation_cid))
-    results_commendation = db.execute(query).scalars().all()
-    query2 = select(Commodity).where(Commodity.commodity_id.in_(results_commendation_like_cid))
-    res = db.execute(query2).scalars().all()
+    query = select(Commodity, User.user_name, User.avatar_url).join(User, Commodity.seller_id == User.user_id).where(Commodity.commodity_id.in_(results_commendation_cid))
+    results = db.execute(query).all()
+    
+    # 将元组结果转换为Commodity_username_avatar对象列表
+    results_commendation = []
+    for row in results:
+        commodity, user_name, avatar_url = row
+        commodity_data = commodity.__dict__
+        commodity_data['user_name'] = user_name
+        commodity_data['avatar_url'] = avatar_url
+        results_commendation.append(Commodity_username_avatar(**commodity_data))
+
     return results_commendation
 
 
-def get_commodities_by_search(db: Session,request: SearchCommodityRequest):
+def get_commodities_by_search(db: Session,request: SearchCommodityRequest) -> List[Commodity_username_avatar]:
     """通过搜索获取商品信息"""
     #部分1-模糊查询
     stopwords_file = "app/stopwords/stopwords.txt"
@@ -105,7 +112,7 @@ def get_commodities_by_search(db: Session,request: SearchCommodityRequest):
         token_condition = func.lower(Commodity.commodity_name).like(func.lower(f"%{token}%"))  # 商品名称包含token（不区分大小写）
         # func.lower(token).like(func.lower(f"%{Commodity.commodity_name}%"))  # 方向2：token包含商品名称（注释掉）
         token_conditions.append(token_condition)
-    query = select(Commodity).filter(
+    query = select(Commodity, User.user_name, User.avatar_url).join(User, Commodity.seller_id == User.user_id).filter(
         # 核心条件：任意一个token满足条件即可（OR组合）
         or_(*token_conditions),
         # 必选条件：商品状态为"在售"（与上述条件用AND连接）
@@ -114,27 +121,33 @@ def get_commodities_by_search(db: Session,request: SearchCommodityRequest):
         Commodity.seller_id != user_id
     ).order_by(func.random()).limit(40)#随机取40个
     # 执行查询
-    results_search = db.execute(query).scalars().all()
-    # 直接返回 SQLAlchemy 对象列表
+    results_search_raw = db.execute(query).all()
+    
     #部分3-桶2:返回个性化推荐内容
     embedder = Embedder()
     results_commendation_like_cid = embedder.recommendation_by_like(user_id=user_id)
-    query = select(Commodity).where(Commodity.commodity_id.in_(results_commendation_like_cid))
-    results_commendation_like = db.execute(query).scalars().all()
-    # 合并结果并基于commodity_id去重
-    all_results = results_search + results_commendation_like
+    query = select(Commodity, User.user_name, User.avatar_url).join(User, Commodity.seller_id == User.user_id).where(Commodity.commodity_id.in_(results_commendation_like_cid))
+    results_commendation_like_raw = db.execute(query).all()
+    
     # 桶3 查询结果与特征匹配
-    results_commendation_token = embedder.recommendation_by_token(token_list,user_id=user_id)
-    query = select(Commodity).where(Commodity.commodity_id.in_(results_commendation_token))
-    results_commendation_token = db.execute(query).scalars().all()
-    all_results += results_commendation_token
+    results_commendation_token_cid = embedder.recommendation_by_token(token_list,user_id=user_id)
+    query = select(Commodity, User.user_name, User.avatar_url).join(User, Commodity.seller_id == User.user_id).where(Commodity.commodity_id.in_(results_commendation_token_cid))
+    results_commendation_token_raw = db.execute(query).all()
+
+    all_results_raw = results_search_raw + results_commendation_like_raw + results_commendation_token_raw
+
     # 使用字典去重，保持第一次出现的商品
     seen_ids = set()
     results = []
-    for commodity in all_results:
+    for row in all_results_raw:
+        commodity, user_name, avatar_url = row
         if commodity.commodity_id not in seen_ids:
             seen_ids.add(commodity.commodity_id)
-            results.append(commodity)
+            commodity_data = commodity.__dict__
+            commodity_data['user_name'] = user_name
+            commodity_data['avatar_url'] = avatar_url
+            results.append(Commodity_username_avatar(**commodity_data))
+            
     random.shuffle(results)
     return results
 
@@ -304,3 +317,7 @@ def delete_commodity(request:Commodity_id,db:Session):
     #删除商品向量库
     code = delete_embedding_commodity_id(commodity_id)
     return code
+
+def get_username(user_id,db:Session):
+    username = db.query(users).filter(users.user_id == user_id).first().username
+    return username
