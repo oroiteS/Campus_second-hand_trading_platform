@@ -401,7 +401,7 @@ export default {
         if (response.data.success && response.data.code === 200) {
           // 只获取realName进行展示
           this.userInfo = {
-            name: response.data.data.realName || '未知用户',
+            name: response.data.data.userName || '未知用户',
             avatar: response.data.data.avatarUrl || '/测试图片.jpg',
           };
           console.log('获取用户信息成功:', this.userInfo);
@@ -432,7 +432,14 @@ export default {
     },
     // 跳转到商品详情页
     goToProductDetail(productId) {
-      this.$router.push(`/product/${productId}`);
+      // 获取当前用户ID
+      const userId = localStorage.getItem('userId');
+      this.$router.push({
+        path: `/product/${productId}`,
+        query: {
+          userId: userId
+        }
+      });
     },
     // 退出登录
     logout() {

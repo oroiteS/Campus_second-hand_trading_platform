@@ -6,17 +6,17 @@ import (
 
 // User 用户模型
 type User struct {
-	UserID       string    `gorm:"column:User_ID;primaryKey;size:9" json:"user_id"`
-	UserName     string    `gorm:"column:User_name;size:20;not null" json:"user_name"`
-	Password     string    `gorm:"column:password;size:64;not null" json:"-"`
-	Telephone    string    `gorm:"column:telephone;size:11;not null" json:"telephone"`
-	RealName     string    `gorm:"column:real_name;size:50;not null" json:"real_name"`
-	AvatarURL    *string   `gorm:"column:avatar_url;size:255" json:"avatar_url"`
-	Longitude    float64   `gorm:"column:User_Loc_longitude;type:decimal(9,6);not null" json:"longitude"`
-	Latitude     float64   `gorm:"column:User_Loc_latitude;type:decimal(9,6);not null" json:"latitude"`
-	UserStatus   bool      `gorm:"column:User_sta;default:false" json:"user_status"`
-	CreateAt     time.Time `gorm:"column:Create_at;default:CURRENT_TIMESTAMP" json:"create_at"`
-	IDCard       string    `gorm:"column:ID;size:18;not null" json:"-"`
+	UserID     string    `gorm:"column:User_ID;primaryKey;size:9" json:"user_id"`
+	UserName   string    `gorm:"column:User_name;size:20;not null" json:"user_name"`
+	Password   string    `gorm:"column:password;size:64;not null" json:"-"`
+	Telephone  string    `gorm:"column:telephone;size:11;not null" json:"telephone"`
+	RealName   string    `gorm:"column:real_name;size:50;not null" json:"real_name"`
+	AvatarURL  *string   `gorm:"column:avatar_url;size:255" json:"avatar_url"`
+	Longitude  float64   `gorm:"column:User_Loc_longitude;type:decimal(9,6);not null" json:"longitude"`
+	Latitude   float64   `gorm:"column:User_Loc_latitude;type:decimal(9,6);not null" json:"latitude"`
+	UserStatus bool      `gorm:"column:User_sta;default:false" json:"user_status"`
+	CreateAt   time.Time `gorm:"column:Create_at;default:CURRENT_TIMESTAMP" json:"create_at"`
+	IDCard     string    `gorm:"column:ID;size:18;not null" json:"-"`
 }
 
 // TableName 指定表名
@@ -26,16 +26,16 @@ func (User) TableName() string {
 
 // ChatSession 聊天会话模型
 type ChatSession struct {
-	SessionID     string    `gorm:"column:session_id;primaryKey;size:36" json:"session_id"`
-	BuyerID       string    `gorm:"column:buyer_id;size:9;not null" json:"buyer_id"`
-	SellerID      string    `gorm:"column:seller_id;size:9;not null" json:"seller_id"`
-	SessionStatus string    `gorm:"column:session_status;type:enum('active','closed');default:'active'" json:"session_status"`
-	CreatedAt     time.Time `gorm:"column:created_at;default:CURRENT_TIMESTAMP" json:"created_at"`
-	UpdatedAt     time.Time `gorm:"column:updated_at;default:CURRENT_TIMESTAMP" json:"updated_at"`
+	SessionID string `gorm:"column:session_id;primaryKey;size:36" json:"session_id"`
+	FirstID   string `gorm:"column:first_id;size:9;not null" json:"first_id"`
+	SecondID  string `gorm:"column:second_id;size:9;not null" json:"second_id"`
+	// SessionStatus string    `gorm:"column:session_status;type:enum('active','closed');default:'active'" json:"session_status"`
+	CreatedAt time.Time `gorm:"column:created_at;default:CURRENT_TIMESTAMP" json:"created_at"`
+	UpdatedAt time.Time `gorm:"column:updated_at;default:CURRENT_TIMESTAMP" json:"updated_at"`
 
 	// 关联字段
-	Buyer    User `gorm:"foreignKey:BuyerID;references:UserID" json:"buyer,omitempty"`
-	Seller   User `gorm:"foreignKey:SellerID;references:UserID" json:"seller,omitempty"`
+	First    User          `gorm:"foreignKey:FirstID;references:UserID" json:"first,omitempty"`
+	Second   User          `gorm:"foreignKey:SecondID;references:UserID" json:"second,omitempty"`
 	Messages []ChatMessage `gorm:"foreignKey:SessionID;references:SessionID" json:"messages,omitempty"`
 }
 
@@ -70,8 +70,8 @@ func (ChatMessage) TableName() string {
 
 // CreateSessionRequest 创建会话请求
 type CreateSessionRequest struct {
-	BuyerID  string `json:"buyer_id" binding:"required"`
-	SellerID string `json:"seller_id" binding:"required"`
+	FirstID  string `json:"first_id" binding:"required"`
+	SecondID string `json:"second_id" binding:"required"`
 }
 
 // SendMessageRequest 发送消息请求
@@ -86,10 +86,10 @@ type SendMessageRequest struct {
 
 // WebSocketMessage WebSocket消息结构
 type WebSocketMessage struct {
-	Type    string      `json:"type"` // message, notification, error
-	Data    interface{} `json:"data"`
-	UserID  string      `json:"user_id,omitempty"`
-	Time    time.Time   `json:"time"`
+	Type   string      `json:"type"` // message, notification, error
+	Data   interface{} `json:"data"`
+	UserID string      `json:"user_id,omitempty"`
+	Time   time.Time   `json:"time"`
 }
 
 // UnreadCountResponse 未读消息数量响应
