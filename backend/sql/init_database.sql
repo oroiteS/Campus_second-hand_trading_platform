@@ -319,8 +319,6 @@ CREATE TABLE IF NOT EXISTS `comments` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='评论表';
 
 
--- ... existing code ...
-
 -- 19. 创建触发器：当插入新用户时自动创建钱包记录
 DELIMITER //
 CREATE TRIGGER `tr_create_wallet_after_user_insert`
