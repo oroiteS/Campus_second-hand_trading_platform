@@ -35,7 +35,7 @@ func main() {
 	cfg := config.Load()
 
 	// 初始化数据库连接
-	db, err := database.InitMySQL(cfg.MySQL)
+	db, err := database.InitMySQL(&cfg.MySQL)
 	if err != nil {
 		log.Fatal("Failed to connect to MySQL:", err)
 	}
