@@ -101,13 +101,7 @@
                   下架
                 </button>
               </div>
-              <button 
-                class="profile-delete-btn" 
-                @click.stop="deleteProduct(product)"
-                title="删除商品"
-              >
-                🗑️
-              </button>
+              <!-- 删除按钮已移除 -->
             </div>
           </div>
         </div>
