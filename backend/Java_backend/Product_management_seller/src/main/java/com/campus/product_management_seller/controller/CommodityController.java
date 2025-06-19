@@ -6,7 +6,9 @@ import com.campus.product_management_seller.dto.CommodityStatusUpdateRequest;
 import com.campus.product_management_seller.dto.CommodityCreateRequest;
 import com.campus.product_management_seller.dto.CommodityUpdateRequest;
 import com.campus.product_management_seller.service.CommodityService;
+import com.campus.product_management_seller.service.TagService;
 import com.campus.product_management_seller.entity.Commodity;
+import com.campus.product_management_seller.dto.TagDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -39,6 +41,9 @@ public class CommodityController {
     
     @Autowired
     private CommodityService commodityService;
+    
+    @Autowired
+    private TagService tagService;
     
     /**
      * 创建并上架商品接口
@@ -483,6 +488,50 @@ public class CommodityController {
         } catch (Exception e) {
             logger.error("获取商品详情异常: commodityId={}, sellerId={}, error={}", 
                         commodityId, sellerId, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("服务器内部错误: " + e.getMessage(), "INTERNAL_ERROR"));
+        }
+    }
+    
+    /**
+     * 根据分类ID获取标签列表
+     * @param categoryId 分类ID
+     * @return 标签列表
+     */
+    @GetMapping("/tags")
+    @Operation(summary = "根据分类ID获取标签列表", description = "根据输入的category_id，返回tags表的TID和tag_Name")
+    public ResponseEntity<ApiResponse<List<TagDTO>>> getTagsByCategoryId(
+            @Parameter(description = "分类ID", required = true)
+            @RequestParam("category_id") Integer categoryId) {
+        
+        logger.info("收到获取标签列表请求: categoryId={}", categoryId);
+        
+        try {
+            // 参数验证
+            if (categoryId == null) {
+                logger.warn("分类ID不能为空");
+                return ResponseEntity.badRequest()
+                        .body(ApiResponse.error("分类ID不能为空", "CATEGORY_ID_REQUIRED"));
+            }
+            
+            if (categoryId <= 0) {
+                logger.warn("分类ID必须大于0: categoryId={}", categoryId);
+                return ResponseEntity.badRequest()
+                        .body(ApiResponse.error("分类ID必须大于0", "INVALID_CATEGORY_ID"));
+            }
+            
+            // 调用服务层获取标签列表
+            List<TagDTO> tags = tagService.getTagsByCategoryId(categoryId);
+            
+            logger.info("获取标签列表成功: categoryId={}, 标签数量={}", categoryId, tags.size());
+            return ResponseEntity.ok(ApiResponse.success("获取标签列表成功", tags));
+            
+        } catch (IllegalArgumentException e) {
+            logger.warn("参数错误: categoryId={}, error={}", categoryId, e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error(e.getMessage(), "INVALID_PARAMETER"));
+        } catch (Exception e) {
+            logger.error("获取标签列表异常: categoryId={}, error={}", categoryId, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.error("服务器内部错误: " + e.getMessage(), "INTERNAL_ERROR"));
         }
