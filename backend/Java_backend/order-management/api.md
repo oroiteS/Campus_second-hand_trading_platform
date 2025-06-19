@@ -192,7 +192,77 @@
 - **200**: 查询成功
 - **400**: 请求参数错误
 
-### 8. 更新订单状态
+### 8. 分页查询所有订单
+
+**接口**: `POST /api/orders/query/all-paged`
+
+**描述**: 分页查询所有订单，支持按创建时间倒序排列，适用于管理员查看所有订单或用户浏览订单列表
+
+**请求体**:
+```json
+{
+  "page": 1,        // 页码，必填，最小值为1
+  "pageSize": 10    // 每页大小，必填，范围1-100
+}
+```
+
+**响应**:
+- **200**: 查询成功
+- **400**: 请求参数错误
+
+**成功响应示例**:
+```json
+{
+  "success": true,
+  "message": "查询成功",
+  "code": 200,
+  "data": {
+    "orders": [
+      {
+        "orderId": "ORD-20241216-001",
+        "commodityId": "COMM-001",
+        "buyerId": "USER001",
+        "sellerId": "USER002",
+        "orderStatus": "pending_payment",
+        "orderStatusDescription": "待付款",
+        "saleTime": "2024-12-16 10:30:00",
+        "money": 99.99,
+        "saleLocation": "校园咖啡厅",
+        "buyQuantity": 1,
+        "commodityInfo": {
+          "commodityName": "二手教材",
+          "commodityDescription": "高等数学教材"
+        },
+        "buyerInfo": {
+          "buyerName": "张三",
+          "buyerContact": "138****1234"
+        },
+        "sellerInfo": {
+          "sellerName": "李四",
+          "sellerContact": "139****5678"
+        }
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "pageSize": 10,
+      "total": 25,
+      "totalPages": 3,
+      "hasNext": true,
+      "hasPrevious": false
+    }
+  }
+}
+```
+
+**特性说明**:
+- 支持Redis缓存，提高查询性能
+- 订单按创建时间倒序排列（最新的在前）
+- 包含商品信息、买家信息、卖家信息的详细数据
+- 分页信息包含总数、总页数、是否有下一页/上一页等
+- 参数验证：页码最小为1，页面大小范围1-100
+
+### 9. 更新订单状态
 
 **接口**: `POST /api/orders/update-status`
 
@@ -212,7 +282,7 @@
 - **200**: 状态更新成功
 - **400**: 请求参数错误
 
-### 9. 取消订单
+### 10. 取消订单
 
 **接口**: `POST /api/orders/cancel`
 
@@ -244,7 +314,7 @@
 }
 ```
 
-### 10. 获取订单统计
+### 11. 获取订单统计
 
 **接口**: `POST /api/orders/statistics`
 
@@ -293,7 +363,46 @@
   "saleTime": "2024-12-16 10:30:00",     // 交易时间
   "money": 99.99,                        // 交易金额
   "saleLocation": "string",              // 交易地址
-  "buyQuantity": 1                       // 购买数量
+  "buyQuantity": 1,                      // 购买数量
+  "commodityInfo": {                     // 商品信息（仅在分页查询中包含）
+    "commodityName": "string",           // 商品名称
+    "commodityDescription": "string"     // 商品描述
+  },
+  "buyerInfo": {                        // 买家信息（仅在分页查询中包含）
+    "buyerName": "string",              // 买家姓名
+    "buyerContact": "string"             // 买家联系方式
+  },
+  "sellerInfo": {                       // 卖家信息（仅在分页查询中包含）
+    "sellerName": "string",             // 卖家姓名
+    "sellerContact": "string"            // 卖家联系方式
+  }
+}
+```
+
+### PagedOrderResponse (分页订单响应对象)
+
+```json
+{
+  "orders": [                           // 订单列表
+    // OrderResponse 对象数组
+  ],
+  "pagination": {                       // 分页信息
+    "page": 1,                          // 当前页码
+    "pageSize": 10,                     // 每页大小
+    "total": 25,                        // 总记录数
+    "totalPages": 3,                    // 总页数
+    "hasNext": true,                    // 是否有下一页
+    "hasPrevious": false                // 是否有上一页
+  }
+}
+```
+
+### QueryAllOrdersRequest (分页查询请求对象)
+
+```json
+{
+  "page": 1,        // 页码，必填，最小值为1
+  "pageSize": 10    // 每页大小，必填，范围1-100
 }
 ```
 

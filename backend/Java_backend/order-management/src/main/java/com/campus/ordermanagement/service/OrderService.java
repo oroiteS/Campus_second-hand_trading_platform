@@ -4,6 +4,8 @@ import com.campus.ordermanagement.pojo.Order;
 import com.campus.ordermanagement.dto.CreateOrderRequest;
 import com.campus.ordermanagement.dto.OrderResponse;
 import com.campus.ordermanagement.dto.UpdateOrderStatusRequest;
+import com.campus.ordermanagement.dto.QueryAllOrdersRequest;
+import com.campus.ordermanagement.dto.PagedOrderResponse;
 
 import java.util.List;
 import java.util.Optional;
@@ -70,6 +72,14 @@ public interface OrderService {
      * @return 订单列表
      */
     List<OrderResponse> getOrdersByUserId(String userId);
+
+    /**
+     * 分页查询所有订单
+     * 
+     * @param request 分页查询请求
+     * @return 分页查询结果
+     */
+    PagedOrderResponse getAllOrdersPaged(QueryAllOrdersRequest request);
 
     /**
      * 更新订单状态

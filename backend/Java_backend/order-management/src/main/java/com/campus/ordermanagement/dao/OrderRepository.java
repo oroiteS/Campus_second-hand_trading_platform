@@ -97,6 +97,24 @@ public interface OrderRepository extends BaseMapper<Order> {
                                @Param("endTime") LocalDateTime endTime);
 
     /**
+     * 分页查询所有订单
+     * 
+     * @param offset 偏移量
+     * @param limit 限制数量
+     * @return 订单列表
+     */
+    @Select("SELECT * FROM orders ORDER BY Sale_time DESC LIMIT #{limit} OFFSET #{offset}")
+    List<Order> findAllOrdersPaged(@Param("offset") int offset, @Param("limit") int limit);
+
+    /**
+     * 统计订单总数
+     * 
+     * @return 订单总数
+     */
+    @Select("SELECT COUNT(*) FROM orders")
+    long countAllOrders();
+
+    /**
      * 根据买家ID和时间范围查找订单列表
      * 
      * @param buyerId 买家ID
