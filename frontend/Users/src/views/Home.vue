@@ -203,11 +203,7 @@ export default {
         { id: 7, name: '美妆护肤', icon: '💄' },
         { id: 8, name: '其他物品', icon: '📦' }
       ],
-      notices: [
-        { id: 1, text: '新用户注册送积分', date: '12-20' },
-        { id: 2, text: '期末教材回收活动', date: '12-18' },
-        { id: 3, text: '诚信交易倡议书', date: '12-15' }
-      ],
+      notices: [],
       recommendedProducts: [],
       isLoadingHotProducts: false,
       // 将newProducts改为从API获取
