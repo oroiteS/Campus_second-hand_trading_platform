@@ -246,10 +246,10 @@ CREATE TABLE IF NOT EXISTS `announcements` (
 
 -- 16. 创建申诉表
 CREATE TABLE IF NOT EXISTS `appeals` (
-    `Argument_Id` VARCHAR(10) NOT NULL PRIMARY KEY COMMENT '申诉ID，主键',
-    `Argue1_id` CHAR(9) NOT NULL COMMENT '外键指向Root表的User_ID，申诉发起者',
-    `Argue2_id` CHAR(9) NOT NULL COMMENT '外键指向Root表的User_ID，被申诉者',
-    `order_id` CHAR(36) NOT NULL COMMENT 'UUID v7，作为外键指向orders表',
+    `Argument_Id` CHAR(36) NOT NULL PRIMARY KEY COMMENT 'UUID v7，申诉ID，主键',
+    `Argue1_id` CHAR(9) NOT NULL COMMENT '外键指向user表的User_ID，申诉发起者',
+    `Argue2_id` CHAR(9) COMMENT '外键指向user表的User_ID，被申诉者，可以为空',
+    `order_id` CHAR(36) COMMENT 'UUID v7，作为外键指向orders表，可以为空',
     `Reason` TEXT NOT NULL COMMENT '申诉理由',
     `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '申诉发起（创建）时间',
     `Root_id` CHAR(9) DEFAULT NULL COMMENT '外键指向Root表',
