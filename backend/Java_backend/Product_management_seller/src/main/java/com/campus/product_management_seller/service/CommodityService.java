@@ -270,6 +270,32 @@ public class CommodityService {
     }
     
     /**
+     * 标记商品为已售
+     * @param commodityId 商品ID
+     * @param sellerId 卖家ID
+     * @return 是否成功
+     */
+    public boolean markAsSold(String commodityId, String sellerId) {
+        logger.info("尝试标记商品为已售: commodityId={}, sellerId={}", commodityId, sellerId);
+        
+        try {
+            int updatedRows = commodityRepository.updateCommodityStatus(
+                commodityId, sellerId, Commodity.CommodityStatus.SOLD);
+            
+            if (updatedRows > 0) {
+                logger.info("商品标记为已售成功: commodityId={}, sellerId={}", commodityId, sellerId);
+                return true;
+            } else {
+                logger.warn("商品标记为已售失败，未找到对应商品: commodityId={}, sellerId={}", commodityId, sellerId);
+                return false;
+            }
+        } catch (Exception e) {
+            logger.error("商品标记为已售异常: commodityId={}, sellerId={}, error={}", commodityId, sellerId, e.getMessage(), e);
+            throw new RuntimeException("商品标记为已售失败: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
      * 更新商品信息（名称、价格、新旧度）
      * @param request 商品更新请求
      * @return 是否更新成功

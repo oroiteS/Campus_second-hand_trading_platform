@@ -268,6 +268,51 @@ public class CommodityController {
     }
     
     /**
+     * 标记商品为已售
+     * @param request 商品状态更新请求（包含商品ID和卖家ID）
+     * @param bindingResult 验证结果
+     * @return 响应结果
+     */
+    @PostMapping("/mark-as-sold")
+    public ResponseEntity<ApiResponse<Void>> markAsSold(
+            @Valid @RequestBody CommodityStatusUpdateRequest request,
+            BindingResult bindingResult) {
+        
+        logger.info("收到标记商品为已售请求: commodityId={}, sellerId={}", 
+                   request.getCommodityId(), request.getSellerId());
+        
+        // 参数验证
+        if (bindingResult.hasErrors()) {
+            String errorMessage = bindingResult.getFieldErrors().get(0).getDefaultMessage();
+            logger.warn("标记商品为已售参数验证失败: {}", errorMessage);
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("参数验证失败: " + errorMessage, "VALIDATION_ERROR"));
+        }
+        
+        try {
+            boolean success = commodityService.markAsSold(
+                request.getCommodityId(), 
+                request.getSellerId()
+            );
+            
+            if (success) {
+                logger.info("商品标记为已售成功: commodityId={}, sellerId={}", 
+                           request.getCommodityId(), request.getSellerId());
+                return ResponseEntity.ok(ApiResponse.success("商品已标记为已售"));
+            } else {
+                logger.warn("商品标记为已售失败，商品不存在或无权限: commodityId={}, sellerId={}", 
+                           request.getCommodityId(), request.getSellerId());
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(ApiResponse.error("商品不存在或您无权限操作此商品", "COMMODITY_NOT_FOUND"));
+            }
+        } catch (Exception e) {
+            logger.error("商品标记为已售异常: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("服务器内部错误: " + e.getMessage(), "INTERNAL_ERROR"));
+        }
+    }
+    
+    /**
      * 更新商品信息（名称、描述、价格、新旧度）
      * @param request 更新请求
      * @param bindingResult 验证结果

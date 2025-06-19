@@ -188,8 +188,41 @@ src/main/java/com/example/product_management_seller/
 ### 业务逻辑
 1. **上架**: 系统自动将 `commodity_status` 设置为 `on_sale`
 2. **下架**: 系统自动将 `commodity_status` 设置为 `off_sale`
-3. **修改描述**: 更新 `commodity_description` 字段
-4. **权限控制**: 只能操作属于自己的商品 (通过 `seller_id` 验证)
+3. **已售**: 系统自动将 `commodity_status` 设置为 `sold`
+4. **修改描述**: 更新 `commodity_description` 字段
+5. **权限控制**: 只能操作属于自己的商品 (通过 `seller_id` 验证)
+
+### 商品状态管理
+
+#### 上架商品
+```bash
+curl -X POST http://localhost:8084/api/commodity/put-on-sale \
+  -H "Content-Type: application/json" \
+  -d '{
+    "commodityId": "your-commodity-id",
+    "sellerId": "your-seller-id"
+  }'
+```
+
+#### 下架商品
+```bash
+curl -X POST http://localhost:8084/api/commodity/put-off-sale \
+  -H "Content-Type: application/json" \
+  -d '{
+    "commodityId": "your-commodity-id",
+    "sellerId": "your-seller-id"
+  }'
+```
+
+#### 标记商品为已售
+```bash
+curl -X POST http://localhost:8084/api/commodity/mark-as-sold \
+  -H "Content-Type: application/json" \
+  -d '{
+    "commodityId": "your-commodity-id",
+    "sellerId": "your-seller-id"
+  }'
+```
 
 ### 日志配置
 项目配置了详细的日志记录，包括：

@@ -210,6 +210,36 @@ http://localhost:8084/swagger-ui.html
 }
 ```
 
+#### 3.1. 标记商品为已售
+
+- **URL**: `/api/commodity/mark-as-sold`
+- **方法**: `POST`
+- **描述**: 将商品状态设置为 `sold`（已售）。
+- **Content-Type**: `application/json`
+
+**请求参数**:
+
+```json
+{
+  "commodityId": "string",
+  "sellerId": "string"
+}
+```
+
+| 参数名      | 类型   | 必填 | 描述     | 验证规则 |
+|-------------|--------|------|----------|----------|
+| commodityId | string | 是   | 商品ID   | 不能为空 |
+| sellerId    | string | 是   | 卖家ID   | 不能为空 |
+
+**响应示例**:
+
+```json
+{
+  "success": true,
+  "message": "商品已标记为已售"
+}
+```
+
 #### 4. 更新商品信息
 
 - **URL**: `/api/commodity/update-info`
@@ -594,7 +624,15 @@ mvn verify
 
 ### v0.0.1-SNAPSHOT (2024年12月)
 
-#### 最新更新：商品上架下架接口简化
+#### 最新更新：新增商品已售状态管理
+- **新增功能**: 添加商品标记为已售接口 `POST /api/commodity/mark-as-sold`
+- **功能描述**: 将商品状态设置为 `sold`（已售）
+- **参数要求**: 只需要传入 `commodityId` 和 `sellerId`
+- **实现层级**: Service层新增 `markAsSold` 方法，Controller层新增对应接口
+- **复用设计**: 使用现有的 `CommodityStatusUpdateRequest` DTO和数据库方法
+- **优势**: 提供完整的商品状态管理功能，支持上架、下架、已售三种状态操作
+
+#### 商品上架下架接口简化
 - **修改内容**: 简化商品上架和下架接口，移除 `status` 参数
 - **影响范围**: 
   - 接口参数：只需要传入 `commodityId` 和 `sellerId`
