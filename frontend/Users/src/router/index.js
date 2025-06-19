@@ -69,8 +69,14 @@ const routes = [
     name: 'NoticeDetail',
     component: NoticeDetail
   },
-  {    path: '/chat-list/:userId',
+  {
+    path: '/chat-list/:userId',
     name: 'ChatList',
+    component: () => import('../views/ChatList.vue')
+  },
+  {
+    path: '/chat-list',
+    name: 'ChatListQuery',
     component: () => import('../views/ChatList.vue')
   },
   {
