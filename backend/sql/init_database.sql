@@ -1,11 +1,10 @@
 -- 校园二手交易平台数据库初始化脚本
 -- 包含数据库创建、用户创建和表创建的完整流程
 
-
--- 4. 使用数据库
+-- 1. 使用数据库
 USE campus;
 
--- 5. 创建用户表
+-- 2. 创建用户表
 CREATE TABLE IF NOT EXISTS `users` (
     `User_ID` CHAR(9) NOT NULL PRIMARY KEY COMMENT '主键，用户ID',
     `User_name` VARCHAR(20) NOT NULL COMMENT '存储用户名',
@@ -33,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户表';
 
--- 6. 创建商品类别表
+-- 3. 创建商品类别表
 CREATE TABLE IF NOT EXISTS `categories` (
     `category_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '商品类别ID，主键',
     `category` VARCHAR(64) NOT NULL COMMENT '存储商品具体类别',
@@ -46,7 +45,7 @@ CREATE TABLE IF NOT EXISTS `categories` (
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='商品类别表';
 
--- 创建商品表
+-- 4. 创建商品表
 CREATE TABLE IF NOT EXISTS `commodities` (
     `commodity_id` CHAR(36) NOT NULL PRIMARY KEY COMMENT '商品唯一标识符（UUIDv7）',
     `commodity_name` VARCHAR(100) NOT NULL COMMENT '商品标题（如"苹果iPhone 13"）',
@@ -90,7 +89,7 @@ CREATE TABLE IF NOT EXISTS `commodities` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='商品表';
 
 
--- 9. 创建订单表
+-- 5. 创建订单表
 CREATE TABLE IF NOT EXISTS `orders` (
     `order_id` CHAR(36) NOT NULL PRIMARY KEY COMMENT 'uuidv7，主键，订单ID',
     `commodity_id` CHAR(36) NOT NULL COMMENT '外键，与商品表关联',
@@ -125,7 +124,7 @@ CREATE TABLE IF NOT EXISTS `orders` (
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='订单表';
 
--- 10. 创建钱包表
+-- 6. 创建钱包表
 CREATE TABLE IF NOT EXISTS `wallet` (
     `User_ID` CHAR(9) NOT NULL PRIMARY KEY COMMENT '主键/外键，用户ID',
     `money` DECIMAL(10,2) NOT NULL DEFAULT 0.00 COMMENT '用户余额（默认为0）',
@@ -143,7 +142,7 @@ CREATE TABLE IF NOT EXISTS `wallet` (
     CONSTRAINT `chk_money_positive` CHECK (`money` >= 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='钱包表';
 
--- 11. 聊天会话表
+-- 7. 聊天会话表
 CREATE TABLE IF NOT EXISTS `chat_sessions` (
     `session_id` CHAR(36) NOT NULL PRIMARY KEY COMMENT '会话ID（UUID）',
     `first_id` CHAR(9) NOT NULL COMMENT '第一个用户ID',
@@ -169,7 +168,7 @@ CREATE TABLE IF NOT EXISTS `chat_sessions` (
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='聊天会话表';
 
--- 12. 聊天消息表
+-- 8. 聊天消息表
 CREATE TABLE IF NOT EXISTS `chat_messages` (
     `message_id` CHAR(36) NOT NULL PRIMARY KEY COMMENT '消息ID（UUID）',
     `session_id` CHAR(36) NOT NULL COMMENT '会话ID',
@@ -201,7 +200,7 @@ CREATE TABLE IF NOT EXISTS `chat_messages` (
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='聊天消息表';
 
--- 13. 创建购物车表
+-- 9. 创建购物车表
 CREATE TABLE IF NOT EXISTS `cart` (
     `Cart_ID` VARCHAR(10) NOT NULL PRIMARY KEY COMMENT '主键',
     `User_ID` CHAR(9) NOT NULL COMMENT '外键指向users表',
@@ -219,14 +218,14 @@ CREATE TABLE IF NOT EXISTS `cart` (
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='购物车表';
 
--- 14. 创建管理员表
+-- 10. 创建管理员表
 CREATE TABLE IF NOT EXISTS `Root` (
     `Root_id` CHAR(9) NOT NULL PRIMARY KEY COMMENT '主键',
     `password` VARCHAR(64) NOT NULL COMMENT 'sha256'
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='管理员表';
 
--- 15. 创建公告表
+-- 11. 创建公告表
 CREATE TABLE IF NOT EXISTS `announcements` (
     `Announcement_Id` VARCHAR(10) NOT NULL PRIMARY KEY COMMENT '公告ID，主键',
     `Root_id` CHAR(9) NOT NULL COMMENT '外键指向Root表',
@@ -244,7 +243,7 @@ CREATE TABLE IF NOT EXISTS `announcements` (
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='公告表';
 
--- 16. 创建申诉表
+-- 12. 创建申诉表
 CREATE TABLE IF NOT EXISTS `appeals` (
     `Argument_Id` CHAR(36) NOT NULL PRIMARY KEY COMMENT 'UUID v7，申诉ID，主键',
     `Argue1_id` CHAR(9) NOT NULL COMMENT '外键指向user表的User_ID，申诉发起者',
@@ -270,7 +269,7 @@ CREATE TABLE IF NOT EXISTS `appeals` (
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='申诉表';
 
--- 17. 创建特征表
+-- 13. 创建特征表
 CREATE TABLE IF NOT EXISTS `tags` (
     `TID` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
     `category_id` INT UNSIGNED NOT NULL COMMENT '外键指向categories',
@@ -285,7 +284,7 @@ CREATE TABLE IF NOT EXISTS `tags` (
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='特征表';
 
--- 18. 创建评论表
+-- 14. 创建评论表
 CREATE TABLE IF NOT EXISTS `comments` (
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '评论ID，主键',
     `message_id` CHAR(36) NOT NULL COMMENT '消息ID（UUID）',
@@ -319,7 +318,7 @@ CREATE TABLE IF NOT EXISTS `comments` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='评论表';
 
 
--- 19. 创建触发器：当插入新用户时自动创建钱包记录
+-- 15. 创建触发器：当插入新用户时自动创建钱包记录
 DELIMITER //
 CREATE TRIGGER `tr_create_wallet_after_user_insert`
 AFTER INSERT ON `users`
