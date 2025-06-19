@@ -62,9 +62,9 @@
         <!-- 校园公告 -->
         <div class="home-notice-board">
           <h3 class="home-notice-title">📢 校园公告</h3>
-          <div class="home-notice-item" v-for="notice in notices" :key="notice.id" @click="goToNoticeDetail(notice.id)">
-            <span class="home-notice-text">{{ notice.text }}</span>
-            <span class="home-notice-date">{{ notice.date }}</span>
+          <div class="home-notice-item" v-for="notice in notices" :key="notice.announcementId" @click="goToNoticeDetail(notice.announcementId)">
+            <span class="home-notice-text">{{ notice.content.substring(0, 10) }}{{ notice.content.length > 10 ? '...' : '' }}</span>
+            <span class="home-notice-date">{{ new Date(notice.createdAt).toLocaleDateString().substring(5) }}</span>
           </div>
         </div>
       </aside>
@@ -199,11 +199,7 @@ export default {
         { id: 7, name: '美妆护肤', icon: '💄' },
         { id: 8, name: '其他物品', icon: '📦' }
       ],
-      notices: [
-        { id: 1, text: '新用户注册送积分', date: '12-20' },
-        { id: 2, text: '期末教材回收活动', date: '12-18' },
-        { id: 3, text: '诚信交易倡议书', date: '12-15' }
-      ],
+      notices: [],
       hotProducts: [
         {
           id: 1,
@@ -271,6 +267,8 @@ export default {
     this.checkLoginStatus();
     // 自动加载最新商品数据
     await this.loadLatestProducts();
+    // 获取校园公告
+    await this.fetchAnnouncements();
     // 添加存储监听器，当localStorage发生变化时更新状态
     window.addEventListener('storage', this.handleStorageChange);
   },
@@ -442,7 +440,24 @@ export default {
     },
     // 跳转到公告详情页面
     goToNoticeDetail(noticeId) {
-      this.$router.push(`/notice/${noticeId}`);
+      // 找到对应的公告对象
+      const notice = this.notices.find(item => item.announcementId === noticeId);
+      
+      if (notice) {
+        // 使用query参数传递公告信息
+        this.$router.push({
+          path: '/notice',
+          query: {
+            id: notice.announcementId,
+            content: notice.content,
+            createdAt: notice.createdAt,
+            rootName:'平台管理员'
+          }
+        });
+      } else {
+        console.error('未找到对应的公告信息');
+        this.$router.push('/notice?error=notfound');
+      }
     },
     showNotifications() {
       // 获取当前用户ID
@@ -584,6 +599,32 @@ export default {
      */
     async refreshLatestProducts() {
       await this.loadLatestProducts();
+    },
+    
+    /**
+     * 获取校园公告
+     * @param {Number} n - 获取公告的数量，默认为5
+     * @param {String} rootId - 可选的管理员ID过滤
+     */
+    async fetchAnnouncements(n = 5, rootId = null) {
+      try {
+        const params = { n };
+        
+        // 如果提供了rootId，则添加到请求参数中
+        if (rootId) {
+          params.rootId = rootId;
+        }
+        
+        const response = await axios.get('http://localhost:8092/api/announcements', { params });
+        
+        // 过滤公告，只显示visibleStatus为false的公告
+        this.notices = response.data.filter(announcement => announcement.visibleStatus === true);
+        console.log('获取校园公告成功:', this.notices);
+      } catch (error) {
+        console.error('获取校园公告失败:', error);
+        // 使用空数组作为后备
+        this.notices = [];
+      }
     }
   }
 }

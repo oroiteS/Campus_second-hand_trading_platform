@@ -12,7 +12,6 @@ import PublishProduct from '../views/PublishProduct.vue'
 import NoticeDetail from '../views/NoticeDetail.vue'
 import PasswordReset from '../views/PasswordReset.vue'
 import WalletManagement from '../views/WalletManagement.vue'
-import SellerProfile from '../views/SellerProfile.vue'
 
 const routes = [
   {
@@ -66,7 +65,7 @@ const routes = [
     component: PublishProduct
   },
   {
-    path: '/notice/:id',
+    path: '/notice',
     name: 'NoticeDetail',
     component: NoticeDetail
   },
@@ -83,11 +82,6 @@ const routes = [
     path: '/wallet',
     name: 'WalletManagement',
     component: WalletManagement
-  },
-  {
-    path: '/sellerprofile/:sellerId',
-    name: 'SellerProfile',
-    component: SellerProfile
   }
 ]
 

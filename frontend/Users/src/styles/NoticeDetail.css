@@ -75,7 +75,7 @@
   
   .notice-meta {
     display: flex;
-    gap: 20px;
+    justify-content: space-between;
     color: #666;
     font-size: 14px;
   }
