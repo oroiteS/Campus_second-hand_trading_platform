@@ -338,6 +338,12 @@
     margin-bottom: 30px;
     background: linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%);
     box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+  }
+  
+  .seller-section:hover {
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
   }
   
   .seller-header {
@@ -345,6 +351,14 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 15px;
+    transition: all 0.3s ease;
+  }
+  
+  .seller-header:hover {
+    background-color: rgba(102, 126, 234, 0.1);
+    border-radius: 8px;
+    padding: 8px;
+    margin: -8px -8px 7px -8px;
   }
   
   .seller-header h3 {
@@ -367,6 +381,14 @@
     display: flex;
     align-items: center;
     gap: 15px;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    padding: 8px;
+    margin: -8px;
+  }
+  
+  .seller-info:hover {
+    background-color: rgba(102, 126, 234, 0.1);
   }
   
   .seller-avatar {
@@ -855,6 +877,69 @@
       font-size: 11px;
       padding: 2px 6px;
     }
+  
+  /* 加载状态样式 */
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    text-align: center;
+  }
+  
+  .loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #ff6b35;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  /* 错误状态样式 */
+  .error-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    text-align: center;
+    padding: 40px;
+  }
+  
+  .error-icon {
+    font-size: 48px;
+    margin-bottom: 20px;
+  }
+  
+  .error-message {
+    font-size: 18px;
+    color: #666;
+    margin-bottom: 30px;
+    max-width: 400px;
+  }
+  
+  .error-container .back-btn {
+    background: #ff6b35;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .error-container .back-btn:hover {
+    background: #e55a2b;
+  }
   
   /* 编辑按钮样式 */
   .edit-btn {

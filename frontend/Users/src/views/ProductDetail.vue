@@ -13,8 +13,21 @@
       </div>
     </header>
 
-    <div class="detail-container">
-      <!-- 左侧：商品图片 -->
+    <!-- 加载状态 -->
+    <div v-if="loading" class="loading-container">
+      <div class="loading-spinner"></div>
+      <p>正在加载商品详情...</p>
+    </div>
+
+    <!-- 错误状态 -->
+    <div v-else-if="error" class="error-container">
+      <div class="error-icon">⚠️</div>
+      <p class="error-message">{{ error }}</p>
+      <button @click="goBack" class="back-btn">返回上一页</button>
+    </div>
+
+    <!-- 商品详情内容 -->
+    <div v-else class="detail-container">
       <div class="product-images">
         <div class="main-image">
           <img :src="currentImage" :alt="product.name" class="main-img" />
@@ -40,17 +53,18 @@
             <span class="currency">¥</span>
             <span class="price">{{ product.price }}</span>
           </div>
-          <div class="price-original" v-if="product.originalPrice">
+          <!-- 删除原价显示部分 -->
+          <!-- <div class="price-original" v-if="product.originalPrice">
             原价：¥{{ product.originalPrice }}
-          </div>
+          </div> -->
         </div>
 
         <h2 class="product-title">{{ product.name }}</h2>
         
-        <!-- 商品描述 -->
-        <div class="product-description">
+        <!-- 删除商品描述部分 -->
+        <!-- <div class="product-description">
           <p>{{ product.description }}</p>
-        </div>
+        </div> -->
 
         <!-- 商品详细信息 -->
         <div class="product-details">
@@ -58,39 +72,49 @@
             <span class="label">成色：</span>
             <span class="value condition">{{ product.condition }}</span>
           </div>
-          <div class="detail-item">
+          <!-- 删除品牌字段 -->
+          <!-- <div class="detail-item">
             <span class="label">品牌：</span>
             <span class="value">{{ product.brand }}</span>
-          </div>
-          <div class="detail-item">
+          </div> -->
+          <!-- 删除交易地点字段 -->
+          <!-- <div class="detail-item">
             <span class="label">交易地点：</span>
             <span class="value location">📍 {{ product.location }}</span>
-          </div>
+          </div> -->
           <div class="detail-item">
             <span class="label">发布时间：</span>
             <span class="value">{{ product.publishTime }}</span>
           </div>
           <div class="detail-item">
+            <span class="label">商品数量：</span>
+            <span class="value">{{ product.quantity }} 件</span>
+          </div>
+          <!-- 删除以下浏览次数相关代码 -->
+          <!-- <div class="detail-item">
             <span class="label">浏览次数：</span>
             <span class="value">{{ product.viewCount }} 次</span>
-          </div>
+          </div> -->
         </div>
 
         <!-- 卖家信息 -->
         <div class="seller-section">
-          <div class="seller-header">
+          <div class="seller-header" @click="viewSellerProfile" style="cursor: pointer;">
             <h3>卖家信息</h3>
-            <span class="seller-badge">{{ product.seller.badge }}</span>
+            <!-- 删除卖家徽章 -->
+            <!-- <span class="seller-badge">{{ product.seller.badge }}</span> -->
           </div>
-          <div class="seller-info">
+          <div class="seller-info" @click="viewSellerProfile" style="cursor: pointer;">
             <img :src="product.seller.avatar" class="seller-avatar" />
             <div class="seller-details">
               <div class="seller-name">{{ product.seller.name }}</div>
-              <div class="seller-school">{{ product.seller.school }}</div>
-              <div class="seller-stats">
+              <!-- 删除学院信息 -->
+              <!-- <div class="seller-school">{{ product.seller.school }}</div> -->
+              <!-- 删除信用评分和成交次数 -->
+              <!-- <div class="seller-stats">
                 <span>信用评分：{{ product.seller.creditScore }}</span>
                 <span>成交：{{ product.seller.dealCount }}笔</span>
-              </div>
+              </div> -->
             </div>
           </div>
         </div>
@@ -286,6 +310,10 @@
             </div>
           </div>
           <div class="form-group">
+            <label>商品数量</label>
+            <input v-model="editingProduct.quantity" type="number" class="form-input" placeholder="请输入商品数量" min="1">
+          </div>
+          <div class="form-group">
             <label>商品描述</label>
             <textarea v-model="editingProduct.description" class="form-textarea" placeholder="请输入商品描述"></textarea>
           </div>
@@ -324,15 +352,19 @@
 </template>
 
 <script>
+import { getCommodityDetail, transformCommodityDetailData } from '@/api/commodity'
+
 export default {
   name: 'ProductDetail',
   data() {
     return {
       currentImageIndex: 0,
       isFavorited: false,
-      isEditable: false, // 是否可编辑
-      showEditModal: false, // 是否显示编辑弹窗
-      editingProduct: {}, // 编辑中的商品信息
+      isEditable: false,
+      showEditModal: false,
+      editingProduct: {},
+      loading: true, // 添加加载状态
+      error: null, // 添加错误状态
       // 评论相关数据
       newComment: '',
       replyContent: '',
@@ -392,35 +424,22 @@ export default {
         }
       ],
       product: {
-        id: 1,
-        name: 'JOYO JAM BUDDY电吉他音箱效果器',
-        price: 350,
-        originalPrice: 500,
-        condition: '9成新',
-        brand: 'JOYO',
-        location: '东校区宿舍',
-        publishTime: '2024年11月14日',
-        viewCount: 128,
-        description: 'JOYO JAM BUDDY电吉他音箱效果器，这个小巧的设备是卓越的爆款产品，适合练琴和演出',
-        detailDescription: [
-          '功能正常，九五新，配9v电源，原厂包装都在，标价就是卖价，不议价，议价不回复......',
-          '需要直接拍了发出......邮费到付，签收不退！',
-          '这是一款非常适合初学者和专业音乐人的便携式音箱效果器，音质清晰，功能齐全。'
-        ],
-        images: [
-          '/测试图片.jpg',
-          'https://via.placeholder.com/400x300/FF6B35/FFFFFF?text=图片2',
-          'https://via.placeholder.com/400x300/4CAF50/FFFFFF?text=图片3',
-          'https://via.placeholder.com/400x300/2196F3/FFFFFF?text=图片4',
-          'https://via.placeholder.com/400x300/9C27B0/FFFFFF?text=图片5'
-        ],
+        // 初始化为空对象，将通过API获取
+        id: '',
+        name: '',
+        price: 0,
+        condition: '',
+        publishTime: '',
+        quantity: 1,
+        description: '',
+        detailDescription: [],
+        images: ['/测试图片.jpg'],
+        status: '',
+        sellerId: '',
         seller: {
-          name: '江城空空的铺子',
-          school: '音乐学院',
-          avatar: 'https://via.placeholder.com/60x60/4CAF50/FFFFFF?text=江',
-          badge: '几乎全新',
-          creditScore: '98%',
-          dealCount: 47
+          id: '',
+          name: '',
+          avatar: ''
         }
       },
       relatedProducts: [
@@ -453,21 +472,54 @@ export default {
   },
   computed: {
     currentImage() {
-      return this.product.images[this.currentImageIndex]
+      return this.product.images && this.product.images.length > 0 ? 
+        this.product.images[this.currentImageIndex] : '/测试图片.jpg'
     }
   },
-  mounted() {
-    // 根据路由参数获取商品ID，实际项目中这里会调用API获取商品详情
+  async mounted() {
+    // 获取路由参数中的商品ID
     const productId = this.$route.params.id
     console.log('商品ID:', productId)
     
-    // 检查是否从个人资料页面进入，决定是否显示编辑功能
+    // 检查是否从个人资料页面进入
     this.isEditable = this.$route.query.from === 'profile' && this.$route.query.editable === 'true'
-    console.log('是否可编辑:', this.isEditable)
     
-    // this.fetchProductDetail(productId)
+    // 获取商品详情
+    if (productId) {
+      await this.fetchProductDetail(productId)
+    } else {
+      this.error = '商品ID不存在'
+      this.loading = false
+    }
   },
   methods: {
+    // 添加获取商品详情的方法
+    async fetchProductDetail(commodityId) {
+      try {
+        this.loading = true
+        this.error = null
+        
+        // 调用API获取商品详情
+        const commodityData = await getCommodityDetail(commodityId)
+        
+        // 转换数据格式（现在是异步的）
+        this.product = await transformCommodityDetailData(commodityData)
+        
+        console.log('获取到的商品详情:', this.product)
+        
+      } catch (error) {
+        console.error('获取商品详情失败:', error)
+        this.error = error.message || '获取商品详情失败'
+        
+        // 如果是404错误，显示商品不存在
+        if (error.message.includes('404')) {
+          this.error = '商品不存在或已被删除'
+        }
+      } finally {
+        this.loading = false
+      }
+    },
+    
     goBack() {
       this.$router.go(-1); // 返回上一页
     },
@@ -475,13 +527,29 @@ export default {
       this.currentImageIndex = index
     },
     contactSeller() {
-      // 获取从Home.vue传递过来的userId
-      const userId = this.$route.query.userId;
+      // 获取当前用户ID
+      const userId = localStorage.getItem('userId');
       
-      // 跳转到聊天列表页面，使用路径参数传递userId
-      this.$router.push({
-        path: `/chat-list/${userId}`,
-      })
+      if (!userId) {
+        // 如果用户未登录，提示登录
+        alert('请先登录后联系卖家');
+        this.$router.push('/login');
+        return;
+      }
+      
+      // 跳转到聊天列表页面
+      this.$router.push(`/chat-list/${userId}`);
+      
+      // 可选：如果需要直接创建与卖家的会话，可以在ChatList页面中处理
+      // 或者可以传递卖家信息作为query参数
+      // this.$router.push({
+      //   path: `/chat-list/${userId}`,
+      //   query: {
+      //     sellerId: this.product.seller.id,
+      //     sellerName: this.product.seller.name,
+      //     productId: this.product.id
+      //   }
+      // });
     },
     buyNow() {
       alert('立即购买功能')
@@ -493,103 +561,6 @@ export default {
     },
     viewProduct(productId) {
       this.$router.push(`/product/${productId}`)
-    },
-    
-    // ... existing code ...
-    
-    // 评论相关方法
-    submitComment() {
-      if (!this.newComment.trim()) return
-      
-      const comment = {
-        id: Date.now(),
-        user: { ...this.currentUser },
-        content: this.newComment.trim(),
-        createTime: new Date(),
-        likeCount: 0,
-        isLiked: false,
-        replies: []
-      }
-      
-      this.comments.unshift(comment)
-      this.newComment = ''
-      
-      // 实际项目中这里会调用API提交评论
-      this.$message?.success('评论发表成功！')
-    },
-    
-    showReplyInput(commentId) {
-      this.replyingTo = this.replyingTo === commentId ? null : commentId
-      this.replyContent = ''
-    },
-    
-    cancelReply() {
-      this.replyingTo = null
-      this.replyContent = ''
-    },
-    
-    submitReply(commentId) {
-      if (!this.replyContent.trim()) return
-      
-      const comment = this.comments.find(c => c.id === commentId)
-      if (!comment) return
-      
-      const reply = {
-        id: Date.now(),
-        user: { ...this.currentUser },
-        content: this.replyContent.trim(),
-        createTime: new Date(),
-        likeCount: 0,
-        isLiked: false,
-        replyTo: {
-          id: comment.user.id,
-          name: comment.user.name
-        }
-      }
-      
-      if (!comment.replies) {
-        comment.replies = []
-      }
-      comment.replies.push(reply)
-      
-      this.cancelReply()
-      
-      // 实际项目中这里会调用API提交回复
-      this.$message?.success('回复发表成功！')
-    },
-    
-    replyToReply(commentId, targetReply) {
-      this.replyingTo = commentId
-      this.replyContent = `@${targetReply.user.name} `
-    },
-    
-    toggleLike(comment) {
-      comment.isLiked = !comment.isLiked
-      comment.likeCount += comment.isLiked ? 1 : -1
-      
-      // 实际项目中这里会调用API
-    },
-    
-    toggleReplyLike(reply) {
-      reply.isLiked = !reply.isLiked
-      reply.likeCount += reply.isLiked ? 1 : -1
-      
-      // 实际项目中这里会调用API
-    },
-    
-    formatTime(time) {
-      const now = new Date()
-      const diff = now - new Date(time)
-      const minutes = Math.floor(diff / 60000)
-      const hours = Math.floor(diff / 3600000)
-      const days = Math.floor(diff / 86400000)
-      
-      if (minutes < 1) return '刚刚'
-      if (minutes < 60) return `${minutes}分钟前`
-      if (hours < 24) return `${hours}小时前`
-      if (days < 7) return `${days}天前`
-      
-      return new Date(time).toLocaleDateString()
     },
     
     // 编辑商品
@@ -624,12 +595,34 @@ export default {
       this.product.condition = this.editingProduct.condition
       this.product.brand = this.editingProduct.brand
       this.product.location = this.editingProduct.location
-      this.product.detailDescription = this.editingProduct.detailDescription.split('\n').filter(p => p.trim())
+      this.product.detailDescription = this.editingProduct.detailDescription.split('\n').filter(line => line.trim())
       
       this.closeEditModal()
       
       // 实际项目中这里会调用API保存到后端
       alert('商品信息已更新！')
+    },
+    
+    // 添加formatTime方法
+    formatTime(time) {
+      const now = new Date()
+      const diff = now - new Date(time)
+      const days = Math.floor(diff / 86400000)
+      
+      if (days === 0) {
+        return '今天 ' + new Date(time).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+      } else if (days === 1) {
+        return '昨天 ' + new Date(time).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+      } else {
+        return new Date(time).toLocaleDateString('zh-CN')
+      }
+    },
+    // 在methods中更新
+    viewSellerProfile() {
+      this.$router.push({
+        path: `/sellerprofile/${this.product.sellerId}`,
+        query: { from: 'productDetail' }
+      });
     }
   }
 }

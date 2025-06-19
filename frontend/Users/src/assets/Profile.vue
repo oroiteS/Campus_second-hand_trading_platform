@@ -267,7 +267,7 @@ export default {
           await this.handleNearbyClick()
           console.log('跳转到附近的人')
           break
-          case 'wallet':
+        case 'wallet':
           // 跳转到钱包管理页面，并传递userId
           console.log('跳转到钱包管理，userId:', this.userId)
           this.$router.push({

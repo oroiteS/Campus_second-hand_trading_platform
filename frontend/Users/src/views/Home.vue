@@ -27,6 +27,12 @@
             <img :src="userInfo.avatar" :alt="userInfo.name + '的头像'" class="home-user-avatar" @click="goToProfile" />
             <div class="home-user-details" @click="goToProfile">
               <span class="home-user-name">{{ userInfo.name }}</span>
+              <span class="home-user-status">{{ userInfo.status }}</span>
+            </div>
+            <!-- 消息通知按钮 -->
+            <div class="home-notification-btn" @click="showNotifications">
+              <span class="notification-icon">🔔</span>
+              <span v-if="unreadCount > 0" class="notification-badge">{{ unreadCount }}</span>
             </div>
             <!-- 悬浮菜单 -->
             <div class="home-user-dropdown">
@@ -47,7 +53,7 @@
       <aside class="home-sidebar">
         <div class="home-category-menu">
           <h3 class="home-category-title">商品分类</h3>
-          <div class="home-category-item" v-for="category in categories" :key="category.id">
+          <div class="home-category-item" v-for="category in categories" :key="category.id" @click="goToCategoryBrowse(category.id)">
             <span class="home-category-icon">{{ category.icon }}</span>
             <span class="home-category-name">{{ category.name }}</span>
           </div>
@@ -119,12 +125,10 @@
                 </div>
                 <div class="home-product-details">
                   <span class="home-product-condition">{{ product.condition }}</span>
-                  <span class="home-product-location">📍 {{ product.location }}</span>
                 </div>
                 <div class="home-seller-info">
                   <img :src="product.sellerAvatar" class="home-seller-avatar" />
                   <span class="home-seller-name">{{ product.sellerName }}</span>
-                  <span class="home-seller-school">{{ product.sellerSchool }}</span>
                 </div>
               </div>
             </div>
@@ -135,9 +139,16 @@
         <section class="home-section">
           <div class="home-section-header">
             <h3 class="home-section-title">🆕 最新发布</h3>
-            <a href="#" class="home-more-link">查看更多 →</a>
+            <a href="#" class="home-more-link" @click="refreshLatestProducts">刷新数据 →</a>
           </div>
-          <div class="home-products-grid">
+          
+          <!-- 加载状态 -->
+          <div v-if="isLoadingNewProducts" class="loading-container">
+            <p>正在加载最新商品...</p>
+          </div>
+          
+          <!-- 商品列表 -->
+          <div v-else class="home-products-grid">
             <div class="home-product-card" v-for="product in newProducts" :key="product.id" @click="goToProductDetail(product.id)">
               <div class="home-product-image-container">
                 <img :src="product.image" :alt="product.name" class="home-product-image" />
@@ -150,12 +161,10 @@
                 </div>
                 <div class="home-product-details">
                   <span class="home-product-condition">{{ product.condition }}</span>
-                  <span class="home-product-location">📍 {{ product.location }}</span>
                 </div>
                 <div class="home-seller-info">
                   <img :src="product.sellerAvatar" class="home-seller-avatar" />
                   <span class="home-seller-name">{{ product.sellerName }}</span>
-                  <span class="home-seller-school">{{ product.sellerSchool }}</span>
                 </div>
               </div>
             </div>
@@ -167,6 +176,8 @@
 </template>
 <script>
 import axios from 'axios';
+// 导入API函数
+import { getLatestCommodities, getAllUsers, transformCommodityData } from '../api/commodity.js';
 
 export default {
   name: 'HomePage',
@@ -245,61 +256,21 @@ export default {
           sellerAvatar: 'https://via.placeholder.com/30x30/E91E63/FFFFFF?text=赵'
         }
       ],
-      newProducts: [
-        {
-          id: 5,
-          name: 'AirPods Pro 2代',
-          price: 1299,
-          condition: '9成新',
-          location: '东校区',
-          image: 'https://via.placeholder.com/200x150/F0F0F0/666666?text=AirPods',
-          timeAgo: '5分钟前',
-          sellerName: '陈同学',
-          sellerSchool: '音乐学院',
-          sellerAvatar: 'https://via.placeholder.com/30x30/9C27B0/FFFFFF?text=陈'
-        },
-        {
-          id: 6,
-          name: '英语四级真题集',
-          price: 15,
-          condition: '8成新',
-          location: '西校区',
-          image: 'https://via.placeholder.com/200x150/F0F0F0/666666?text=四级',
-          timeAgo: '10分钟前',
-          sellerName: '刘同学',
-          sellerSchool: '外语学院',
-          sellerAvatar: 'https://via.placeholder.com/30x30/607D8B/FFFFFF?text=刘'
-        },
-        {
-          id: 7,
-          name: '宿舍小冰箱',
-          price: 299,
-          condition: '9成新',
-          location: '南校区',
-          image: 'https://via.placeholder.com/200x150/F0F0F0/666666?text=冰箱',
-          timeAgo: '15分钟前',
-          sellerName: '周同学',
-          sellerSchool: '生活学院',
-          sellerAvatar: 'https://via.placeholder.com/30x30/795548/FFFFFF?text=周'
-        },
-        {
-          id: 8,
-          name: '篮球鞋 Nike Air',
-          price: 399,
-          condition: '7成新',
-          location: '北校区',
-          image: 'https://via.placeholder.com/200x150/F0F0F0/666666?text=球鞋',
-          timeAgo: '20分钟前',
-          sellerName: '吴同学',
-          sellerSchool: '体育学院',
-          sellerAvatar: 'https://via.placeholder.com/30x30/FF5722/FFFFFF?text=吴'
-        }
-      ]
+      // 将newProducts改为从API获取
+      newProducts: [],
+      // 添加加载状态
+      isLoadingNewProducts: false,
+      // 添加用户数据缓存
+      usersCache: [],
+      usersCacheTime: null // 添加缓存时间戳
     }
   },
-  mounted() {
+  
+  async mounted() {
     // 检查用户登录状态
     this.checkLoginStatus();
+    // 自动加载最新商品数据
+    await this.loadLatestProducts();
     // 添加存储监听器，当localStorage发生变化时更新状态
     window.addEventListener('storage', this.handleStorageChange);
   },
@@ -308,14 +279,22 @@ export default {
     window.removeEventListener('storage', this.handleStorageChange);
   },
   watch: {
-    // 监听路由变化，每次进入页面都检查登录状态
-    '$route'() {
+    // 监听路由变化，每次进入页面都检查登录状态并刷新商品数据
+    async '$route'(to) {
       this.checkLoginStatus();
+      // 如果是从其他页面回到首页，自动刷新最新商品
+      if (to.path === '/' || to.name === 'HomePage') {
+        await this.loadLatestProducts();
+      }
     }
   },
   methods: {
     searchProducts() {
       console.log('搜索:', this.searchQuery)
+    },
+    // 跳转到分类浏览页面
+    goToCategoryBrowse(categoryId) {
+      this.$router.push(`/browse?category=${categoryId}`);
     },
     // 检查登录状态
     checkLoginStatus() {
@@ -432,14 +411,7 @@ export default {
     },
     // 跳转到商品详情页
     goToProductDetail(productId) {
-      // 获取当前用户ID
-      const userId = localStorage.getItem('userId');
-      this.$router.push({
-        path: `/product/${productId}`,
-        query: {
-          userId: userId
-        }
-      });
+      this.$router.push(`/product/${productId}`);
     },
     // 退出登录
     logout() {
@@ -471,6 +443,147 @@ export default {
     // 跳转到公告详情页面
     goToNoticeDetail(noticeId) {
       this.$router.push(`/notice/${noticeId}`);
+    },
+    showNotifications() {
+      // 获取当前用户ID
+      const userId = localStorage.getItem('userId');
+      
+      if (!userId) {
+        // 如果用户未登录，提示登录
+        alert('请先登录后查看消息');
+        this.$router.push('/login');
+        return;
+      }
+      
+      // 跳转到聊天列表页面
+      this.$router.push(`/chat-list/${userId}`);
+      
+      // 可选：清除未读消息数量
+      this.unreadCount = 0;
+    },
+    
+    /**
+     * 加载最新商品数据
+     */
+    async loadLatestProducts() {
+      this.isLoadingNewProducts = true;
+      
+      try {
+        // 并行获取商品数据和用户数据
+        const [commodities, users] = await Promise.all([
+          getLatestCommodities(),
+          this.getUsersData()
+        ]);
+        
+        // 转换数据格式
+        this.newProducts = transformCommodityData(commodities, users);
+        
+        console.log('成功加载最新商品:', this.newProducts);
+        
+      } catch (error) {
+        console.error('加载最新商品失败:', error);
+        
+        // 显示错误提示
+        this.showErrorMessage('加载最新商品失败，请稍后重试');
+        
+        // 使用默认数据作为后备
+        this.newProducts = this.getDefaultNewProducts();
+        
+      } finally {
+        this.isLoadingNewProducts = false;
+      }
+    },
+    
+    /**
+     * 获取用户数据（带缓存）
+     */
+    async getUsersData() {
+      // 如果已有缓存且不超过5分钟，直接使用缓存
+      if (this.usersCache.length > 0 && this.usersCacheTime && 
+          (Date.now() - this.usersCacheTime) < 5 * 60 * 1000) {
+        return this.usersCache;
+      }
+      
+      try {
+        const users = await getAllUsers();
+        this.usersCache = users;
+        this.usersCacheTime = Date.now();
+        return users;
+      } catch (error) {
+        console.warn('获取用户数据失败，使用空数组:', error);
+        return [];
+      }
+    },
+    
+    /**
+     * 显示错误消息
+     */
+    showErrorMessage(message) {
+      // 这里可以使用更好的提示组件，比如Element UI的Message
+      alert(message);
+    },
+    
+    /**
+     * 获取默认的新商品数据（作为后备）
+     */
+    getDefaultNewProducts() {
+      return [
+        {
+          id: 5,
+          name: 'AirPods Pro 2代',
+          price: 1299,
+          condition: '9成新',
+          location: '东校区',
+          image: 'https://via.placeholder.com/200x150/F0F0F0/666666?text=AirPods',
+          timeAgo: '5分钟前',
+          sellerName: '陈同学',
+          sellerSchool: '音乐学院',
+          sellerAvatar: 'https://via.placeholder.com/30x30/9C27B0/FFFFFF?text=陈'
+        },
+        {
+          id: 6,
+          name: '英语四级真题集',
+          price: 15,
+          condition: '8成新',
+          location: '西校区',
+          image: 'https://via.placeholder.com/200x150/F0F0F0/666666?text=四级',
+          timeAgo: '10分钟前',
+          sellerName: '刘同学',
+          sellerSchool: '外语学院',
+          sellerAvatar: 'https://via.placeholder.com/30x30/607D8B/FFFFFF?text=刘'
+        },
+        {
+          id: 7,
+          name: '宿舍小冰箱',
+          price: 299,
+          condition: '9成新',
+          location: '南校区',
+          image: 'https://via.placeholder.com/200x150/F0F0F0/666666?text=冰箱',
+          timeAgo: '15分钟前',
+          sellerName: '周同学',
+          sellerSchool: '生活学院',
+          sellerAvatar: 'https://via.placeholder.com/30x30/795548/FFFFFF?text=周'
+        },
+        {
+          id: 8,
+          name: '篮球鞋 Nike Air',
+          price: 399,
+          condition: '7成新',
+          location: '北校区',
+          image: 'https://via.placeholder.com/200x150/F0F0F0/666666?text=球鞋',
+          timeAgo: '20分钟前',
+          sellerName: '吴同学',
+          sellerSchool: '体育学院',
+          sellerAvatar: 'https://via.placeholder.com/30x30/FF5722/FFFFFF?text=吴'
+        }
+      ];
+    },
+    
+    /**
+     * 刷新最新商品数据
+     */
+    async refreshLatestProducts() {
+      await this.loadLatestProducts();
     }
   }
 }

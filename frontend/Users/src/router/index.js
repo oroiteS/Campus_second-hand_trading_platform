@@ -12,7 +12,7 @@ import PublishProduct from '../views/PublishProduct.vue'
 import NoticeDetail from '../views/NoticeDetail.vue'
 import PasswordReset from '../views/PasswordReset.vue'
 import WalletManagement from '../views/WalletManagement.vue'
-import ChatList from '../views/ChatList.vue'
+import SellerProfile from '../views/SellerProfile.vue'
 
 const routes = [
   {
@@ -70,9 +70,9 @@ const routes = [
     name: 'NoticeDetail',
     component: NoticeDetail
   },
-  {    path: '/chat-list',
+  {    path: '/chat-list/:userId',
     name: 'ChatList',
-    component: ChatList
+    component: () => import('../views/ChatList.vue')
   },
   {
     path: '/password-reset',
@@ -83,6 +83,11 @@ const routes = [
     path: '/wallet',
     name: 'WalletManagement',
     component: WalletManagement
+  },
+  {
+    path: '/sellerprofile/:sellerId',
+    name: 'SellerProfile',
+    component: SellerProfile
   }
 ]
 
