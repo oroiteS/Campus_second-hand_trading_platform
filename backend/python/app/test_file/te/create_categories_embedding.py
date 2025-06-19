@@ -8,7 +8,7 @@ load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '.env'))
 
 OPENAI_API_BASE = os.getenv("OPENAI_API_BASE")
 OPENAI_EMBEDDING_MODEL_NAME = os.getenv("OPENAI_EMBEDDING_MODEL_NAME")
-categories = ['电子设备','教材书籍','生活用品','运动器材','文具办公','美妆护肤','食品饮料','家居用品']
+categories = ['电子设备','教材书籍','生活用品','运动器材','文具办公','美妆护肤','食品饮料','其他']
 client = chromadb.PersistentClient('./embedding_folder')
 collection_category = client.get_or_create_collection('categories')
 i = 1
