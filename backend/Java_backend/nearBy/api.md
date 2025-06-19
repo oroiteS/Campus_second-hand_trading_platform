@@ -108,4 +108,3 @@ curl -X POST "http://localhost:8080/api/user/nearby?userId=U123&lat=31.230416&lo
 
 3. **距离计算**  
    使用WGS84地球模型（地球半径=6371km）
-```
