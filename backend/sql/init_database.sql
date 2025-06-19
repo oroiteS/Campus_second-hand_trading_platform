@@ -253,7 +253,7 @@ CREATE TABLE IF NOT EXISTS `appeals` (
     `Reason` TEXT NOT NULL COMMENT '申诉理由',
     `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '申诉发起（创建）时间',
     `Root_id` CHAR(9) DEFAULT NULL COMMENT '外键指向Root表',
-    `status` BOOLEAN DEFAULT FALSE comment '是否通过，通过代表完成',
+    `status` ENUM('finish', 'refuse','process') DEFAULT 'process' COMMENT '申诉状态，finish代表完成，refuse代表拒绝，process代表处理中，默认值为process',
 
     -- 创建索引
     INDEX `idx_appeal_argue1_id` (`Argue1_id`),
