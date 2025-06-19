@@ -6,6 +6,8 @@ import com.campus.ordermanagement.pojo.Commodity;
 import com.campus.ordermanagement.dto.CreateOrderRequest;
 import com.campus.ordermanagement.dto.OrderResponse;
 import com.campus.ordermanagement.dto.UpdateOrderStatusRequest;
+import com.campus.ordermanagement.dto.QueryAllOrdersRequest;
+import com.campus.ordermanagement.dto.PagedOrderResponse;
 import com.campus.ordermanagement.pojo.Order;
 import com.campus.ordermanagement.service.OrderService;
 import com.campus.ordermanagement.util.UUIDGenerator;
@@ -52,7 +54,8 @@ public class OrderServiceImpl implements OrderService {
         @CacheEvict(value = "ordersByUser", key = "#request.sellerId"),
         @CacheEvict(value = "ordersByCommodity", key = "#request.commodityId"),
         @CacheEvict(value = "orderStatistics", key = "#request.buyerId + '_buyer'"),
-        @CacheEvict(value = "orderStatistics", key = "#request.sellerId + '_seller'")
+        @CacheEvict(value = "orderStatistics", key = "#request.sellerId + '_seller'"),
+        @CacheEvict(value = "allOrdersPaged", allEntries = true)
     })
     public OrderResponse createOrder(CreateOrderRequest request) {
         // 参数验证
@@ -244,12 +247,53 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    @Cacheable(value = "allOrdersPaged", key = "#request.pageNum + '_' + #request.pageSize")
+    public PagedOrderResponse getAllOrdersPaged(QueryAllOrdersRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("分页查询请求不能为空");
+        }
+        
+        if (request.getPageNum() == null || request.getPageNum() < 1) {
+            throw new IllegalArgumentException("页码必须大于0");
+        }
+        
+        if (request.getPageSize() == null || request.getPageSize() < 1 || request.getPageSize() > 100) {
+            throw new IllegalArgumentException("每页大小必须在1-100之间");
+        }
+        
+        // 计算偏移量
+        int offset = (request.getPageNum() - 1) * request.getPageSize();
+        
+        // 查询总数
+        long total = orderRepository.countAllOrders();
+        
+        // 分页查询订单
+        List<Order> orders = orderRepository.findAllOrdersPaged(offset, request.getPageSize());
+        
+        // 转换为响应DTO
+        List<OrderResponse> orderResponses = orders.stream()
+                .map(order -> {
+                    OrderResponse response = new OrderResponse(order);
+                    // 查询商品信息并设置到响应中
+                    enrichOrderResponseWithCommodityInfo(response, order.getCommodityId());
+                    // 查询用户信息并设置到响应中
+                    enrichOrderResponseWithUserInfo(response, order.getBuyerId(), order.getSellerId());
+                    return response;
+                })
+                .collect(Collectors.toList());
+        
+        return new PagedOrderResponse(orderResponses, request.getPageNum(), request.getPageSize(), total);
+    }
+
+    @Override
     @Caching(evict = {
         @CacheEvict(value = "orders", key = "#request.orderId"),
         @CacheEvict(value = "ordersByBuyer", allEntries = true),
         @CacheEvict(value = "ordersBySeller", allEntries = true),
         @CacheEvict(value = "ordersByUser", allEntries = true),
-        @CacheEvict(value = "orderStatistics", allEntries = true)
+        @CacheEvict(value = "orderStatistics", allEntries = true),
+        @CacheEvict(value = "allOrdersPaged", allEntries = true)
     })
     public OrderResponse updateOrderStatus(UpdateOrderStatusRequest request) {
         // 参数验证
@@ -291,7 +335,8 @@ public class OrderServiceImpl implements OrderService {
         @CacheEvict(value = "ordersByBuyer", allEntries = true),
         @CacheEvict(value = "ordersBySeller", allEntries = true),
         @CacheEvict(value = "ordersByUser", allEntries = true),
-        @CacheEvict(value = "orderStatistics", allEntries = true)
+        @CacheEvict(value = "orderStatistics", allEntries = true),
+        @CacheEvict(value = "allOrdersPaged", allEntries = true)
     })
     public OrderResponse confirmPayment(String orderId) {
         if (orderId == null || orderId.trim().isEmpty()) {
@@ -316,6 +361,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Caching(evict = {
+        @CacheEvict(value = "orders", key = "#orderId"),
+        @CacheEvict(value = "ordersByBuyer", allEntries = true),
+        @CacheEvict(value = "ordersBySeller", allEntries = true),
+        @CacheEvict(value = "ordersByUser", allEntries = true),
+        @CacheEvict(value = "orderStatistics", allEntries = true),
+        @CacheEvict(value = "allOrdersPaged", allEntries = true)
+    })
     public OrderResponse completeOrder(String orderId) {
         if (orderId == null || orderId.trim().isEmpty()) {
             throw new IllegalArgumentException("订单ID不能为空");
@@ -345,7 +398,8 @@ public class OrderServiceImpl implements OrderService {
         @CacheEvict(value = "ordersByBuyer", allEntries = true),
         @CacheEvict(value = "ordersBySeller", allEntries = true),
         @CacheEvict(value = "ordersByUser", allEntries = true),
-        @CacheEvict(value = "orderStatistics", allEntries = true)
+        @CacheEvict(value = "orderStatistics", allEntries = true),
+        @CacheEvict(value = "allOrdersPaged", allEntries = true)
     })
     public boolean cancelOrder(String orderId) {
         try {

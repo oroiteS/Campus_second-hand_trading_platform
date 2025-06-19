@@ -372,7 +372,59 @@ http://localhost:8084/swagger-ui.html
 }
 ```
 
-#### 9. 健康检查
+#### 9. 获取标签列表
+
+- **URL**: `/api/commodity/tags`
+- **方法**: `GET`
+- **描述**: 根据商品类别ID获取该类别下的所有标签列表。
+
+**查询参数**:
+
+| 参数名      | 类型    | 必填 | 描述         | 验证规则 |
+|-------------|---------|------|--------------|----------|
+| category_id | integer | 是   | 商品类别ID   | 必须大于0 |
+
+**请求示例**:
+
+```
+GET /api/commodity/tags?category_id=1
+```
+
+**响应示例**:
+
+```json
+{
+  "success": true,
+  "message": "获取标签列表成功",
+  "data": [
+    {
+      "tid": 1,
+      "tagName": "苹果"
+    },
+    {
+      "tid": 2,
+      "tagName": "安卓"
+    },
+    {
+      "tid": 3,
+      "tagName": "华为"
+    }
+  ]
+}
+```
+
+**错误响应示例**:
+
+```json
+{
+  "success": false,
+  "message": "category_id 参数无效，必须为正整数",
+  "data": null,
+  "errorCode": "VALIDATION_ERROR"
+}
+```
+
+#### 10. 健康检查
 
 - **URL**: `/api/commodity/health`
 - **方法**: `GET`
@@ -408,6 +460,25 @@ public class Commodity {
     private String imageList;            // 图片列表 (JSON格式，包含带https前缀的完整OSS访问地址)
     private LocalDateTime createdAt;     // 创建时间
     private LocalDateTime updatedAt;     // 更新时间
+}
+```
+
+### Tag 实体
+
+```java
+public class Tag {
+    private Integer tid;                 // 标签ID (主键)
+    private Integer categoryId;          // 所属类别ID (外键)
+    private String tagName;              // 标签名称
+}
+```
+
+### TagDTO 数据传输对象
+
+```java
+public class TagDTO {
+    private Integer tid;                 // 标签ID
+    private String tagName;              // 标签名称
 }
 ```
 
@@ -473,15 +544,19 @@ src/main/java/com/campus/product_management_seller/
 │   ├── CommodityCreateRequest.java          # 商品创建请求DTO
 │   ├── CommodityUpdateRequest.java          # 商品信息更新请求DTO
 │   ├── CommodityStatusUpdateRequest.java    # 状态更新请求DTO
-│   └── CommodityDescriptionUpdateRequest.java # 描述更新请求DTO（已废弃）
+│   ├── CommodityDescriptionUpdateRequest.java # 描述更新请求DTO（已废弃）
+│   └── TagDTO.java                          # 标签数据传输对象
 ├── entity/
-│   └── Commodity.java                       # 商品实体类
+│   ├── Commodity.java                       # 商品实体类
+│   └── Tag.java                             # 标签实体类
 ├── exception/
 │   └── GlobalExceptionHandler.java          # 全局异常处理
 ├── repository/
-│   └── CommodityRepository.java             # 数据访问层
+│   ├── CommodityRepository.java             # 商品数据访问层
+│   └── TagRepository.java                   # 标签数据访问层
 ├── service/
-│   └── CommodityService.java                # 业务逻辑层
+│   ├── CommodityService.java                # 商品业务逻辑层
+│   └── TagService.java                      # 标签业务逻辑层
 ├── util/
 │   └── OssUtil.java                         # OSS工具类
 └── converter/
@@ -533,6 +608,14 @@ mvn verify
   - 图片URL统一使用带https前缀的完整访问地址
   - 添加图片格式和大小验证（支持JPG/JPEG/PNG/GIF/WEBP，单个文件不超过10MB）
   - 新增商品数量(quantity)字段支持
+- **新增标签管理功能**：
+  - 新增 `Tag` 实体类，对应数据库 `tags` 表
+  - 新增 `TagRepository` 数据访问层，支持按类别查询标签
+  - 新增 `TagService` 业务逻辑层，提供标签查询服务
+  - 新增 `TagDTO` 数据传输对象，用于API响应
+  - 新增 `/api/commodity/tags` 接口，根据类别ID获取标签列表
+  - 支持标签与商品类别的关联查询
+  - 完善了商品创建时的标签ID验证和存储
 
 ## 联系方式
 

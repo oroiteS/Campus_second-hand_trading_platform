@@ -9,6 +9,8 @@ import com.campus.ordermanagement.dto.QueryOrdersByBuyerRequest;
 import com.campus.ordermanagement.dto.QueryOrdersBySellerRequest;
 import com.campus.ordermanagement.dto.QueryOrdersByCommodityRequest;
 import com.campus.ordermanagement.dto.QueryOrdersByStatusRequest;
+import com.campus.ordermanagement.dto.QueryAllOrdersRequest;
+import com.campus.ordermanagement.dto.PagedOrderResponse;
 
 import com.campus.ordermanagement.dto.CancelOrderRequest;
 import com.campus.ordermanagement.dto.OrderStatisticsRequest;
@@ -201,6 +203,26 @@ public class OrderApiController {
         try {
             List<OrderResponse> orders = orderService.getOrdersBySellerId(request.getSellerId());
             return successResponse("查询成功", orders, orders.size());
+        } catch (Exception e) {
+            return handleException(e);
+        }
+    }
+
+    /**
+     * 分页查询所有订单
+     */
+    @PostMapping("/query/all-paged")
+    @Operation(summary = "分页查询所有订单", description = "分页查询系统中的所有订单，支持按时间倒序排列")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "查询成功"),
+        @ApiResponse(responseCode = "400", description = "请求参数错误")
+    })
+    public ResponseEntity<?> queryAllOrdersPaged(
+        @Parameter(description = "分页查询请求体，包含页码和每页大小")
+        @Valid @RequestBody QueryAllOrdersRequest request) {
+        try {
+            PagedOrderResponse pagedResult = orderService.getAllOrdersPaged(request);
+            return successResponse("查询成功", pagedResult);
         } catch (Exception e) {
             return handleException(e);
         }

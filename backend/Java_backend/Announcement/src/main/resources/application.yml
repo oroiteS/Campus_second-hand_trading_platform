@@ -1,4 +1,4 @@
-# THYMELEAF \u914D\u7F6E
+# THYMELEAF 配置
 spring:
   thymeleaf:
     cache: true
@@ -11,18 +11,28 @@ spring:
     mode: HTML5
     prefix: classpath:/templates/
     suffix: .html
+
+  # 🚀 数据库连接配置（根据图片信息更新）
+  datasource:
+    url: jdbc:mysql://rm-cn-smw4b7vtl0001ho.rwlb.rds.aliyuncs.com:3306/campus?useSSL=false&serverTimezone=Asia/Shanghai
+    username: campus_test
+    password: Campus_suep2022  # 请替换为实际密码
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      connection-timeout: 30000
+      maximum-pool-size: 10
+
   profiles:
     active: local
 
-# \u5E94\u7528\u670D\u52A1 WEB \u8BBF\u95EE\u7AEF\u53E3
+# 应用服务 WEB 访问端口
 server:
   port: 8092
 
-# MyBatis \u914D\u7F6E
+# MyBatis 配置
 mybatis:
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.campus.announcement.pojo
-  # \u81EA\u52A8\u5C06\u6570\u636E\u5E93\u5B57\u6BB5\u4E0B\u5212\u7EBF\u547D\u540D\uFF08\u5982 commodity_id\uFF09\u6620\u5C04\u4E3A Java \u7684\u9A7C\u5CF0\u547D\u540D\uFF08\u5982 commodityId\uFF09
+  # 自动将数据库字段下划线命名映射为 Java 的驼峰命名
   configuration:
     map-underscore-to-camel-case: true
-
