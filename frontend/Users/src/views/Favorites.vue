@@ -67,7 +67,7 @@
               <p class="product-price">¥{{ product.price }}</p>
               <div class="product-meta">
                 <span class="product-seller">{{ product.seller }}</span>
-                <span class="product-school">{{ product.school }}</span>
+                <!-- <span class="product-school">{{ product.school }}</span> -->
               </div>
               <p class="favorite-time">{{ product.favoriteTime }}</p>
             </div>
@@ -111,10 +111,14 @@ export default {
       sortBy: 'time',
       categories: [
         { id: 'all', name: '全部' },
-        { id: 'electronics', name: '数码' },
-        { id: 'books', name: '书籍' },
-        { id: 'clothing', name: '服装' },
-        { id: 'daily', name: '日用' }
+        { id: 'electronics', name: '电子设备' },
+        { id: 'books', name: '教材书籍' },
+        { id: 'daily', name: '生活用品' },
+        { id: 'clothing', name: '服装配饰' },
+        { id: 'sports', name: '运动器材' },
+        { id: 'study', name: '学习用品' },
+        { id: 'beauty', name: '美妆护肤' },
+        { id: 'others', name: '其它物品' }
       ],
       favoriteProducts: [
         {
@@ -126,7 +130,7 @@ export default {
           school: '计算机学院',
           status: '在售中',
           statusClass: 'available',
-          category: 'electronics',
+          category: 'electronics', // 对应"电子设备"
           favoriteTime: '2024年1月15日收藏'
         },
         {
@@ -138,7 +142,7 @@ export default {
           school: '数学学院',
           status: '在售中',
           statusClass: 'available',
-          category: 'books',
+          category: 'books', // 对应"教材书籍"
           favoriteTime: '2024年1月10日收藏'
         },
         {
@@ -150,7 +154,7 @@ export default {
           school: '体育学院',
           status: '已售出',
           statusClass: 'sold',
-          category: 'clothing',
+          category: 'clothing', // 对应"服装配饰"
           favoriteTime: '2024年1月8日收藏'
         },
         {
@@ -162,7 +166,7 @@ export default {
           school: '设计学院',
           status: '在售中',
           statusClass: 'available',
-          category: 'daily',
+          category: 'daily', // 对应"生活用品"
           favoriteTime: '2024年1月5日收藏'
         }
       ]

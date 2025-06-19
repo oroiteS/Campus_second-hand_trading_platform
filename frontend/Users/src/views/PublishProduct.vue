@@ -131,7 +131,7 @@
           <input 
             v-model="productForm.contact" 
             type="text" 
-            placeholder="请输入手机号" 
+            placeholder="请输入微信号或QQ号" 
             class="publish-form-input"
             required
           >
