@@ -128,3 +128,8 @@ def get_username(user_id: str, db: Session = Depends(get_db)):
         return {"code": 0, "username": username}
     else:
         return {"code": 1, "message": "用户不存在"}
+@router.get("/get_commodities_on_sale")
+def get_commodities_on_sale(db: Session = Depends(get_db)):
+    """获取在售商品数量"""
+    commodity_num = crud_commodity.get_commodities_on_sale(db)
+    return commodity_num

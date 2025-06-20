@@ -320,3 +320,6 @@ def delete_commodity(request:Commodity_id,db:Session):
 def get_username(user_id,db:Session):
     username = db.query(users).filter(users.user_id == user_id).first().username
     return username
+def get_commodities_on_sale(db:Session):
+    commodity_num = db.query(Commodity).filter(Commodity.commodity_status == "on_sale").count()
+    return commodity_num
