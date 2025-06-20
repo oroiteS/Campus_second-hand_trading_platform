@@ -204,19 +204,6 @@ export default {
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-.remember-checkbox {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  font-size: 14px;
-  color: #57606f;
-}
-
-.remember-checkbox input[type="checkbox"] {
-  margin-right: 8px;
-  transform: scale(1.1);
-}
-
 .checkbox-text {
   user-select: none;
 }
