@@ -54,7 +54,6 @@ Content-Type: application/json
     "currentPrice": 3500.00,
     "commodityStatus": "on_sale",
     "sellerId": "user123",
-    "mainImageUrl": "https://example.com/images/iphone13_main.jpg",
     "imageList": [
       "https://example.com/images/iphone13_1.jpg",
       "https://example.com/images/iphone13_2.jpg"
@@ -100,7 +99,6 @@ Content-Type: application/json
 | currentPrice | BigDecimal | 商品价格 |
 | commodityStatus | String | 商品状态（on_sale=在售/sold=已售/off_sale=下架） |
 | sellerId | String | 卖家ID |
-| mainImageUrl | String | 商品主图链接 |
 | imageList | Array<String> | 多图链接数组 |
 | createdAt | DateTime | 商品发布时间 |
 | updatedAt | DateTime | 信息更新时间 |
