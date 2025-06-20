@@ -49,7 +49,7 @@ public class CommodityController {
     private TagService tagService;
     
     /**
-     * 创建并上架商品接口
+     * 创建商品接口（待审核状态）
      * @param commodityName 商品名称
      * @param commodityDescription 商品描述
      * @param categoryId 分类ID
@@ -61,7 +61,7 @@ public class CommodityController {
      * @param images 商品图片
      * @return 响应结果
      */
-    @Operation(summary = "创建并上架商品", description = "创建新商品并直接上架销售")
+    @Operation(summary = "创建商品", description = "创建新商品，状态为待审核(to_sale)，需要管理员审核后才能正式上架")
     @PostMapping(value = "/create-and-put-on-sale", consumes = "multipart/form-data")
     public ResponseEntity<ApiResponse<Commodity>> createAndPutOnSale(
             @Parameter(description = "商品名称", required = true)
@@ -83,7 +83,7 @@ public class CommodityController {
             @Parameter(description = "商品图片文件，支持多张图片上传", required = true)
             @RequestParam(value = "images", required = true) MultipartFile[] images) {
         
-        logger.info("收到创建并上架商品请求: {}", commodityName);
+        logger.info("收到创建商品请求: {}", commodityName);
         
         try {
             // 详细记录接收到的参数信息
@@ -176,17 +176,17 @@ public class CommodityController {
             );
             
             Commodity commodity = commodityService.createAndPutOnSaleWithImages(request, images);
-            logger.info("商品创建并上架成功，商品ID: {}", commodity.getCommodityId());
-            return ResponseEntity.ok(ApiResponse.success("商品创建并上架成功", commodity));
+            logger.info("商品创建成功，商品ID: {}，状态: 待审核", commodity.getCommodityId());
+            return ResponseEntity.ok(ApiResponse.success("商品创建成功，等待管理员审核", commodity));
         } catch (Exception e) {
-            logger.error("商品创建并上架异常: {}", e.getMessage(), e);
+            logger.error("商品创建异常: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResponse.error("商品创建并上架失败: " + e.getMessage(), "CREATE_FAILED"));
+                    .body(ApiResponse.error("商品创建失败: " + e.getMessage(), "CREATE_FAILED"));
         }
     }
     
     /**
-     * 上架商品
+     * 申请上架商品（设置状态为待审核）
      * @param request 上架请求（只需要商品ID和卖家ID）
      * @param bindingResult 验证结果
      * @return 响应结果
@@ -196,12 +196,12 @@ public class CommodityController {
             @Valid @RequestBody CommodityStatusUpdateRequest request,
             BindingResult bindingResult) {
         
-        logger.info("收到上架商品请求: {}", request);
+        logger.info("收到申请上架商品请求: {}", request);
         
         // 参数验证
         if (bindingResult.hasErrors()) {
             String errorMessage = bindingResult.getFieldErrors().get(0).getDefaultMessage();
-            logger.warn("上架商品参数验证失败: {}", errorMessage);
+            logger.warn("申请上架商品参数验证失败: {}", errorMessage);
             return ResponseEntity.badRequest()
                     .body(ApiResponse.error("参数验证失败: " + errorMessage, "VALIDATION_ERROR"));
         }
@@ -210,11 +210,11 @@ public class CommodityController {
             boolean success = commodityService.putOnSale(request.getCommodityId(), request.getSellerId());
             
             if (success) {
-                logger.info("商品上架成功: commodityId={}, sellerId={}", 
+                logger.info("商品申请上架成功，状态已设为待审核: commodityId={}, sellerId={}", 
                            request.getCommodityId(), request.getSellerId());
-                return ResponseEntity.ok(ApiResponse.success("商品上架成功"));
+                return ResponseEntity.ok(ApiResponse.success("商品申请上架成功，状态已设为待审核"));
             } else {
-                logger.warn("商品上架失败，商品不存在或无权限: commodityId={}, sellerId={}", 
+                logger.warn("商品申请上架失败，商品不存在或无权限: commodityId={}, sellerId={}", 
                            request.getCommodityId(), request.getSellerId());
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(ApiResponse.error("商品不存在或您无权限操作此商品", "COMMODITY_NOT_FOUND"));
@@ -450,6 +450,9 @@ public class CommodityController {
         Commodity.CommodityStatus commodityStatus;
         try {
             switch (status.toLowerCase()) {
+                case "to_sale":
+                    commodityStatus = Commodity.CommodityStatus.TO_SALE;
+                    break;
                 case "on_sale":
                     commodityStatus = Commodity.CommodityStatus.ON_SALE;
                     break;
@@ -462,7 +465,7 @@ public class CommodityController {
                 default:
                     logger.warn("无效的商品状态: {}", status);
                     return ResponseEntity.badRequest()
-                            .body(ApiResponse.error("无效的商品状态，支持的状态: on_sale, off_sale, sold", "INVALID_STATUS"));
+                            .body(ApiResponse.error("无效的商品状态，支持的状态: to_sale, on_sale, off_sale, sold", "INVALID_STATUS"));
             }
         } catch (Exception e) {
             logger.warn("商品状态解析失败: {}", status);

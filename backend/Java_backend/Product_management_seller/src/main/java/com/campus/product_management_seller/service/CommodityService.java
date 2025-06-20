@@ -62,7 +62,7 @@ public class CommodityService {
             commodity.setQuantity(request.getQuantity());
             commodity.setSellerId(request.getSellerId());
             commodity.setNewness(request.getNewness());
-            commodity.setCommodityStatus(Commodity.CommodityStatus.ON_SALE);
+            commodity.setCommodityStatus(Commodity.CommodityStatus.TO_SALE);
             commodity.setCreatedAt(LocalDateTime.now());
             commodity.setUpdatedAt(LocalDateTime.now());
             
@@ -200,7 +200,7 @@ public class CommodityService {
             commodity.setQuantity(request.getQuantity());
             commodity.setSellerId(request.getSellerId());
             commodity.setNewness(request.getNewness());
-            commodity.setCommodityStatus(Commodity.CommodityStatus.ON_SALE);
+            commodity.setCommodityStatus(Commodity.CommodityStatus.TO_SALE);
             commodity.setCreatedAt(LocalDateTime.now());
             commodity.setUpdatedAt(LocalDateTime.now());
             
@@ -218,28 +218,28 @@ public class CommodityService {
     }
     
     /**
-     * 上架已存在商品（原有功能保留）
+     * 申请上架商品（设置状态为待审核）
      * @param commodityId 商品ID
      * @param sellerId 卖家ID
      * @return 是否成功
      */
     public boolean putOnSale(String commodityId, String sellerId) {
-        logger.info("尝试上架商品: commodityId={}, sellerId={}", commodityId, sellerId);
+        logger.info("尝试申请上架商品: commodityId={}, sellerId={}", commodityId, sellerId);
         
         try {
             int updatedRows = commodityRepository.updateCommodityStatus(
-                commodityId, sellerId, Commodity.CommodityStatus.ON_SALE);
+                commodityId, sellerId, Commodity.CommodityStatus.TO_SALE);
             
             if (updatedRows > 0) {
-                logger.info("商品上架成功: commodityId={}, sellerId={}", commodityId, sellerId);
+                logger.info("商品申请上架成功，状态已设为待审核: commodityId={}, sellerId={}", commodityId, sellerId);
                 return true;
             } else {
-                logger.warn("商品上架失败，未找到对应商品: commodityId={}, sellerId={}", commodityId, sellerId);
+                logger.warn("商品申请上架失败，未找到对应商品: commodityId={}, sellerId={}", commodityId, sellerId);
                 return false;
             }
         } catch (Exception e) {
-            logger.error("商品上架异常: commodityId={}, sellerId={}, error={}", commodityId, sellerId, e.getMessage(), e);
-            throw new RuntimeException("商品上架失败: " + e.getMessage(), e);
+            logger.error("商品申请上架异常: commodityId={}, sellerId={}, error={}", commodityId, sellerId, e.getMessage(), e);
+            throw new RuntimeException("商品申请上架失败: " + e.getMessage(), e);
         }
     }
     
