@@ -31,4 +31,3 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 
 # aliyun oss配置移到application-local.yml
-
