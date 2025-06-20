@@ -174,6 +174,29 @@
         </section>
       </main>
     </div>
+    <!-- 悬浮球 -->
+    <div class="floating-ball" @click="toggleEmbedWindow" :class="{ active: showEmbedWindow }">
+      <span class="floating-ball-icon">🤖</span>
+    </div>
+    
+    <!-- 嵌入窗口 -->
+    <div v-if="showEmbedWindow" class="embed-window" @click.self="closeEmbedWindow">
+      <div class="embed-content">
+        <div class="embed-header">
+          <h3>AI助手</h3>
+          <button @click="closeEmbedWindow" class="close-btn">×</button>
+        </div>
+        <div class="embed-body">
+          <iframe 
+            :src="embedUrl" 
+            frameborder="0" 
+            width="100%" 
+            height="100%"
+            allow="microphone; camera"
+          ></iframe>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 <script>
@@ -213,6 +236,9 @@ export default {
       // 添加用户数据缓存
       usersCache: [],
       usersCacheTime: null, // 添加缓存时间戳
+      // 悬浮球和嵌入窗口相关
+      showEmbedWindow: false,
+      embedUrl: 'http://localhost:7860',
       stats: {
         totalProducts: 1234,
         activeUsers: 567,
@@ -605,7 +631,19 @@ export default {
     async refreshLatestProducts() {
       await this.loadLatestProducts();
     },
-
+    /**
+     * 切换嵌入窗口显示状态
+     */
+     toggleEmbedWindow() {
+      this.showEmbedWindow = !this.showEmbedWindow;
+    },
+    
+    /**
+     * 关闭嵌入窗口
+     */
+    closeEmbedWindow() {
+      this.showEmbedWindow = false;
+    },
     /**
      * 获取校园公告
      * @param {Number} n - 获取公告的数量，默认为5
