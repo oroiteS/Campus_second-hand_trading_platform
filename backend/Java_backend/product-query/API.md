@@ -4,9 +4,9 @@
 
 商品查询服务专门提供商品分类查询功能，支持按分类查询、价格筛选、新旧度筛选、排序和分页功能。该服务自动过滤在售商品，为用户提供精准的商品查询体验。
 
-**服务端口**: 8082  
+**服务端口**: 8200 
 **上下文路径**: /product-query  
-**基础URL**: http://localhost:8082/product-query/api/commodity-query
+**基础URL**: http://localhost:8200/product-query/swagger-ui/index.html
 
 ## API 接口列表
 
@@ -17,6 +17,7 @@
 **描述**: 根据商品分类查询商品，支持价格筛选、新旧度筛选、排序和分页功能
 
 **请求体**:
+
 ```json
 {
   "categoryId": 1,
@@ -30,16 +31,17 @@
 
 **请求参数说明**:
 
-| 参数名 | 类型 | 必填 | 描述 | 示例值 |
-|--------|------|------|------|--------|
-| categoryId | Integer | 是 | 商品分类ID（1-8） | 1 |
-| priceRange | String | 否 | 价格区间筛选 | "50-200" |
-| newness | String | 否 | 新旧度筛选 | "全新" |
-| sortBy | String | 否 | 排序方式 | "time_desc" |
-| pageNum | Integer | 否 | 页码（默认1） | 1 |
-| pageSize | Integer | 否 | 每页大小（默认10，最大100） | 20 |
+| 参数名     | 类型    | 必填 | 描述                        | 示例值      |
+| ---------- | ------- | ---- | --------------------------- | ----------- |
+| categoryId | Integer | 是   | 商品分类ID（1-8）           | 1           |
+| priceRange | String  | 否   | 价格区间筛选                | "50-200"    |
+| newness    | String  | 否   | 新旧度筛选                  | "全新"      |
+| sortBy     | String  | 否   | 排序方式                    | "time_desc" |
+| pageNum    | Integer | 否   | 页码（默认1）               | 1           |
+| pageSize   | Integer | 否   | 每页大小（默认10，最大100） | 20          |
 
 **价格区间选项**:
+
 - `"0-50"`: 0-50元
 - `"50-200"`: 50-200元
 - `"200-500"`: 200-500元
@@ -47,17 +49,20 @@
 - `"1000+"`: 1000元以上
 
 **新旧度选项**:
+
 - `"全新"`: 全新商品
 - `"95新"`: 95新商品
 - `"9新"`: 9新商品
 
 **排序方式选项**:
+
 - `"price_asc"`: 价格从低到高
 - `"price_desc"`: 价格从高到低
 - `"time_desc"`: 发布时间从新到旧（默认）
 - `"time_asc"`: 发布时间从旧到新
 
 **响应示例**:
+
 ```json
 {
   "code": 200,
@@ -89,6 +94,7 @@
 ## 响应格式
 
 ### 成功响应
+
 ```json
 {
   "code": 200,
@@ -99,6 +105,7 @@
 ```
 
 ### 错误响应
+
 ```json
 {
   "code": 400,
@@ -119,39 +126,39 @@
 
 ### CategoryQueryRequest（分类查询请求）
 
-| 字段名 | 类型 | 必填 | 描述 | 验证规则 |
-|--------|------|------|------|----------|
-| categoryId | Integer | 是 | 商品分类ID | 1-8之间 |
-| priceRange | String | 否 | 价格区间 | 枚举值："0-50", "50-200", "200-500", "500-1000", "1000+" |
-| newness | String | 否 | 新旧度 | 枚举值："全新", "95新", "9新" |
-| sortBy | String | 否 | 排序方式 | 枚举值："price_asc", "price_desc", "time_desc", "time_asc" |
-| pageNum | Integer | 否 | 页码 | 最小值：1 |
-| pageSize | Integer | 否 | 每页大小 | 1-100之间 |
+| 字段名     | 类型    | 必填 | 描述       | 验证规则                                                   |
+| ---------- | ------- | ---- | ---------- | ---------------------------------------------------------- |
+| categoryId | Integer | 是   | 商品分类ID | 1-8之间                                                    |
+| priceRange | String  | 否   | 价格区间   | 枚举值："0-50", "50-200", "200-500", "500-1000", "1000+"   |
+| newness    | String  | 否   | 新旧度     | 枚举值："全新", "95新", "9新"                              |
+| sortBy     | String  | 否   | 排序方式   | 枚举值："price_asc", "price_desc", "time_desc", "time_asc" |
+| pageNum    | Integer | 否   | 页码       | 最小值：1                                                  |
+| pageSize   | Integer | 否   | 每页大小   | 1-100之间                                                  |
 
 ### Commodity（商品）
 
-| 字段名 | 类型 | 描述 |
-|--------|------|------|
-| commodityId | String | 商品唯一标识符（UUID） |
-| commodityName | String | 商品标题 |
-| commodityPrice | BigDecimal | 商品售价 |
-| commodityDescription | String | 详细描述 |
-| commodityNewness | String | 商品新旧度 |
-| commodityStatus | String | 商品状态（固定为on_sale） |
-| categoryId | Integer | 商品分类ID |
-| sellerId | String | 卖家ID |
-| createdAt | String | 商品发布时间 |
-| updatedAt | String | 信息更新时间 |
+| 字段名               | 类型       | 描述                      |
+| -------------------- | ---------- | ------------------------- |
+| commodityId          | String     | 商品唯一标识符（UUID）    |
+| commodityName        | String     | 商品标题                  |
+| commodityPrice       | BigDecimal | 商品售价                  |
+| commodityDescription | String     | 详细描述                  |
+| commodityNewness     | String     | 商品新旧度                |
+| commodityStatus      | String     | 商品状态（固定为on_sale） |
+| categoryId           | Integer    | 商品分类ID                |
+| sellerId             | String     | 卖家ID                    |
+| createdAt            | String     | 商品发布时间              |
+| updatedAt            | String     | 信息更新时间              |
 
 ### PagedCommodityResponse（分页商品响应）
 
-| 字段名 | 类型 | 描述 |
-|--------|------|------|
-| records | List<Commodity> | 商品列表 |
-| total | Long | 总记录数 |
-| size | Integer | 当前页大小 |
-| current | Integer | 当前页码 |
-| pages | Integer | 总页数 |
+| 字段名  | 类型            | 描述       |
+| ------- | --------------- | ---------- |
+| records | List<Commodity> | 商品列表   |
+| total   | Long            | 总记录数   |
+| size    | Integer         | 当前页大小 |
+| current | Integer         | 当前页码   |
+| pages   | Integer         | 总页数     |
 
 ## 使用示例
 
@@ -221,11 +228,11 @@ curl -X POST "http://localhost:8082/product-query/api/commodity-query/category" 
 2. **最大分页**: 每页最多100条记录
 3. **获取全部数据**: 设置 `pageSize` 为100，根据返回的 `pages` 字段进行多次请求
 4. **分页信息**:
-   - `total`: 总记录数
-   - `size`: 当前页大小
-   - `current`: 当前页码
-   - `pages`: 总页数
-   - `records`: 当前页数据列表
+    - `total`: 总记录数
+    - `size`: 当前页大小
+    - `current`: 当前页码
+    - `pages`: 总页数
+    - `records`: 当前页数据列表
 
 ## 注意事项
 

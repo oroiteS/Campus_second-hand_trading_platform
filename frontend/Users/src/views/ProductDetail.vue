@@ -745,6 +745,7 @@ export default {
             },
             timeout: 5000 // 5秒超时
           })
+          
           if (cartResponse.data && cartResponse.data.success) {
             // 购物车添加成功后，更新用户画像
             try {
@@ -757,6 +758,7 @@ export default {
                 },
                 timeout: 30000
               })
+              
               if (profileResponse.data && profileResponse.data.code === 0) {
                 this.isFavorited = true
                 alert('收藏成功！商品已添加到购物车，用户画像已更新')
@@ -845,6 +847,8 @@ export default {
         const newImageIndex = index - this.product.images.length
         this.newImages.splice(newImageIndex, 1)
       }
+      // 注意：如果删除的是原有图片（index < this.product.images.length），
+      // 我们只从editingImages中删除，这样hasImageChanges检查就能检测到变更
     },
     closeEditModal() {
       this.showEditModal = false
@@ -879,8 +883,12 @@ export default {
           formData.append('quantity', parseInt(this.editingProduct.quantity).toString())
         }
         
-        // 处理图片文件（如果有新上传的图片）
-        if (this.newImages && this.newImages.length > 0) {
+        // 检查图片是否有变更（删除原有图片或添加新图片）
+        const hasImageChanges = this.editingImages.length !== this.product.images.length || 
+                               this.newImages.length > 0
+        
+        // 如果图片有任何变更，发送新图片数据
+        if (hasImageChanges && this.newImages && this.newImages.length > 0) {
           // 验证图片文件
           const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif']
           const maxSize = 5 * 1024 * 1024 // 5MB
@@ -902,6 +910,10 @@ export default {
             
             formData.append('images', file)
           }
+        } else if (hasImageChanges && this.newImages.length === 0) {
+          // 如果只是删除了原有图片而没有添加新图片，发送空的图片数据
+          // 这样后端就知道要清空图片
+          formData.append('images', new Blob(), 'empty')
         }
         
         console.log('正在发送更新请求...')
@@ -921,10 +933,9 @@ export default {
           this.product.condition = this.editingProduct.condition
           this.product.quantity = this.editingProduct.quantity
           
-          // 如果有新图片，更新图片列表
-          if (this.newImages && this.newImages.length > 0) {
-            // 这里可以根据后端返回的图片URL更新本地图片列表
-            // 或者重新获取商品详情
+          // 如果图片有任何变更，重新获取商品详情以同步最新的图片状态
+          if (hasImageChanges) {
+            // 重新获取商品详情以获取最新的图片列表
             await this.fetchProductDetail(this.product.id)
           }
           
