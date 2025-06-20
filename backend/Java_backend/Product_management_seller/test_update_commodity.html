@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品信息更新测试页面</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        .required {
+            color: red;
+        }
+        .optional {
+            color: #888;
+            font-size: 12px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .clear-btn {
+            background-color: #6c757d;
+        }
+        .clear-btn:hover {
+            background-color: #545b62;
+        }
+        .response {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background-color: #e2e3e5;
+            border: 1px solid #d6d8db;
+            color: #383d41;
+            margin-bottom: 20px;
+        }
+        .field-info {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        input[type="file"] {
+            padding: 8px;
+            border: 2px dashed #ddd;
+            background-color: #fafafa;
+            cursor: pointer;
+        }
+        input[type="file"]:hover {
+            border-color: #007bff;
+            background-color: #f0f8ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>商品信息更新测试页面</h1>
+        
+        <div class="info">
+            <strong>接口信息：</strong><br>
+            URL: /api/commodity/update-info<br>
+            方法: POST<br>
+            Content-Type: multipart/form-data<br><br>
+            <strong>说明：</strong>此页面用于测试商品信息更新功能，支持更新商品名称、描述、价格、新旧度、数量和图片文件。所有字段都是可选的，只需填写要更新的字段。图片支持直接上传文件。
+        </div>
+
+        <form id="updateForm">
+            <div class="form-group">
+                <label for="commodityId">商品ID <span class="required">*</span></label>
+                <input type="text" id="commodityId" name="commodityId" required>
+                <div class="field-info">必填字段，要更新的商品ID</div>
+            </div>
+
+            <div class="form-group">
+                <label for="sellerId">卖家ID <span class="required">*</span></label>
+                <input type="text" id="sellerId" name="sellerId" required>
+                <div class="field-info">必填字段，商品所属卖家的ID</div>
+            </div>
+
+            <div class="form-group">
+                <label for="commodityName">商品名称 <span class="optional">(可选)</span></label>
+                <input type="text" id="commodityName" name="commodityName">
+                <div class="field-info">可选字段，更新商品名称</div>
+            </div>
+
+            <div class="form-group">
+                <label for="commodityDescription">商品描述 <span class="optional">(可选)</span></label>
+                <textarea id="commodityDescription" name="commodityDescription" placeholder="输入商品描述信息..."></textarea>
+                <div class="field-info">可选字段，更新商品详细描述</div>
+            </div>
+
+            <div class="form-group">
+                <label for="currentPrice">当前价格 <span class="optional">(可选)</span></label>
+                <input type="number" id="currentPrice" name="currentPrice" step="0.01" min="0">
+                <div class="field-info">可选字段，更新商品价格（必须为正数）</div>
+            </div>
+
+            <div class="form-group">
+                <label for="newness">商品新旧度 <span class="optional">(可选)</span></label>
+                <select id="newness" name="newness">
+                    <option value="">请选择新旧度</option>
+                    <option value="全新">全新</option>
+                    <option value="95新">95新</option>
+                    <option value="9成新">9成新</option>
+                    <option value="8成新">8成新</option>
+                    <option value="7成新">7成新</option>
+                </select>
+                <div class="field-info">可选字段，选择商品新旧程度</div>
+            </div>
+
+            <div class="form-group">
+                <label for="quantity">商品数量 <span class="optional">(可选)</span></label>
+                <input type="number" id="quantity" name="quantity" min="1">
+                <div class="field-info">可选字段，更新商品库存数量（必须为正整数）</div>
+            </div>
+
+            <div class="form-group">
+                <label for="images">商品图片 <span class="optional">(可选)</span></label>
+                <input type="file" id="images" name="images" multiple accept="image/jpeg,image/jpg,image/png,image/gif">
+                <div class="field-info">可选字段，支持上传多张图片文件（jpg, jpeg, png, gif格式，每张图片最大5MB）</div>
+            </div>
+
+            <button type="submit">更新商品信息</button>
+            <button type="button" class="clear-btn" onclick="clearForm()">清空表单</button>
+        </form>
+
+        <div id="response"></div>
+    </div>
+
+    <script>
+        // 设置默认的服务器地址
+        const SERVER_URL = 'http://localhost:8084';
+
+        document.getElementById('updateForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            
+            // 获取表单数据
+            const commodityId = document.getElementById('commodityId').value.trim();
+            const sellerId = document.getElementById('sellerId').value.trim();
+            const commodityName = document.getElementById('commodityName').value.trim();
+            const commodityDescription = document.getElementById('commodityDescription').value.trim();
+            const currentPrice = document.getElementById('currentPrice').value.trim();
+            const newness = document.getElementById('newness').value.trim();
+            const quantity = document.getElementById('quantity').value.trim();
+            const images = document.getElementById('images').files;
+            
+            // 验证必填字段
+            if (!commodityId || !sellerId) {
+                showResponse('请填写商品ID和卖家ID', 'error');
+                return;
+            }
+            
+            // 添加必填字段
+            formData.append('commodityId', commodityId);
+            formData.append('sellerId', sellerId);
+            
+            // 添加可选字段（只有非空时才添加）
+            if (commodityName) formData.append('commodityName', commodityName);
+            if (commodityDescription) formData.append('commodityDescription', commodityDescription);
+            if (currentPrice) formData.append('currentPrice', currentPrice);
+            if (newness) formData.append('newness', newness);
+            if (quantity) formData.append('quantity', quantity);
+            
+            // 验证图片文件
+            if (images.length > 0) {
+                const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+                const maxSize = 5 * 1024 * 1024; // 5MB
+                
+                for (let i = 0; i < images.length; i++) {
+                    const file = images[i];
+                    
+                    // 检查文件类型
+                    if (!allowedTypes.includes(file.type)) {
+                        showResponse(`图片文件 "${file.name}" 格式不支持，请选择 jpg、jpeg、png 或 gif 格式的图片`, 'error');
+                        return;
+                    }
+                    
+                    // 检查文件大小
+                    if (file.size > maxSize) {
+                        showResponse(`图片文件 "${file.name}" 大小超过5MB限制`, 'error');
+                        return;
+                    }
+                    
+                    formData.append('images', file);
+                }
+            }
+            
+            try {
+                showResponse('正在发送请求...', 'info');
+                
+                const response = await fetch(`${SERVER_URL}/api/commodity/update-info`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.text();
+                
+                if (response.ok) {
+                    showResponse(`请求成功！\n\n响应状态: ${response.status}\n响应内容: ${result}`, 'success');
+                } else {
+                    showResponse(`请求失败！\n\n响应状态: ${response.status}\n错误信息: ${result}`, 'error');
+                }
+                
+            } catch (error) {
+                showResponse(`网络错误: ${error.message}\n\n请确保服务器正在运行并且地址正确`, 'error');
+            }
+        });
+        
+        function showResponse(message, type) {
+            const responseDiv = document.getElementById('response');
+            responseDiv.textContent = message;
+            responseDiv.className = `response ${type}`;
+        }
+        
+        function clearForm() {
+            document.getElementById('updateForm').reset();
+            document.getElementById('response').innerHTML = '';
+        }
+        
+        // 示例数据填充函数
+        function fillExampleData() {
+            document.getElementById('commodityId').value = 'commodity123';
+            document.getElementById('sellerId').value = 'seller456';
+            document.getElementById('commodityName').value = '二手iPhone 13';
+            document.getElementById('commodityDescription').value = '9成新iPhone 13，128GB，无磕碰，功能正常';
+            document.getElementById('currentPrice').value = '4500.00';
+            document.getElementById('newness').value = '9成新';
+            document.getElementById('quantity').value = '1';
+            // 注意：图片文件需要手动选择，无法通过代码自动填充
+            showResponse('示例数据已填充，请手动选择要上传的图片文件', 'info');
+        }
+        
+        // 添加示例数据按钮
+        window.onload = function() {
+            const button = document.createElement('button');
+            button.textContent = '填充示例数据';
+            button.type = 'button';
+            button.style.backgroundColor = '#28a745';
+            button.onclick = fillExampleData;
+            button.onmouseover = function() { this.style.backgroundColor = '#218838'; };
+            button.onmouseout = function() { this.style.backgroundColor = '#28a745'; };
+            
+            const form = document.getElementById('updateForm');
+            form.appendChild(button);
+        };
+    </script>
+</body>
+</html>

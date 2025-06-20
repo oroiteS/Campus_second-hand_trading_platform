@@ -244,7 +244,7 @@ http://localhost:8084/swagger-ui.html
 
 - **URL**: `/api/commodity/update-info`
 - **方法**: `POST`
-- **描述**: 更新商品的详细信息，包括名称、描述、价格和新旧度。支持部分字段更新。
+- **描述**: 更新商品的详细信息，包括名称、描述、价格、新旧度、数量和图片。支持部分字段更新。
 - **Content-Type**: `application/json`
 
 **请求参数**:
@@ -256,7 +256,10 @@ http://localhost:8084/swagger-ui.html
   "commodityName": "string",
   "commodityDescription": "string",
   "currentPrice": 0.00,
-  "newness": "string"
+  "newness": "string",
+  "quantity": 1,
+  "mainImageUrl": "string",
+  "imageList": "string"
 }
 ```
 
@@ -267,7 +270,10 @@ http://localhost:8084/swagger-ui.html
 | commodityName       | string  | 否   | 商品名称     | 可选，提供时不能为空字符串   |
 | commodityDescription| string  | 否   | 商品描述     | 可选，允许为空（清空描述）   |
 | currentPrice        | decimal | 否   | 当前价格     | 可选，必须为正数            |
-| newness             | string  | 否   | 商品新旧度   | 可选，提供时不能为空字符串   |
+| newness             | string  | 否   | 商品新旧度   | 可选，提供时不能为空字符串，支持：全新、95新、9成新、8成新、7成新 |
+| quantity            | integer | 否   | 商品数量     | 可选，必须为正整数          |
+| mainImageUrl        | string  | 否   | 主图片URL    | 可选，商品主要展示图片的URL |
+| imageList           | string  | 否   | 图片列表     | 可选，JSON格式的图片URL数组字符串 |
 
 **响应示例**:
 
@@ -668,10 +674,22 @@ mvn verify
 - **优势**: 提高类型安全性，简化前端处理逻辑，保持数据一致性
 - **前端使用示例**: `"tagsId": [1, 2, 3]` 替代 `"tagsId": "1,2,3"`
 
+#### 商品信息更新功能增强
+- **功能扩展**: 更新商品信息接口 `/update-info` 支持更多字段
+- **新增字段**: 
+  - `quantity`（商品数量）：支持更新商品库存数量
+  - `mainImageUrl`（主图片URL）：支持更新商品主要展示图片
+  - `imageList`（图片列表）：支持更新商品图片列表，JSON格式存储
+- **完整支持字段**: 商品名称、描述、价格、新旧度、数量、图片
+- **新旧度选项**: 支持全新、95新、9成新、8成新、7成新五个等级
+- **技术实现**: 
+  - DTO层：`CommodityUpdateRequest.java` 新增数量和图片相关字段
+  - Service层：`updateCommodityInfo` 方法增加对新字段的处理逻辑
+  - Controller层：更新接口注释说明支持的字段范围
+- **业务价值**: 提供完整的商品信息维护功能，满足卖家对商品全方位管理需求
+
 #### 其他功能更新
-- 新增商品信息统一更新接口 `/update-info`
-- 添加商品新旧度字段支持
-- 废弃原有的 `/update-description` 接口
+- 废弃原有的 `/update-description` 接口，统一使用 `/update-info`
 - 支持商品名称、描述、价格、新旧度的统一更新
 - **新增OSS图片上传功能**：
   - 集成阿里云OSS服务，支持商品图片直接上传

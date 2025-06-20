@@ -25,16 +25,27 @@ public class CommodityUpdateRequest {
     
     private String newness;
     
+    @Positive(message = "商品数量必须大于0")
+    private Integer quantity;
+    
+    private String mainImageUrl;
+    
+    private String imageList;
+    
     public CommodityUpdateRequest() {}
     
     public CommodityUpdateRequest(String commodityId, String sellerId, String commodityName, 
-                                 String commodityDescription, BigDecimal currentPrice, String newness) {
+                                 String commodityDescription, BigDecimal currentPrice, String newness,
+                                 Integer quantity, String mainImageUrl, String imageList) {
         this.commodityId = commodityId;
         this.sellerId = sellerId;
         this.commodityName = commodityName;
         this.commodityDescription = commodityDescription;
         this.currentPrice = currentPrice;
         this.newness = newness;
+        this.quantity = quantity;
+        this.mainImageUrl = mainImageUrl;
+        this.imageList = imageList;
     }
     
     public String getCommodityId() {
@@ -85,6 +96,30 @@ public class CommodityUpdateRequest {
         this.newness = newness;
     }
     
+    public Integer getQuantity() {
+        return quantity;
+    }
+    
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
+    
+    public String getMainImageUrl() {
+        return mainImageUrl;
+    }
+    
+    public void setMainImageUrl(String mainImageUrl) {
+        this.mainImageUrl = mainImageUrl;
+    }
+    
+    public String getImageList() {
+        return imageList;
+    }
+    
+    public void setImageList(String imageList) {
+        this.imageList = imageList;
+    }
+    
     @Override
     public String toString() {
         return "CommodityUpdateRequest{" +
@@ -94,6 +129,9 @@ public class CommodityUpdateRequest {
                 ", commodityDescription='" + commodityDescription + '\'' +
                 ", currentPrice=" + currentPrice +
                 ", newness='" + newness + '\'' +
+                ", quantity=" + quantity +
+                ", mainImageUrl='" + mainImageUrl + '\'' +
+                ", imageList='" + imageList + '\'' +
                 '}';
     }
 }
