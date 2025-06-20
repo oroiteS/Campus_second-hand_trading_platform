@@ -46,7 +46,7 @@ class Embedder:
             for data in results_data:
                 results_buy_recommendation = self.chroma_collection_commodity.query(
                     query_embeddings=[data['embedding']],
-                    n_results=10,
+                    n_results=2,
                     where={"seller_id": {"$ne": user_id}},
                     include=['documents','metadatas']
                 )

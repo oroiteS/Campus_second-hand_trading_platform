@@ -412,6 +412,24 @@ export default {
     // 跳转到商品详情页
     goToProductDetail(productId) {
       this.$router.push(`/product/${productId}`);
+      // 记录点击行为
+      this.recordClickBehavior(productId);
+    },
+    // 记录用户点击商品行为
+    async recordClickBehavior(commodityId) {
+      try {
+        const userId = localStorage.getItem('userId');
+        if (userId) {
+          await axios.post('http://localhost:8000/api/v1/commodities/click_commodity', {
+            user_id: userId,
+            commodity_id: commodityId
+          });
+          console.log('点击行为已记录:', { userId, commodityId });
+        }
+      } catch (error) {
+        console.error('记录点击行为失败:', error);
+        // 不影响正常跳转，只记录错误
+      }
     },
     // 退出登录
     logout() {

@@ -1,6 +1,7 @@
 <template>
   <div class="nearby-users-container">
     <div class="nearby-users-card">
+      <router-link to="/" class="back-home-btn">← 返回首页</router-link>
       <h2 class="nearby-title">附近的人</h2>
       
       <!-- 查询按钮 -->
@@ -163,6 +164,30 @@ export default {
 
 <style scoped>
 @import '../styles/NearbyUsers.css';
+
+.nearby-users-card {
+  position: relative; /* For positioning the back button */
+}
+
+.back-home-btn {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  padding: 8px 12px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 16px;
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.back-home-btn:hover {
+  background-color: #f0f0f0;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
 .location-modal {
   position: fixed;
   top: 0;
