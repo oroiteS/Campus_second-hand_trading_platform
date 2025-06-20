@@ -59,6 +59,33 @@ public class CorsConfig implements WebMvcConfigurer {
         configuration.addExposedHeader("Origin");
         configuration.addExposedHeader("Access-Control-Request-Method");
         configuration.addExposedHeader("Access-Control-Request-Headers");
+        configuration.addExposedHeader("Authorization");
+        configuration.addExposedHeader("Content-Length");
+        configuration.addExposedHeader("X-Requested-With");
+        
+        // 支持图片跨域访问的额外配置
+        configuration.addExposedHeader("Cache-Control");
+        configuration.addExposedHeader("Content-Disposition");
+        configuration.addExposedHeader("Content-Encoding");
+        configuration.addExposedHeader("Date");
+        configuration.addExposedHeader("ETag");
+        configuration.addExposedHeader("Expires");
+        configuration.addExposedHeader("Last-Modified");
+        configuration.addExposedHeader("Server");
+        configuration.addExposedHeader("Vary");
+        
+        // 设置允许的请求头，支持文件上传
+        configuration.addAllowedHeader("Content-Type");
+        configuration.addAllowedHeader("X-Requested-With");
+        configuration.addAllowedHeader("accept");
+        configuration.addAllowedHeader("Origin");
+        configuration.addAllowedHeader("Access-Control-Request-Method");
+        configuration.addAllowedHeader("Access-Control-Request-Headers");
+        configuration.addAllowedHeader("Authorization");
+        configuration.addAllowedHeader("Cache-Control");
+        configuration.addAllowedHeader("Content-Disposition");
+        configuration.addAllowedHeader("Content-Range");
+        configuration.addAllowedHeader("Range");
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

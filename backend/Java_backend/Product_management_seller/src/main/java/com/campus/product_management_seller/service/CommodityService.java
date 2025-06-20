@@ -304,14 +304,13 @@ public class CommodityService {
      * @param currentPrice 商品价格
      * @param newness 商品新旧度
      * @param quantity 商品数量
-     * @param deleteExistingImages 已废弃，传入null即可
-     * @param images 商品图片文件数组（如果提供则直接替换原有图片）（可选）
+     * @param images 商品图片文件数组（可选）
      * @return 是否更新成功
      */
     public boolean updateCommodityInfoWithImages(String commodityId, String sellerId, 
                                                String commodityName, String commodityDescription,
                                                BigDecimal currentPrice, String newness, 
-                                               Integer quantity, Boolean deleteExistingImages, MultipartFile[] images) {
+                                               Integer quantity, MultipartFile[] images) {
         logger.info("尝试更新商品信息（支持图片上传）: commodityId={}, sellerId={}", commodityId, sellerId);
         
         try {
@@ -356,36 +355,36 @@ public class CommodityService {
                 updated = true;
             }
             
-            // 处理图片更新逻辑 - 如果有新图片则直接替换
+            // 处理图片上传（如果提供了新图片）
             if (images != null && images.length > 0) {
-                List<String> newImageUrls = ossUtil.uploadCommodityImages(Arrays.asList(images), sellerId);
+                // 上传新图片到OSS
+                List<String> imageUrls = ossUtil.uploadCommodityImages(Arrays.asList(images), sellerId);
                 
-                if (newImageUrls != null && !newImageUrls.isEmpty()) {
-                    List<String> finalImageUrls = new ArrayList<>();
-                    
-                    // 为新图片URL添加https前缀
-                    for (String url : newImageUrls) {
+                if (imageUrls != null && !imageUrls.isEmpty()) {
+                    // 为所有URL添加https前缀
+                    List<String> httpsImageUrls = new ArrayList<>();
+                    for (String url : imageUrls) {
                         String httpsUrl = "https://" + url;
-                        finalImageUrls.add(httpsUrl);
+                        httpsImageUrls.add(httpsUrl);
                     }
                     
                     // 第一张图片作为主图
-                    String mainImageUrl = finalImageUrls.get(0);
+                    String mainImageUrl = httpsImageUrls.get(0);
                     commodity.setMainImageUrl(mainImageUrl);
                     
                     // 构建图片列表JSON
                     StringBuilder imageListBuilder = new StringBuilder("[");
-                    for (int i = 0; i < finalImageUrls.size(); i++) {
+                    for (int i = 0; i < httpsImageUrls.size(); i++) {
                         if (i > 0) {
                             imageListBuilder.append(",");
                         }
-                        imageListBuilder.append("\"").append(finalImageUrls.get(i)).append("\"");
+                        imageListBuilder.append("\"").append(httpsImageUrls.get(i)).append("\"");
                     }
                     imageListBuilder.append("]");
                     commodity.setImageList(imageListBuilder.toString());
                     
                     updated = true;
-                    logger.info("商品图片更新成功: commodityId={}, 图片数量={}", commodityId, finalImageUrls.size());
+                    logger.info("商品图片更新成功: commodityId={}, 图片数量={}", commodityId, httpsImageUrls.size());
                 }
             }
             

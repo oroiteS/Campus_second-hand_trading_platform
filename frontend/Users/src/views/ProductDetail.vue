@@ -847,6 +847,8 @@ export default {
         const newImageIndex = index - this.product.images.length
         this.newImages.splice(newImageIndex, 1)
       }
+      // 注意：如果删除的是原有图片（index < this.product.images.length），
+      // 我们只从editingImages中删除，这样hasImageChanges检查就能检测到变更
     },
     closeEditModal() {
       this.showEditModal = false
@@ -881,28 +883,94 @@ export default {
           formData.append('quantity', parseInt(this.editingProduct.quantity).toString())
         }
         
-        // 处理图片文件（如果有新上传的图片）
-        if (this.newImages && this.newImages.length > 0) {
-          // 验证图片文件
-          const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif']
-          const maxSize = 5 * 1024 * 1024 // 5MB
+        // 检查图片是否有变更（删除原有图片或添加新图片）
+        const hasImageChanges = this.editingImages.length !== this.product.images.length || 
+                               this.newImages.length > 0
+        
+        // 如果图片有任何变更，将保留的原有图片和新增图片合并发送
+        if (hasImageChanges) {
+          const allImagesToSend = []
           
-          for (let i = 0; i < this.newImages.length; i++) {
-            const file = this.newImages[i]
-            
-            // 检查文件类型
-            if (!allowedTypes.includes(file.type)) {
-              alert(`图片文件 "${file.name}" 格式不支持，请选择 jpg、jpeg、png 或 gif 格式的图片`)
-              return
+          // 收集需要保留的原有图片URL并转换为文件
+          const retainedOriginalImages = []
+          for (let i = 0; i < this.editingImages.length; i++) {
+            const editingImage = this.editingImages[i]
+            // 如果这个图片是原有图片（不是base64格式的新图片）
+            if (!editingImage.startsWith('data:image/')) {
+              retainedOriginalImages.push(editingImage)
             }
-            
-            // 检查文件大小
-            if (file.size > maxSize) {
-              alert(`图片文件 "${file.name}" 大小超过5MB限制`)
-              return
+          }
+          
+          // 使用fetch将保留的原有图片转换为文件
+          try {
+            for (const imageUrl of retainedOriginalImages) {
+              let fullUrl = imageUrl
+              
+              // 处理相对路径，添加服务器地址
+              if (!imageUrl.startsWith('http')) {
+                fullUrl = `http://localhost:8084${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`
+              }
+              
+              console.log('正在获取保留图片:', fullUrl)
+              
+              const response = await fetch(fullUrl, {
+                method: 'GET',
+                mode: 'cors',
+                credentials: 'include'
+              })
+              
+              if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+              }
+              
+              const blob = await response.blob()
+              const fileName = `retained_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.jpg`
+              const file = new File([blob], fileName, { type: blob.type || 'image/jpeg' })
+              allImagesToSend.push(file)
+              
+              console.log('成功转换保留图片:', fileName, 'size:', file.size)
             }
+          } catch (error) {
+            console.error('处理保留图片失败:', error)
+            console.error('错误详情:', {
+              message: error.message,
+              stack: error.stack,
+              retainedImages: retainedOriginalImages
+            })
+            alert(`处理保留图片时出错: ${error.message}\n\n请检查网络连接或联系管理员。`)
+            return
+          }
+          
+          // 添加新增的图片文件
+          if (this.newImages && this.newImages.length > 0) {
+            allImagesToSend.push(...this.newImages)
+          }
+          
+          // 验证并发送所有图片文件
+          if (allImagesToSend.length > 0) {
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif']
+            const maxSize = 5 * 1024 * 1024 // 5MB
             
-            formData.append('images', file)
+            for (let i = 0; i < allImagesToSend.length; i++) {
+              const file = allImagesToSend[i]
+              
+              // 检查文件类型
+              if (!allowedTypes.includes(file.type)) {
+                alert(`图片文件 "${file.name}" 格式不支持，请选择 jpg、jpeg、png 或 gif 格式的图片`)
+                return
+              }
+              
+              // 检查文件大小
+              if (file.size > maxSize) {
+                alert(`图片文件 "${file.name}" 大小超过5MB限制`)
+                return
+              }
+              
+              formData.append('images', file)
+            }
+          } else {
+            // 如果没有任何图片，发送空的图片数据
+            formData.append('images', new Blob(), 'empty.txt')
           }
         }
         
@@ -923,10 +991,9 @@ export default {
           this.product.condition = this.editingProduct.condition
           this.product.quantity = this.editingProduct.quantity
           
-          // 如果有新图片，更新图片列表
-          if (this.newImages && this.newImages.length > 0) {
-            // 这里可以根据后端返回的图片URL更新本地图片列表
-            // 或者重新获取商品详情
+          // 如果图片有任何变更，重新获取商品详情以同步最新的图片状态
+          if (hasImageChanges) {
+            // 重新获取商品详情以获取最新的图片列表
             await this.fetchProductDetail(this.product.id)
           }
           

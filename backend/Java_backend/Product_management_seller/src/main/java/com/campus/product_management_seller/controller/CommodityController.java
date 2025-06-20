@@ -402,7 +402,7 @@ public class CommodityController {
         try {
             boolean success = commodityService.updateCommodityInfoWithImages(
                 commodityId, sellerId, commodityName, commodityDescription, 
-                currentPrice, newness, quantity, null, images);
+                currentPrice, newness, quantity, images);
             
             if (success) {
                 logger.info("商品信息更新成功: commodityId={}, sellerId={}", commodityId, sellerId);
