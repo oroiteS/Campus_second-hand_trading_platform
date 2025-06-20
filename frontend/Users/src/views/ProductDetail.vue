@@ -745,6 +745,7 @@ export default {
             },
             timeout: 5000 // 5秒超时
           })
+          
           if (cartResponse.data && cartResponse.data.success) {
             // 购物车添加成功后，更新用户画像
             try {
@@ -757,6 +758,7 @@ export default {
                 },
                 timeout: 30000
               })
+              
               if (profileResponse.data && profileResponse.data.code === 0) {
                 this.isFavorited = true
                 alert('收藏成功！商品已添加到购物车，用户画像已更新')
@@ -885,91 +887,33 @@ export default {
         const hasImageChanges = this.editingImages.length !== this.product.images.length || 
                                this.newImages.length > 0
         
-        // 如果图片有任何变更，将保留的原有图片和新增图片合并发送
-        if (hasImageChanges) {
-          const allImagesToSend = []
+        // 如果图片有任何变更，发送新图片数据
+        if (hasImageChanges && this.newImages && this.newImages.length > 0) {
+          // 验证图片文件
+          const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif']
+          const maxSize = 5 * 1024 * 1024 // 5MB
           
-          // 收集需要保留的原有图片URL并转换为文件
-          const retainedOriginalImages = []
-          for (let i = 0; i < this.editingImages.length; i++) {
-            const editingImage = this.editingImages[i]
-            // 如果这个图片是原有图片（不是base64格式的新图片）
-            if (!editingImage.startsWith('data:image/')) {
-              retainedOriginalImages.push(editingImage)
-            }
-          }
-          
-          // 使用fetch将保留的原有图片转换为文件
-          try {
-            for (const imageUrl of retainedOriginalImages) {
-              let fullUrl = imageUrl
-              
-              // 处理相对路径，添加服务器地址
-              if (!imageUrl.startsWith('http')) {
-                fullUrl = `http://localhost:8084${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`
-              }
-              
-              console.log('正在获取保留图片:', fullUrl)
-              
-              const response = await fetch(fullUrl, {
-                method: 'GET',
-                mode: 'cors',
-                credentials: 'include'
-              })
-              
-              if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-              }
-              
-              const blob = await response.blob()
-              const fileName = `retained_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.jpg`
-              const file = new File([blob], fileName, { type: blob.type || 'image/jpeg' })
-              allImagesToSend.push(file)
-              
-              console.log('成功转换保留图片:', fileName, 'size:', file.size)
-            }
-          } catch (error) {
-            console.error('处理保留图片失败:', error)
-            console.error('错误详情:', {
-              message: error.message,
-              stack: error.stack,
-              retainedImages: retainedOriginalImages
-            })
-            alert(`处理保留图片时出错: ${error.message}\n\n请检查网络连接或联系管理员。`)
-            return
-          }
-          
-          // 添加新增的图片文件
-          if (this.newImages && this.newImages.length > 0) {
-            allImagesToSend.push(...this.newImages)
-          }
-          
-          // 验证并发送所有图片文件
-          if (allImagesToSend.length > 0) {
-            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif']
-            const maxSize = 5 * 1024 * 1024 // 5MB
+          for (let i = 0; i < this.newImages.length; i++) {
+            const file = this.newImages[i]
             
-            for (let i = 0; i < allImagesToSend.length; i++) {
-              const file = allImagesToSend[i]
-              
-              // 检查文件类型
-              if (!allowedTypes.includes(file.type)) {
-                alert(`图片文件 "${file.name}" 格式不支持，请选择 jpg、jpeg、png 或 gif 格式的图片`)
-                return
-              }
-              
-              // 检查文件大小
-              if (file.size > maxSize) {
-                alert(`图片文件 "${file.name}" 大小超过5MB限制`)
-                return
-              }
-              
-              formData.append('images', file)
+            // 检查文件类型
+            if (!allowedTypes.includes(file.type)) {
+              alert(`图片文件 "${file.name}" 格式不支持，请选择 jpg、jpeg、png 或 gif 格式的图片`)
+              return
             }
-          } else {
-            // 如果没有任何图片，发送空的图片数据
-            formData.append('images', new Blob(), 'empty.txt')
+            
+            // 检查文件大小
+            if (file.size > maxSize) {
+              alert(`图片文件 "${file.name}" 大小超过5MB限制`)
+              return
+            }
+            
+            formData.append('images', file)
           }
+        } else if (hasImageChanges && this.newImages.length === 0) {
+          // 如果只是删除了原有图片而没有添加新图片，发送空的图片数据
+          // 这样后端就知道要清空图片
+          formData.append('images', new Blob(), 'empty')
         }
         
         console.log('正在发送更新请求...')
