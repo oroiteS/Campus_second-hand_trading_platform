@@ -244,24 +244,10 @@ http://localhost:8084/swagger-ui.html
 
 - **URL**: `/api/commodity/update-info`
 - **方法**: `POST`
-- **描述**: 更新商品的详细信息，包括名称、描述、价格、新旧度、数量和图片。支持部分字段更新。
-- **Content-Type**: `application/json`
+- **描述**: 更新商品的详细信息，包括名称、描述、价格、新旧度、数量和图片。支持部分字段更新和图片文件直接上传。
+- **Content-Type**: `multipart/form-data`
 
 **请求参数**:
-
-```json
-{
-  "commodityId": "string",
-  "sellerId": "string",
-  "commodityName": "string",
-  "commodityDescription": "string",
-  "currentPrice": 0.00,
-  "newness": "string",
-  "quantity": 1,
-  "mainImageUrl": "string",
-  "imageList": "string"
-}
-```
 
 | 参数名               | 类型    | 必填 | 描述         | 验证规则                    |
 |---------------------|---------|------|--------------|-----------------------------|
@@ -272,8 +258,27 @@ http://localhost:8084/swagger-ui.html
 | currentPrice        | decimal | 否   | 当前价格     | 可选，必须为正数            |
 | newness             | string  | 否   | 商品新旧度   | 可选，提供时不能为空字符串，支持：全新、95新、9成新、8成新、7成新 |
 | quantity            | integer | 否   | 商品数量     | 可选，必须为正整数          |
-| mainImageUrl        | string  | 否   | 主图片URL    | 可选，商品主要展示图片的URL |
-| imageList           | string  | 否   | 图片列表     | 可选，JSON格式的图片URL数组字符串 |
+| deleteExistingImages| boolean | 否   | 是否删除原有图片 | 可选，默认false。true=删除原有图片，false=保留原有图片 |
+| images              | file[]  | 否   | 商品图片文件 | 可选，支持多张图片上传，格式：jpg/jpeg/png/gif/webp，单个文件不超过10MB |
+
+**图片更新逻辑说明**:
+
+1. **保留原有图片 + 新增图片** (`deleteExistingImages=false` 且提供 `images`):
+   - 保留商品的所有原有图片
+   - 将新上传的图片添加到图片列表末尾
+   - 第一张图片（原有或新增）作为主图
+
+2. **删除原有图片 + 新增图片** (`deleteExistingImages=true` 且提供 `images`):
+   - 删除商品的所有原有图片
+   - 使用新上传的图片替换
+   - 第一张新图片作为主图
+
+3. **仅删除原有图片** (`deleteExistingImages=true` 且不提供 `images`):
+   - 删除商品的所有原有图片
+   - 清空主图和图片列表
+
+4. **不更改图片** (`deleteExistingImages=false` 且不提供 `images`):
+   - 保持原有图片不变
 
 **响应示例**:
 
