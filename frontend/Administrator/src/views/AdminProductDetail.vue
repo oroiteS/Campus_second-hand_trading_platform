@@ -1,107 +1,147 @@
 <template>
   <div class="admin-product-detail">
-    <!-- 顶部导航栏 -->
-    <header class="header">
+    <!-- 顶部导航 -->
+    <header class="detail-header">
       <div class="header-content">
-        <div class="back-button" @click="goBack">
-          <span class="back-icon">←</span> 返回
-        </div>
+        <button @click="goBack" class="header-btn back-btn">
+          ← 返回
+        </button>
         <h1 class="page-title">商品详情管理</h1>
         <div class="placeholder"></div>
       </div>
     </header>
 
     <div class="detail-container" v-if="product">
-      <!-- 商品基本信息 -->
-      <div class="product-info-card">
-        <div class="product-header">
-          <div class="product-image">
-            <img :src="product.image" :alt="product.name" class="main-image" />
+      <!-- 左侧：商品图片 -->
+      <div class="product-images">
+        <div class="main-image">
+          <img :src="currentImage" :alt="product.name" class="main-img" />
+        </div>
+        <div class="thumbnail-list">
+          <div 
+            v-for="(image, index) in product.images" 
+            :key="index"
+            class="thumbnail"
+            :class="{ active: currentImageIndex === index }"
+            @click="selectImage(index)"
+          >
+            <img :src="image" :alt="`商品图片${index + 1}`" />
           </div>
-          <div class="product-basic-info">
-            <h2 class="product-title">{{ product.name }}</h2>
-            <div class="product-price-section">
-              <span class="product-price">¥{{ product.price }}</span>
-              <span class="product-original-price" v-if="product.originalPrice">¥{{ product.originalPrice }}</span>
+        </div>
+      </div>
+
+      <!-- 右侧：商品信息 -->
+      <div class="product-info">
+        <!-- 价格和标题 -->
+        <div class="price-section">
+          <div class="price-main">
+            <span class="currency">¥</span>
+            <span class="price">{{ product.price }}</span>
+          </div>
+          <div class="price-original" v-if="product.originalPrice">
+            原价：¥{{ product.originalPrice }}
+          </div>
+        </div>
+
+        <h2 class="product-title">{{ product.name }}</h2>
+        
+        <!-- 商品状态 -->
+        <div class="product-status">
+          <span 
+            class="status-badge" 
+            :class="{
+              'status-pending': product.status === 'pending',
+              'status-approved': product.status === 'approved',
+              'status-rejected': product.status === 'rejected'
+            }"
+          >
+            {{ 
+              product.status === 'pending' ? '待审核' : 
+              product.status === 'approved' ? '已上架' : '已下架' 
+            }}
+          </span>
+        </div>
+        
+        <!-- 商品描述 -->
+        <div class="product-description">
+          <p>{{ product.description }}</p>
+        </div>
+
+        <!-- 商品详细信息 -->
+        <div class="product-details">
+          <div class="detail-item">
+            <span class="label">商品ID：</span>
+            <span class="value">{{ product.id }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">成色：</span>
+            <span class="value condition">{{ product.condition }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">品牌：</span>
+            <span class="value">{{ product.brand }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">交易地点：</span>
+            <span class="value location">📍 {{ product.location }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">发布时间：</span>
+            <span class="value">{{ product.publishTime }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">浏览次数：</span>
+            <span class="value">{{ product.viewCount }} 次</span>
+          </div>
+        </div>
+
+        <!-- 卖家信息 -->
+        <div class="seller-section">
+          <div class="seller-header">
+            <h3>卖家信息</h3>
+          </div>
+          <div class="seller-info">
+            <img :src="product.sellerAvatar || product.seller?.avatar" class="seller-avatar" />
+            <div class="seller-details">
+              <div class="seller-name">{{ product.sellerName || product.seller?.name }}</div>
+              <div class="seller-school">{{ product.sellerSchool || product.seller?.school }}</div>
+              <div class="seller-contact" v-if="product.sellerContact">
+                联系方式：{{ product.sellerContact }}
+              </div>
+              <div class="seller-stats" v-if="product.seller">
+                <span>信用评分：{{ product.seller.creditScore }}</span>
+                <span>成交：{{ product.seller.dealCount }}笔</span>
+              </div>
             </div>
-            <div class="product-status">
-              <span 
-                class="status-badge" 
-                :class="{
-                  'status-pending': product.status === 'pending',
-                  'status-approved': product.status === 'approved',
-                  'status-rejected': product.status === 'rejected'
-                }"
-              >
-                {{ 
-                  product.status === 'pending' ? '待审核' : 
-                  product.status === 'approved' ? '已上架' : '已下架' 
-                }}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 商品详细信息 -->
-      <div class="product-details-card">
-        <h3 class="section-title">商品信息</h3>
-        <div class="details-grid">
-          <div class="detail-item">
-            <span class="detail-label">商品ID:</span>
-            <span class="detail-value">{{ product.id }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">商品状态:</span>
-            <span class="detail-value">{{ product.condition }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">发布时间:</span>
-            <span class="detail-value">{{ product.publishTime }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">所在位置:</span>
-            <span class="detail-value">{{ product.location }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- 卖家信息 -->
-      <div class="seller-card">
-        <h3 class="section-title">卖家信息</h3>
-        <div class="seller-info">
-          <img :src="product.sellerAvatar" class="seller-avatar" />
-          <div class="seller-details">
-            <div class="seller-name">{{ product.sellerName }}</div>
-            <div class="seller-school">{{ product.sellerSchool }}</div>
-            <div class="seller-contact">联系方式: {{ product.sellerContact || '未提供' }}</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 商品描述 -->
-      <div class="description-card">
-        <h3 class="section-title">商品描述</h3>
-        <p class="description-text">
-          {{ product.description || '暂无描述' }}
-        </p>
-      </div>
-
-      <!-- 审核记录 -->
-      <div class="audit-card" v-if="product.auditHistory && product.auditHistory.length > 0">
-        <h3 class="section-title">审核记录</h3>
-        <div class="audit-list">
-          <div class="audit-item" v-for="audit in product.auditHistory" :key="audit.id">
-            <div class="audit-time">{{ audit.time }}</div>
-            <div class="audit-action">{{ audit.action }}</div>
-            <div class="audit-operator">操作人: {{ audit.operator }}</div>
-            <div class="audit-reason" v-if="audit.reason">原因: {{ audit.reason }}</div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 底部操作栏 -->
+    <!-- 商品详细描述 -->
+    <div class="description-section" v-if="product">
+      <h3 class="section-title">商品详情</h3>
+      <div class="description-content">
+        <p v-for="(paragraph, index) in product.detailDescription" :key="index">
+          {{ paragraph }}
+        </p>
+      </div>
+    </div>
+
+    <!-- 审核记录 -->
+    <div class="audit-card" v-if="product && product.auditHistory && product.auditHistory.length > 0">
+      <h3 class="section-title">审核记录</h3>
+      <div class="audit-list">
+        <div class="audit-item" v-for="audit in product.auditHistory" :key="audit.id">
+          <div class="audit-time">{{ audit.time }}</div>
+          <div class="audit-action">{{ audit.action }}</div>
+          <div class="audit-operator">操作人: {{ audit.operator }}</div>
+          <div class="audit-reason" v-if="audit.reason">原因: {{ audit.reason }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部操作栏 - 管理员审核按钮 -->
     <div class="bottom-action-bar" v-if="product">
       <div class="action-buttons">
         <button 
@@ -133,14 +173,20 @@
 </template>
 
 <script>
-// 移除 productService 导入，只保留 commodityService
 import { commodityService } from '../api/commodityService'
+import { productService } from '../api/ProductService'
 
 export default {
   name: 'AdminProductDetail',
   data() {
     return {
-      product: null
+      product: null,
+      currentImageIndex: 0
+    }
+  },
+  computed: {
+    currentImage() {
+      return this.product?.images?.[this.currentImageIndex] || this.product?.image
     }
   },
   created() {
@@ -151,73 +197,117 @@ export default {
       const productId = this.$route.params.id
       
       try {
-        // 使用 commodityService 获取商品详情
-        const result = await commodityService.getCommoditiesWithUsername()
-        if (result.success) {
-          // 从返回的商品列表中找到对应的商品
-          this.product = result.data.find(item => item.id == productId)
+        // 使用新的 productService 获取商品详情
+        const result = await productService.getCommodityDetail(productId)
+        if (result.success && result.data.code === 200) {
+          const commodityData = result.data.data
+          
+          // 映射API返回的数据到组件需要的格式
+          this.product = {
+            id: commodityData.commodityId,
+            name: commodityData.commodityName,
+            description: commodityData.commodityDescription,
+            price: commodityData.currentPrice,
+            status: this.mapCommodityStatus(commodityData.commodityStatus),
+            condition: commodityData.newness,
+            category: commodityData.categoryName,
+            sellerId: commodityData.sellerId,
+            image: commodityData.mainImageUrl,
+            images: commodityData.imageList ? JSON.parse(commodityData.imageList) : [commodityData.mainImageUrl],
+            publishTime: new Date(commodityData.createdAt).toLocaleString(),
+            viewCount: 0, // API未提供，设为默认值
+            quantity: commodityData.quantity,
+            // 卖家信息需要从其他API获取或设置默认值
+            sellerName: '卖家信息',
+            sellerAvatar: '/default-avatar.png',
+            sellerSchool: '未知学校',
+            detailDescription: [commodityData.commodityDescription]
+          }
         } else {
           console.error('获取商品详情失败:', result.message)
         }
       } catch (error) {
         console.error('获取商品详情出错:', error)
       }
-    }
-  },
-  goBack() {
-    this.$router.go(-1)
-  },
-  approveProduct() {
-    if (confirm('确定要上架这个商品吗？')) {
-      commodityService.updateCommodityStatus(this.product.id, 'approved')
-        .then(() => {
-          this.product.status = 'approved'
-          // 添加审核记录
-          if (!this.product.auditHistory) {
-            this.product.auditHistory = []
-          }
-          this.product.auditHistory.push({
-            id: this.product.auditHistory.length + 1,
-            time: new Date().toLocaleString(),
-            action: '审核通过',
-            operator: '管理员',
-            reason: '商品审核通过，允许上架'
+    },
+    
+    // 映射商品状态
+    mapCommodityStatus(status) {
+      const statusMap = {
+        'to_sale': 'pending',
+        'on_sale': 'approved', 
+        'sold': 'sold',
+        'off_sale': 'rejected'
+      }
+      return statusMap[status] || 'pending'
+    },
+    
+    goBack() {
+      // 直接跳转到 AdminDashboard 的商品管理页面
+      this.$router.push({ 
+        path: '/admin/dashboard',
+        query: { activeMenu: 'products' }
+      })
+    },
+    
+    selectImage(index) {
+      this.currentImageIndex = index
+    },
+    
+    approveProduct() {
+      if (confirm('确定要上架这个商品吗？')) {
+        commodityService.updateCommodityStatus(this.product.id, 'approved')
+          .then(() => {
+            this.product.status = 'approved'
+            // 添加审核记录
+            if (!this.product.auditHistory) {
+              this.product.auditHistory = []
+            }
+            this.product.auditHistory.push({
+              id: this.product.auditHistory.length + 1,
+              time: new Date().toLocaleString(),
+              action: '审核通过',
+              operator: '管理员',
+              reason: '商品审核通过，允许上架'
+            })
+            alert('商品已成功上架')
           })
-          alert('商品已成功上架')
-        })
-        .catch(error => {
-          console.error('更新商品状态失败:', error)
-          alert('操作失败，请重试')
-        })
-    }
-  },
-  rejectProduct() {
-    const reason = prompt('请输入下架原因:')
-    if (reason !== null) {
-      commodityService.updateCommodityStatus(this.product.id, 'rejected')
-        .then(() => {
-          this.product.status = 'rejected'
-          // 添加审核记录
-          if (!this.product.auditHistory) {
-            this.product.auditHistory = []
-          }
-          this.product.auditHistory.push({
-            id: this.product.auditHistory.length + 1,
-            time: new Date().toLocaleString(),
-            action: '审核拒绝',
-            operator: '管理员',
-            reason: reason || '不符合平台规范'
+          .catch(error => {
+            console.error('更新商品状态失败:', error)
+            alert('操作失败，请重试')
           })
-          alert('商品已下架')
-        })
-        .catch(error => {
-          console.error('更新商品状态失败:', error)
-          alert('操作失败，请重试')
-        })
+      }
+    },
+    
+    rejectProduct() {
+      const reason = prompt('请输入下架原因:')
+      if (reason !== null) {
+        commodityService.updateCommodityStatus(this.product.id, 'rejected')
+          .then(() => {
+            this.product.status = 'rejected'
+            // 添加审核记录
+            if (!this.product.auditHistory) {
+              this.product.auditHistory = []
+            }
+            this.product.auditHistory.push({
+              id: this.product.auditHistory.length + 1,
+              time: new Date().toLocaleString(),
+              action: '审核拒绝',
+              operator: '管理员',
+              reason: reason || '不符合平台规范'
+            })
+            alert('商品已下架')
+          })
+          .catch(error => {
+            console.error('更新商品状态失败:', error)
+            alert('操作失败，请重试')
+          })
+      }
+    },
+    
+    contactSeller() {
+      alert(`联系卖家: ${this.product.sellerContact || '联系方式未提供'}`)
     }
-  },
-  contactSeller() {
-    alert(`联系卖家: ${this.product.sellerContact || '联系方式未提供'}`)
   }
 }
 </script>
@@ -229,7 +319,7 @@ export default {
   padding-bottom: 80px;
 }
 
-.header {
+.detail-header {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 15px 0;
   position: sticky;
@@ -248,21 +338,25 @@ export default {
   color: white;
 }
 
-.back-button {
-  display: flex;
-  align-items: center;
+.header-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 16px;
   cursor: pointer;
-  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 6px;
+  transition: background-color 0.3s;
 }
 
-.back-icon {
-  margin-right: 5px;
-  font-size: 18px;
+.header-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .page-title {
   font-size: 18px;
   font-weight: 600;
+  margin: 0;
 }
 
 .placeholder {
@@ -270,69 +364,107 @@ export default {
 }
 
 .detail-container {
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
-}
-
-.product-info-card {
-  background-color: white;
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-}
-
-.product-header {
   display: flex;
-  gap: 20px;
+  gap: 30px;
 }
 
-.product-image {
-  flex-shrink: 0;
+.product-images {
+  flex: 0 0 400px;
 }
 
 .main-image {
-  width: 200px;
-  height: 200px;
-  object-fit: cover;
-  border-radius: 8px;
+  margin-bottom: 15px;
 }
 
-.product-basic-info {
-  flex-grow: 1;
+.main-img {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.thumbnail-list {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+}
+
+.thumbnail {
+  flex-shrink: 0;
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.3s;
+}
+
+.thumbnail.active {
+  border-color: #667eea;
+}
+
+.thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-info {
+  flex: 1;
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+.price-section {
+  margin-bottom: 20px;
+}
+
+.price-main {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+.currency {
+  font-size: 24px;
+  color: #ff4757;
+  font-weight: 600;
+  margin-right: 5px;
+}
+
+.price {
+  font-size: 36px;
+  color: #ff4757;
+  font-weight: bold;
+}
+
+.price-original {
+  color: #a4b0be;
+  text-decoration: line-through;
+  font-size: 16px;
 }
 
 .product-title {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 600;
   color: #2f3542;
-  margin-bottom: 15px;
-}
-
-.product-price-section {
-  margin-bottom: 15px;
-}
-
-.product-price {
-  font-size: 28px;
-  font-weight: bold;
-  color: #ff4757;
-}
-
-.product-original-price {
-  font-size: 18px;
-  color: #a4b0be;
-  text-decoration: line-through;
-  margin-left: 15px;
+  margin-bottom: 20px;
+  line-height: 1.3;
 }
 
 .product-status {
-  margin-top: 10px;
+  margin-bottom: 20px;
 }
 
 .status-badge {
-  padding: 6px 12px;
+  padding: 8px 16px;
   border-radius: 20px;
   font-size: 14px;
   font-weight: 500;
@@ -353,47 +485,76 @@ export default {
   color: #e17055;
 }
 
-.product-details-card,
-.seller-card,
-.description-card,
-.audit-card {
-  background-color: white;
-  border-radius: 12px;
+.product-description {
+  margin-bottom: 25px;
   padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  background-color: #f8f9fa;
+  border-radius: 8px;
 }
 
-.section-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: #2f3542;
-  margin-bottom: 15px;
-  padding-bottom: 10px;
-  border-bottom: 2px solid #f1f2f6;
+.product-description p {
+  color: #57606f;
+  line-height: 1.6;
+  margin: 0;
+  font-size: 16px;
 }
 
-.details-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 15px;
+.product-details {
+  margin-bottom: 30px;
 }
 
 .detail-item {
   display: flex;
   justify-content: space-between;
-  padding: 10px 0;
+  align-items: center;
+  padding: 12px 0;
   border-bottom: 1px solid #f1f2f6;
 }
 
-.detail-label {
-  color: #747d8c;
-  font-weight: 500;
+.detail-item:last-child {
+  border-bottom: none;
 }
 
-.detail-value {
+.label {
+  color: #747d8c;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.value {
   color: #2f3542;
   font-weight: 600;
+  font-size: 14px;
+}
+
+.condition {
+  background-color: #00b894;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+.location {
+  color: #5352ed;
+}
+
+.seller-section {
+  border-top: 2px solid #f1f2f6;
+  padding-top: 25px;
+}
+
+.seller-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.seller-header h3 {
+  margin: 0;
+  color: #2f3542;
+  font-size: 18px;
 }
 
 .seller-info {
@@ -406,10 +567,11 @@ export default {
   width: 60px;
   height: 60px;
   border-radius: 50%;
+  object-fit: cover;
 }
 
 .seller-details {
-  flex-grow: 1;
+  flex: 1;
 }
 
 .seller-name {
@@ -421,14 +583,46 @@ export default {
 
 .seller-school,
 .seller-contact {
-  font-size: 14px;
   color: #747d8c;
+  font-size: 14px;
   margin-bottom: 3px;
 }
 
-.description-text {
+.seller-stats {
+  display: flex;
+  gap: 15px;
+  margin-top: 8px;
+}
+
+.seller-stats span {
+  color: #5352ed;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.description-section,
+.audit-card {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 30px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #2f3542;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #f1f2f6;
+}
+
+.description-content p {
   color: #57606f;
   line-height: 1.8;
+  margin-bottom: 15px;
   font-size: 16px;
 }
 
@@ -476,7 +670,7 @@ export default {
 }
 
 .action-buttons {
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 0 auto;
   display: flex;
   gap: 15px;
@@ -545,17 +739,17 @@ export default {
 }
 
 @media (max-width: 768px) {
-  .product-header {
+  .detail-container {
     flex-direction: column;
+    gap: 20px;
   }
   
-  .main-image {
-    width: 100%;
-    height: 250px;
+  .product-images {
+    flex: none;
   }
   
-  .details-grid {
-    grid-template-columns: 1fr;
+  .main-img {
+    height: 300px;
   }
   
   .action-buttons {

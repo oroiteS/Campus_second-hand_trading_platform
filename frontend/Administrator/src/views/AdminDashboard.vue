@@ -36,6 +36,14 @@
         </div>
         <div 
           class="nav-item" 
+          :class="{ active: activeMenu === 'orders' }" 
+          @click="activeMenu = 'orders'"
+        >
+          <span class="nav-icon">📋</span>
+          <span class="nav-text">订单管理</span>
+        </div>
+        <div 
+          class="nav-item" 
           :class="{ active: activeMenu === 'appeals' }" 
           @click="activeMenu = 'appeals'"
         >
@@ -114,8 +122,15 @@
 
             <div class="announcements-list" v-if="!showAnnouncementForm">
               <div class="announcement-item" v-for="announcement in announcements" :key="announcement.id">
-                <div class="announcement-header">
-                  <h3 class="announcement-title">{{ announcement.title }}</h3>
+                <!-- 公告内容 -->
+                <div class="announcement-content">{{ announcement.content }}</div>
+                
+                <!-- 底部信息和操作按钮 -->
+                <div class="announcement-footer">
+                  <div class="announcement-meta">
+                    <span class="announcement-time">{{ announcement.publishTime }}</span>
+                    <span class="announcement-publisher">发布者: {{ announcement.publisher }}</span>
+                  </div>
                   <div class="announcement-actions">
                     <button class="action-btn edit-btn" @click="editAnnouncement(announcement)">
                       编辑
@@ -125,24 +140,11 @@
                     </button>
                   </div>
                 </div>
-                <div class="announcement-content">{{ announcement.content }}</div>
-                <div class="announcement-footer">
-                  <span class="announcement-time">发布时间: {{ announcement.publishTime }}</span>
-                </div>
               </div>
             </div>
 
             <div class="announcement-form" v-if="showAnnouncementForm">
               <h3>{{ editingAnnouncement ? '编辑公告' : '发布新公告' }}</h3>
-              <div class="form-group">
-                <label for="announcement-title">公告标题</label>
-                <input 
-                  type="text" 
-                  id="announcement-title" 
-                  v-model="announcementForm.title" 
-                  placeholder="请输入公告标题"
-                />
-              </div>
               <div class="form-group">
                 <label for="announcement-content">公告内容</label>
                 <textarea 
@@ -318,9 +320,6 @@
               </div>
             </div>
             <div class="modal-footer">
-              <button class="reset-password-btn" @click="resetUserPassword">
-                重置密码
-              </button>
               <button class="cancel-btn" @click="closeUserDetailModal">
                 关闭
               </button>
@@ -445,6 +444,132 @@
           </div>
         </div>
 
+        <!-- 订单管理 -->
+        <div v-if="activeMenu === 'orders'" class="orders-content">
+          <div class="content-header">
+            <div class="search-box">
+              <input type="text" placeholder="搜索订单..." v-model="orderSearchQuery" @input="searchOrders" />
+              <span class="search-icon">🔍</span>
+            </div>
+            <div class="filter-actions">
+              <select v-model="orderStatusFilter" @change="filterOrders">
+                <option value="all">所有状态</option>
+                <option value="pending">待付款</option>
+                <option value="paid">已付款</option>
+                <option value="shipped">已发货</option>
+                <option value="completed">已完成</option>
+                <option value="cancelled">已取消</option>
+                <option value="refunding">退款中</option>
+                <option value="refunded">已退款</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>订单ID</th>
+                  <th>买家</th>
+                  <th>卖家</th>
+                  <th>商品名称</th>
+                  <th>订单金额</th>
+                  <th>订单状态</th>
+                  <th>创建时间</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="order in filteredOrders" :key="order.id" class="clickable-row">
+                  <td @click="viewOrderDetail(order.id)">{{ order.id }}</td>
+                  <td @click="viewOrderDetail(order.id)">{{ order.buyerName }}</td>
+                  <td @click="viewOrderDetail(order.id)">{{ order.sellerName }}</td>
+                  <td @click="viewOrderDetail(order.id)">
+                    <div class="product-info">
+                      <div class="product-image">
+                        <img :src="order.productImage" :alt="order.productName" />
+                      </div>
+                      <div class="product-name">{{ order.productName }}</div>
+                    </div>
+                  </td>
+                  <td @click="viewOrderDetail(order.id)">¥{{ order.totalAmount }}</td>
+                  <td @click="viewOrderDetail(order.id)">
+                    <span 
+                      class="status-badge" 
+                      :class="{
+                        'status-pending': order.status === 'pending',
+                        'status-paid': order.status === 'paid',
+                        'status-shipped': order.status === 'shipped',
+                        'status-completed': order.status === 'completed',
+                        'status-cancelled': order.status === 'cancelled',
+                        'status-refunding': order.status === 'refunding',
+                        'status-refunded': order.status === 'refunded'
+                      }"
+                    >
+                      {{ getOrderStatusText(order.status) }}
+                    </span>
+                  </td>
+                  <td @click="viewOrderDetail(order.id)">{{ order.createTime }}</td>
+                  <td @click.stop>
+                    <button 
+                      v-if="order.status === 'refunding'"
+                      class="action-btn approve-btn" 
+                      @click="processRefund(order.id, 'approve')"
+                    >
+                      同意退款
+                    </button>
+                    <button 
+                      v-if="order.status === 'refunding'"
+                      class="action-btn reject-btn" 
+                      @click="processRefund(order.id, 'reject')"
+                    >
+                      拒绝退款
+                    </button>
+                    <button 
+                      class="action-btn detail-btn" 
+                      @click="viewOrderDetail(order.id)"
+                    >
+                      详情
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="pagination">
+            <button 
+              class="page-btn" 
+              :disabled="currentOrderPage === 1" 
+              @click="goToFirstOrderPage"
+            >
+              首页
+            </button>
+            <button 
+              class="page-btn" 
+              :disabled="currentOrderPage === 1" 
+              @click="currentOrderPage--"
+            >
+              上一页
+            </button>
+            <span class="page-info">{{ currentOrderPage }} / {{ totalOrderPages }}</span>
+            <button 
+              class="page-btn" 
+              :disabled="currentOrderPage === totalOrderPages" 
+              @click="currentOrderPage++"
+            >
+              下一页
+            </button>
+            <button 
+              class="page-btn" 
+              :disabled="currentOrderPage === totalOrderPages" 
+              @click="goToLastOrderPage"
+            >
+              末页
+            </button>
+          </div>
+        </div>
+
         <!-- 申诉管理 -->
         <div v-if="activeMenu === 'appeals'" class="appeals-content">
           <div class="content-header">
@@ -459,25 +584,7 @@
             </div>
           </div>
 
-          <div class="appeals-tabs">
-            <div 
-              class="tab-item" 
-              :class="{ active: activeAppealTab === 'refunds' }"
-              @click="activeAppealTab = 'refunds'"
-            >
-              退款请求 ({{ refundAppeals.length }})
-            </div>
-            <div 
-              class="tab-item" 
-              :class="{ active: activeAppealTab === 'passwords' }"
-              @click="activeAppealTab = 'passwords'"
-            >
-              密码重置 ({{ passwordAppeals.length }})
-            </div>
-          </div>
-
-          <!-- 退款请求 -->
-          <div v-if="activeAppealTab === 'refunds'" class="table-container">
+          <div class="table-container">
             <table class="data-table">
               <thead>
                 <tr>
@@ -538,66 +645,6 @@
             </table>
           </div>
 
-          <!-- 密码重置 -->
-          <div v-if="activeAppealTab === 'passwords'" class="table-container">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>用户名</th>
-                  <th>邮箱/手机</th>
-                  <th>验证方式</th>
-                  <th>提交时间</th>
-                  <th>状态</th>
-                  <th>操作</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="password in filteredPasswords" :key="password.id">
-                  <td>{{ password.id }}</td>
-                  <td>{{ password.username }}</td>
-                  <td>{{ password.contact }}</td>
-                  <td>
-                    <span class="type-badge type-password">
-                      {{ password.verifyMethod === 'email' ? '邮箱验证' : '手机验证' }}
-                    </span>
-                  </td>
-                  <td>{{ password.submitTime }}</td>
-                  <td>
-                    <span 
-                      class="status-badge" 
-                      :class="getStatusClass(password.status)"
-                    >
-                      {{ getStatusText(password.status) }}
-                    </span>
-                  </td>
-                  <td>
-                    <button 
-                      v-if="password.status === 'pending'"
-                      class="action-btn approve-btn" 
-                      @click="approvePasswordReset(password)"
-                    >
-                      同意
-                    </button>
-                    <button 
-                      v-if="password.status === 'pending'"
-                      class="action-btn reject-btn" 
-                      @click="rejectPasswordReset(password)"
-                    >
-                      拒绝
-                    </button>
-                    <button 
-                      class="action-btn detail-btn" 
-                      @click="viewPasswordDetail(password)"
-                    >
-                      详情
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
           <div class="pagination">
             <button 
               class="page-btn" 
@@ -642,8 +689,15 @@
 
           <div class="announcements-list" v-if="!showAnnouncementForm">
             <div class="announcement-item" v-for="announcement in announcements" :key="announcement.id">
-              <div class="announcement-header">
-                <h3 class="announcement-title">{{ announcement.title }}</h3>
+              <!-- 公告内容 -->
+              <div class="announcement-content">{{ announcement.content }}</div>
+              
+              <!-- 底部信息和操作按钮 -->
+              <div class="announcement-footer">
+                <div class="announcement-meta">
+                  <span class="announcement-time">{{ announcement.publishTime }}</span>
+                  <span class="announcement-publisher">发布者: {{ announcement.publisher }}</span>
+                </div>
                 <div class="announcement-actions">
                   <button class="action-btn edit-btn" @click="editAnnouncement(announcement)">
                     编辑
@@ -653,24 +707,11 @@
                   </button>
                 </div>
               </div>
-              <div class="announcement-content">{{ announcement.content }}</div>
-              <div class="announcement-footer">
-                <span class="announcement-time">发布时间: {{ announcement.publishTime }}</span>
-              </div>
             </div>
           </div>
 
           <div class="announcement-form" v-if="showAnnouncementForm">
             <h3>{{ editingAnnouncement ? '编辑公告' : '发布新公告' }}</h3>
-            <div class="form-group">
-              <label for="announcement-title">公告标题</label>
-              <input 
-                type="text" 
-                id="announcement-title" 
-                v-model="announcementForm.title" 
-                placeholder="请输入公告标题"
-              />
-            </div>
             <div class="form-group">
               <label for="announcement-content">公告内容</label>
               <textarea 
@@ -706,6 +747,7 @@ export default {
   data() {
     return {
       adminUsername: localStorage.getItem('adminUsername') || '管理员',
+      adminId: localStorage.getItem('adminId') || 'ADMIN0001',
       activeMenu: 'dashboard',
       
       // 统计数据
@@ -748,6 +790,14 @@ export default {
       currentProductPage: 1,
       totalProductPages: 1,
       
+      // 订单管理
+      orders: [],
+      filteredOrders: [],
+      orderSearchQuery: '',
+      orderStatusFilter: 'all',
+      currentOrderPage: 1,
+      totalOrderPages: 1,
+      
       // 申诉管理
       appeals: [],
       filteredAppeals: [],
@@ -756,24 +806,17 @@ export default {
       appealStatusFilter: 'all',
       currentAppealPage: 1,
       totalAppealPages: 1,
-      activeAppealTab: 'refunds',
-      
 
       
       // 退款请求
       refundAppeals: [],
       filteredRefunds: [],
       
-      // 密码重置
-      passwordAppeals: [],
-      filteredPasswords: [],
-      
       // 公告管理
       announcements: [],
       showAnnouncementForm: false,
       editingAnnouncement: null,
       announcementForm: {
-        title: '',
         content: ''
       },
       
@@ -796,6 +839,7 @@ export default {
         case 'dashboard': return '控制面板';
         case 'users': return '用户管理';
         case 'products': return '商品管理';
+        case 'orders': return '订单管理';
         case 'appeals': return '申诉管理';
         case 'announcements': return '公告管理';
         default: return '控制面板';
@@ -824,6 +868,8 @@ export default {
         this.loadUsers();
       } else if (newValue === 'products') {
         this.loadProducts();
+      } else if (newValue === 'orders') {
+        this.loadOrders();
       } else if (newValue === 'appeals') {
         this.loadAppeals();
       } else if (newValue === 'announcements') {
@@ -1012,19 +1058,19 @@ export default {
           console.log('后端返回的商品数据:', response.data); // 调试日志
           
           // 处理后端返回的商品数据，映射到前端需要的格式
-          this.products = response.data.map(commodity => {
-            console.log('商品状态:', commodity.commodity_status); // 调试每个商品的状态
-            return {
-              id: commodity.commodity_id,
-              name: commodity.commodity_name,
-              price: commodity.current_price,
-              seller: commodity.username,
-              publishTime: new Date(commodity.created_at).toLocaleDateString(),
-              status: this.mapCommodityStatus(commodity.commodity_status),
-              originalStatus: commodity.commodity_status, // 保存原始状态用于筛选
-              image: commodity.main_image_url || 'https://via.placeholder.com/50'
-            };
-          });
+      this.products = response.data.map(commodity => {
+        console.log('商品状态:', commodity.commodity_status); // 调试每个商品的状态
+        return {
+          id: commodity.commodity_id,
+          name: commodity.commodity_name,
+          price: commodity.current_price,
+          seller: commodity.user_name, // 修改：使用 user_name 字段
+          publishTime: new Date(commodity.created_at).toLocaleDateString(),
+          status: this.mapCommodityStatus(commodity.commodity_status),
+          originalStatus: commodity.commodity_status, // 保存原始状态用于筛选
+          image: commodity.main_image_url || 'https://via.placeholder.com/50'
+        };
+      });
           
           console.log('处理后的商品数据:', this.products); // 调试处理后的数据
           
@@ -1173,49 +1219,30 @@ export default {
       this.refundAppeals = [
         {
           id: 1,
-          applicant: '用户005',
+          applicantId: 'USER005',
+          respondentId: 'USER002',
           orderId: 'ORD001',
-          productName: 'iPhone 13',
-          amount: 5000,
           reason: '商品与描述不符，要求退款',
           submitTime: '2024-01-13 09:15:00',
-          status: 'pending'
+          status: 'pending',
+          isCompleted: false,
+          adminId: null
         },
         {
           id: 2,
-          applicant: '用户006',
+          applicantId: 'USER006',
+          respondentId: 'USER004',
           orderId: 'ORD002',
-          productName: '笔记本电脑',
-          amount: 3500,
           reason: '商品有质量问题，无法正常使用',
           submitTime: '2024-01-12 14:30:00',
-          status: 'resolved'
-        }
-      ];
-      
-      // 模拟密码重置数据
-      this.passwordAppeals = [
-        {
-          id: 1,
-          username: '用户007',
-          contact: 'user007@example.com',
-          verifyMethod: 'email',
-          submitTime: '2024-01-11 16:45:00',
-          status: 'pending'
-        },
-        {
-          id: 2,
-          username: '用户008',
-          contact: '138****5678',
-          verifyMethod: 'phone',
-          submitTime: '2024-01-10 11:20:00',
-          status: 'resolved'
+          status: 'resolved',
+          isCompleted: true,
+          adminId: 'ADMIN0001'
         }
       ];
       
       this.filteredRefunds = [...this.refundAppeals];
-      this.filteredPasswords = [...this.passwordAppeals];
-      this.totalAppealPages = Math.ceil(Math.max(this.refundAppeals.length, this.passwordAppeals.length) / 10);
+      this.totalAppealPages = Math.ceil(this.refundAppeals.length / 10);
     },
     
     filterAppeals() {
@@ -1225,13 +1252,6 @@ export default {
         filteredRefunds = filteredRefunds.filter(refund => refund.status === this.appealStatusFilter);
       }
       this.filteredRefunds = filteredRefunds;
-      
-      // 过滤密码重置
-      let filteredPasswords = [...this.passwordAppeals];
-      if (this.appealStatusFilter !== 'all') {
-        filteredPasswords = filteredPasswords.filter(password => password.status === this.appealStatusFilter);
-      }
-      this.filteredPasswords = filteredPasswords;
       
       this.currentAppealPage = 1;
     },
@@ -1259,29 +1279,7 @@ export default {
       alert(`退款详情：\n退款ID: ${refund.id}\n申请人: ${refund.applicant}\n订单号: ${refund.orderId}\n商品名称: ${refund.productName}\n退款金额: ¥${refund.amount}\n退款原因: ${refund.reason}\n提交时间: ${refund.submitTime}\n状态: ${statusText}`);
     },
     
-    // 密码重置相关方法
-    approvePasswordReset(password) {
-      if (confirm(`确定要同意用户 ${password.username} 的密码重置申请吗？`)) {
-        password.status = 'resolved';
-        this.filterAppeals();
-        alert('密码重置申请已同意');
-      }
-    },
-    
-    rejectPasswordReset(password) {
-      if (confirm('确定要拒绝这个密码重置申请吗？')) {
-        password.status = 'rejected';
-        this.filterAppeals();
-        alert('密码重置申请已拒绝');
-      }
-    },
-    
-    viewPasswordDetail(password) {
-      const statusText = this.getStatusText(password.status);
-      const verifyText = password.verifyMethod === 'email' ? '邮箱验证' : '手机验证';
-      
-      alert(`密码重置详情：\n申请ID: ${password.id}\n用户名: ${password.username}\n联系方式: ${password.contact}\n验证方式: ${verifyText}\n提交时间: ${password.submitTime}\n状态: ${statusText}`);
-    },
+
     
     // 通用方法
     getStatusText(status) {
@@ -1304,20 +1302,48 @@ export default {
     },
     
     // 公告管理方法
-    loadAnnouncements() {
-      userService.getAnnouncements()
-        .then(response => {
-          this.announcements = response.data;
-        })
-        .catch(error => {
-          console.error('获取公告列表失败:', error);
-        });
+    async loadAnnouncements() {
+      try {
+        const adminIds = ['ADMIN0001', 'ADMIN0002', 'ADMIN0003', 'ADMIN0004', 'ADMIN0005'];
+        let allAnnouncements = [];
+        
+        // 遍历所有管理员ID获取公告
+        for (const adminId of adminIds) {
+          try {
+            const response = await fetch(`/api/announcements?n=9999&rootId=${adminId}`);
+            if (response.ok) {
+              const data = await response.json();
+              // 过滤只显示可见状态的公告，并为每个公告添加发布者信息
+              const visibleAnnouncements = data
+                .filter(announcement => announcement.visibleStatus === true) // 只保留可见的公告
+                .map(announcement => ({
+                  ...announcement,
+                  id: announcement.announcementId,
+                  title: announcement.content.substring(0, 20) + (announcement.content.length > 20 ? '...' : ''), // 从内容生成标题
+                  content: announcement.content,
+                  publishTime: new Date(announcement.createdAt).toLocaleString('zh-CN'),
+                  publisher: adminId
+                }));
+              allAnnouncements = allAnnouncements.concat(visibleAnnouncements);
+            }
+          } catch (error) {
+            console.warn(`获取管理员 ${adminId} 的公告失败:`, error);
+          }
+        }
+        
+        // 按创建时间排序（最新的在前）
+        allAnnouncements.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        this.announcements = allAnnouncements;
+        
+      } catch (error) {
+        console.error('获取公告列表失败:', error);
+        this.announcements = [];
+      }
     },
     
     editAnnouncement(announcement) {
       this.editingAnnouncement = announcement;
       this.announcementForm = {
-        title: announcement.title,
         content: announcement.content
       };
       this.showAnnouncementForm = true;
@@ -1325,15 +1351,43 @@ export default {
     
     deleteAnnouncement(announcementId) {
       if (confirm('确定要删除这条公告吗？')) {
-        userService.deleteAnnouncement(announcementId)
-          .then(() => {
-            // 从列表中移除
+        // 找到要删除的公告
+        const announcement = this.announcements.find(a => a.id === announcementId);
+        if (!announcement) {
+          alert('找不到要删除的公告');
+          return;
+        }
+        
+        // 使用 PUT 请求将 visibleStatus 设置为 false
+        const deleteData = {
+          announcementId: announcement.announcementId,
+          rootId: announcement.publisher, // 发布者ID
+          createdAt: new Date().toISOString(), // 当前更新时间
+          content: announcement.content, // 保持原内容
+          visibleStatus: false // 设置为不可见（删除）
+        };
+        
+        fetch('/api/announcements', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'accept': '*/*'
+          },
+          body: JSON.stringify(deleteData)
+        })
+        .then(response => {
+          if (response.ok) {
+            // 删除成功，从列表中移除
             this.announcements = this.announcements.filter(a => a.id !== announcementId);
-          })
-          .catch(error => {
-            console.error('删除公告失败:', error);
-            alert('操作失败，请重试');
-          });
+            alert('公告删除成功');
+          } else {
+            throw new Error('删除失败');
+          }
+        })
+        .catch(error => {
+          console.error('删除公告失败:', error);
+          alert('操作失败，请重试');
+        });
       }
     },
     
@@ -1341,41 +1395,106 @@ export default {
       this.showAnnouncementForm = false;
       this.editingAnnouncement = null;
       this.announcementForm = {
-        title: '',
         content: ''
       };
     },
     
     submitAnnouncement() {
-      if (!this.announcementForm.title || !this.announcementForm.content) {
-        alert('标题和内容不能为空');
+      if (!this.announcementForm.content.trim()) {
+        alert('请输入公告内容');
         return;
       }
       
       if (this.editingAnnouncement) {
-        // 更新公告
-        userService.updateAnnouncement(this.editingAnnouncement.id, this.announcementForm)
-          .then(() => {
+        // 更新公告 - 使用新的 API
+        const updateData = {
+          announcementId: this.editingAnnouncement.announcementId,
+          rootId: this.editingAnnouncement.publisher, // 发布者ID
+          createdAt: new Date().toISOString(), // 当前更新时间
+          content: this.announcementForm.content,
+          visibleStatus: true // 保持可见
+        };
+        
+        fetch('/api/announcements', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'accept': '*/*'
+          },
+          body: JSON.stringify(updateData)
+        })
+        .then(response => {
+          if (response.ok) {
             // 更新成功
             this.loadAnnouncements();
             this.cancelAnnouncementForm();
-          })
-          .catch(error => {
-            console.error('更新公告失败:', error);
-            alert('操作失败，请重试');
-          });
+            alert('公告更新成功');
+          } else {
+            throw new Error('更新失败');
+          }
+        })
+        .catch(error => {
+          console.error('更新公告失败:', error);
+          alert('操作失败，请重试');
+        });
       } else {
-        // 创建新公告
-        userService.createAnnouncement(this.announcementForm)
-          .then(() => {
-            // 创建成功
-            this.loadAnnouncements();
-            this.cancelAnnouncementForm();
-          })
-          .catch(error => {
-            console.error('创建公告失败:', error);
-            alert('操作失败，请重试');
-          });
+        // 创建新公告 - 使用新的 POST API
+        this.createNewAnnouncement();
+      }
+    },
+    
+    // 新增方法：创建新公告
+    async createNewAnnouncement() {
+      try {
+        // 1. 生成符合要求的 announcementId：ANNO + 6位数字
+        const timestamp = Date.now().toString();
+        // 取时间戳的后6位，前面加上ANNO前缀，总长度为10（符合 varchar(10) 限制）
+        const newAnnouncementId = 'ANNO' + timestamp.slice(-6);
+        
+        // 2. 获取当前真实时间（使用ISO 8601格式，后端可以正确解析）
+        const currentTime = new Date().toISOString();
+        
+        // 3. 创建新公告数据
+        const newAnnouncementData = {
+          announcementId: newAnnouncementId,
+          rootId: this.adminId,
+          createdAt: currentTime,
+          content: this.announcementForm.content.trim(),
+          visibleStatus: true
+        };
+        
+        console.log('发送的数据:', newAnnouncementData);
+        console.log('生成的ID:', newAnnouncementId);
+        console.log('当前时间:', currentTime);
+        
+        // 4. 发送 POST 请求创建公告
+        const createResponse = await fetch('/api/announcements', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'accept': '*/*'
+          },
+          body: JSON.stringify(newAnnouncementData)
+        });
+        
+        console.log('响应状态:', createResponse.status);
+        
+        if (createResponse.ok) {
+          // 修复：后端返回纯文本，不是JSON，所以使用text()而不是json()
+          const result = await createResponse.text();
+          console.log('创建成功:', result);
+          this.loadAnnouncements();
+          this.cancelAnnouncementForm();
+          alert('公告发布成功');
+        } else {
+          const errorText = await createResponse.text();
+          console.error('服务器错误响应:', errorText);
+          throw new Error(`发布失败: ${createResponse.status} - ${errorText}`);
+        }
+        
+      } catch (error) {
+        console.error('发布公告失败:', error);
+        alert(`发布失败: ${error.message}`);
       }
     },
     
@@ -1404,15 +1523,142 @@ export default {
     // 计算待处理申诉数量
     calculatePendingAppeals() {
       // 确保申诉数据已加载
-      if (this.refundAppeals.length === 0 && this.passwordAppeals.length === 0) {
+      if (this.refundAppeals.length === 0) {
         this.loadAppeals();
       }
       
       const pendingRefunds = this.refundAppeals.filter(r => r.status === 'pending').length;
-      const pendingPasswords = this.passwordAppeals.filter(r => r.status === 'pending').length;
       
-      this.stats.pendingAppeals = pendingRefunds + pendingPasswords;
+      this.stats.pendingAppeals = pendingRefunds; // 只计算退款申请
     },
+    
+    // 订单管理方法
+    loadOrders() {
+      // 模拟订单数据
+      this.orders = [
+        {
+          id: 'ORD001',
+          productName: 'iPhone 13',
+          productImage: 'https://via.placeholder.com/50',
+          buyerName: '用户001',
+          sellerName: '用户002',
+          totalAmount: 5000,
+          createTime: '2024-01-13 10:30:00',
+          status: 'pending'
+        },
+        {
+          id: 'ORD002',
+          productName: '笔记本电脑',
+          productImage: 'https://via.placeholder.com/50',
+          buyerName: '用户003',
+          sellerName: '用户004',
+          totalAmount: 3500,
+          createTime: '2024-01-12 15:20:00',
+          status: 'paid'
+        },
+        {
+          id: 'ORD003',
+          productName: '二手自行车',
+          productImage: 'https://via.placeholder.com/50',
+          buyerName: '用户005',
+          sellerName: '用户006',
+          totalAmount: 800,
+          createTime: '2024-01-11 09:15:00',
+          status: 'completed'
+        },
+        {
+          id: 'ORD004',
+          productName: '游戏机',
+          productImage: 'https://via.placeholder.com/50',
+          buyerName: '用户007',
+          sellerName: '用户008',
+          totalAmount: 1200,
+          createTime: '2024-01-10 14:20:00',
+          status: 'refunding'
+        }
+      ];
+      
+      this.filteredOrders = [...this.orders];
+      this.totalOrderPages = Math.ceil(this.filteredOrders.length / 10);
+    },
+    
+    searchOrders() {
+      if (!this.orderSearchQuery) {
+        this.filteredOrders = [...this.orders];
+        return;
+      }
+      
+      const query = this.orderSearchQuery.toLowerCase();
+      this.filteredOrders = this.orders.filter(order => 
+        order.id.toLowerCase().includes(query) ||
+        order.productName.toLowerCase().includes(query) ||
+        order.buyerName.toLowerCase().includes(query) ||
+        order.sellerName.toLowerCase().includes(query)
+      );
+    },
+    
+    filterOrders() {
+      let filtered = [...this.orders];
+      
+      if (this.orderStatusFilter !== 'all') {
+        filtered = filtered.filter(order => order.status === this.orderStatusFilter);
+      }
+      
+      if (this.orderSearchQuery) {
+        const query = this.orderSearchQuery.toLowerCase();
+        filtered = filtered.filter(order => 
+          order.id.toLowerCase().includes(query) ||
+          order.productName.toLowerCase().includes(query) ||
+          order.buyerName.toLowerCase().includes(query) ||
+          order.sellerName.toLowerCase().includes(query)
+        );
+      }
+      
+      this.filteredOrders = filtered;
+      this.currentOrderPage = 1;
+      this.totalOrderPages = Math.ceil(this.filteredOrders.length / 10);
+    },
+    
+    getOrderStatusText(status) {
+      const statusMap = {
+        'pending': '待付款',
+        'paid': '已付款',
+        'shipped': '已发货',
+        'completed': '已完成',
+        'cancelled': '已取消',
+        'refunding': '退款中',
+        'refunded': '已退款'
+      };
+      return statusMap[status] || '未知状态';
+    },
+    
+    viewOrderDetail(orderId) {
+      const order = this.orders.find(o => o.id === orderId);
+      if (order) {
+        const statusText = this.getOrderStatusText(order.status);
+        
+        alert(`订单详情：\n订单ID: ${order.id}\n商品名称: ${order.productName}\n买家: ${order.buyerName}\n卖家: ${order.sellerName}\n金额: ¥${order.totalAmount}\n下单时间: ${order.createTime}\n状态: ${statusText}`);
+      }
+    },
+    
+    processRefund(orderId, action) {
+      const order = this.orders.find(o => o.id === orderId);
+      if (order) {
+        const actionText = action === 'approve' ? '同意' : '拒绝';
+        if (confirm(`确定要${actionText}订单 ${orderId} 的退款申请吗？`)) {
+          if (action === 'approve') {
+            order.status = 'refunded';
+            alert('退款申请已同意，订单状态已更新为已退款');
+          } else {
+            order.status = 'paid';
+            alert('退款申请已拒绝，订单状态已恢复为已付款');
+          }
+          this.filterOrders();
+        }
+      }
+    },
+    
+
     
     // 分页导航方法
     goToFirstPage() {
@@ -1431,6 +1677,16 @@ export default {
     goToLastProductPage() {
       this.currentProductPage = this.totalProductPages;
       this.loadProducts();
+    },
+    
+    goToFirstOrderPage() {
+      this.currentOrderPage = 1;
+      this.loadOrders();
+    },
+    
+    goToLastOrderPage() {
+      this.currentOrderPage = this.totalOrderPages;
+      this.loadOrders();
     },
     
     goToFirstAppealPage() {
@@ -1913,12 +2169,36 @@ export default {
 
 .announcement-footer {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+}
+
+.announcement-meta {
+  display: flex;
+  gap: 15px;
+  font-size: 12px;
+  color: #666;
+}
+
+.announcement-actions {
+  display: flex;
+  gap: 8px;
 }
 
 .announcement-time {
-  font-size: 12px;
-  color: #95a5a6;
+  color: #999;
+}
+
+.announcement-publisher {
+  color: #666;
+  font-weight: bold;
+  background-color: #f0f0f0;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 11px;
 }
 
 .announcement-form {
@@ -1985,6 +2265,42 @@ export default {
 .status-sold {
   background-color: #6c757d;
   color: white;
+}
+
+/* 订单状态样式 */
+.status-paid {
+  background-color: #e3f2fd;
+  color: #1565c0;
+}
+
+.status-shipped {
+  background-color: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.status-completed {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status-cancelled {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.status-refunding {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+.status-refunded {
+  background-color: #fce4ec;
+  color: #ad1457;
+}
+
+.cancel-order-btn {
+  background-color: #ffebee;
+  color: #c62828;
 }
 
 /* 申诉管理样式 */
