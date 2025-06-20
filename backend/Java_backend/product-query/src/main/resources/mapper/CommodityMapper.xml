@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.campus.productquery.dao.CommodityRepository">
+
+    <!-- 结果映射 -->
+    <resultMap id="CommodityResultMap" type="com.campus.productquery.pojo.Commodity">
+        <id column="commodity_id" property="commodityId" />
+        <result column="commodity_name" property="commodityName" />
+        <result column="commodity_description" property="commodityDescription" />
+        <result column="category_id" property="categoryId" />
+        <result column="tags_Id" property="tagsId" />
+        <result column="current_price" property="currentPrice" />
+        <result column="commodity_status" property="commodityStatus" />
+        <result column="seller_id" property="sellerId" />
+        <result column="main_image_url" property="mainImageUrl" />
+        <result column="image_list" property="imageList" />
+        <result column="created_at" property="createdAt" />
+        <result column="updated_at" property="updatedAt" />
+        <result column="quantity" property="quantity" />
+        <result column="newness" property="newness" />
+    </resultMap>
+
+    <!-- 基础查询字段 -->
+    <sql id="Base_Column_List">
+        commodity_id, commodity_name, commodity_description, category_id, tags_Id,
+        current_price, commodity_status, seller_id, main_image_url, image_list,
+        created_at, updated_at, quantity, newness
+    </sql>
+
+    <!-- 使用MyBatis-Plus的BaseMapper，无需自定义SQL映射 -->
+    <!-- 复杂查询通过QueryWrapper在Service层实现 -->
+
+</mapper>
