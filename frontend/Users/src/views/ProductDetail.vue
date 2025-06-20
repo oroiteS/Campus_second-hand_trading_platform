@@ -246,7 +246,6 @@
             <textarea v-model="editingProduct.description" class="form-textarea" placeholder="请输入商品描述"></textarea>
           </div>
           <div class="form-group">
-<<<<<<< HEAD
             <label>成色</label>
             <select v-model="editingProduct.condition" class="form-select">
               <option value="全新">全新</option>
@@ -255,7 +254,6 @@
               <option value="8成新">8成新</option>
               <option value="7成新">7成新</option>
             </select>
-=======
             <label>交易地点</label>
             <input v-model="editingProduct.location" type="text" class="form-input" placeholder="请输入交易地点">
           </div>
@@ -263,7 +261,6 @@
             <label>详细描述</label>
             <textarea v-model="editingProduct.detailDescription" class="form-textarea large" placeholder="请输入详细描述，每行一段"
               rows="6"></textarea>
->>>>>>> 82c8434586f7e443260b7ca1055eddbab06ecd09
           </div>
         </div>
         <div class="modal-footer">
@@ -404,6 +401,9 @@ export default {
 
         console.log('获取到的商品详情:', this.product)
 
+        // 检查商品是否已被收藏
+        await this.checkFavoriteStatus(commodityId)
+
       } catch (error) {
         console.error('获取商品详情失败:', error)
         this.error = error.message || '获取商品详情失败'
@@ -414,6 +414,43 @@ export default {
         }
       } finally {
         this.loading = false
+      }
+    },
+
+    // 新增：检查商品收藏状态
+    async checkFavoriteStatus(commodityId) {
+      try {
+        const userId = this.currentUser.id
+        if (!userId) {
+          console.log('用户未登录，无法检查收藏状态')
+          return
+        }
+
+        // 调用购物车API获取用户收藏的商品列表
+        const response = await axios.get('/cart/commodities', {
+          params: {
+            userId: userId,
+            category: '全部'
+          }
+        })
+
+        // 检查当前商品是否在收藏列表中
+        const favoritedItems = response.data
+        const isFavorited = favoritedItems.some(item => item.commodityId === commodityId)
+        
+        // 更新收藏状态
+        this.isFavorited = isFavorited
+        
+        console.log('收藏状态检查完成:', {
+          commodityId,
+          isFavorited: this.isFavorited,
+          totalFavorites: favoritedItems.length
+        })
+
+      } catch (error) {
+        console.error('检查收藏状态失败:', error)
+        // 如果检查失败，保持默认状态（未收藏）
+        this.isFavorited = false
       }
     },
 
@@ -660,9 +697,76 @@ export default {
       alert('立即购买功能')
       // 实际项目中这里会跳转到订单确认页面
     },
-    toggleFavorite() {
-      this.isFavorited = !this.isFavorited
-      // 实际项目中这里会调用收藏/取消收藏的API
+    async toggleFavorite() {
+      try {
+        const userId = this.currentUser.id || localStorage.getItem('userId')
+        const commodityId = this.product.id
+        
+        if (!userId) {
+          alert('请先登录')
+          return
+        }
+        
+        if (!commodityId) {
+          alert('商品信息错误')
+          return
+        }
+        
+        if (!this.isFavorited) {
+          // 添加到购物车
+          const cartResponse = await axios.post('/cart/add', null, {
+            params: {
+              userId: userId,
+              commodityId: commodityId
+            },
+            timeout: 5000 // 5秒超时
+          })
+          
+          if (cartResponse.data && cartResponse.data.success) {
+            // 购物车添加成功后，更新用户画像
+            try {
+              const profileResponse = await axios.post('http://localhost:8000/api/v1/commodities/add_cart/', {
+                user_id: userId,
+                commodity_id: commodityId
+              }, {
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                timeout: 30000
+              })
+              
+              if (profileResponse.data && profileResponse.data.code === 0) {
+                this.isFavorited = true
+                alert('收藏成功！商品已添加到购物车，用户画像已更新')
+                console.log('用户画像更新成功！')
+              } else {
+                this.isFavorited = true
+                alert('收藏成功！商品已添加到购物车，但用户画像更新失败')
+                console.warn('用户画像更新失败:', profileResponse.data)
+              }
+            } catch (profileError) {
+              this.isFavorited = true
+              alert('收藏成功！商品已添加到购物车，但用户画像更新失败')
+              console.error('用户画像更新失败:', profileError)
+            }
+          } else {
+            alert('收藏失败，请重试')
+          }
+        } else {
+          this.isFavorited = false
+          alert('已取消收藏')
+        }
+      } catch (error) {
+        console.error('收藏操作失败:', error)
+        
+        if (error.code === 'ERR_NETWORK') {
+          alert('无法连接到服务器，请检查网络连接或联系管理员')
+        } else if (error.code === 'ECONNABORTED') {
+          alert('请求超时，请重试')
+        } else {
+          alert('收藏失败，请重试')
+        }
+      }
     },
     viewProduct(productId) {
       this.$router.push(`/product/${productId}`)

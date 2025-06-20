@@ -77,11 +77,7 @@ const routes = [
     name: 'NoticeDetail',
     component: NoticeDetail
   },
-<<<<<<< HEAD
   {    
-=======
-  {
->>>>>>> 82c8434586f7e443260b7ca1055eddbab06ecd09
     path: '/chat-list/:userId',
     name: 'ChatList',
     component: () => import('../views/ChatList.vue')
