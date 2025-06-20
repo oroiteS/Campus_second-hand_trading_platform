@@ -296,20 +296,29 @@ public class CommodityService {
     }
     
     /**
-     * 更新商品信息（名称、价格、新旧度）
-     * @param request 商品更新请求
+     * 更新商品信息（支持图片上传）
+     * @param commodityId 商品ID
+     * @param sellerId 卖家ID
+     * @param commodityName 商品名称
+     * @param commodityDescription 商品描述
+     * @param currentPrice 商品价格
+     * @param newness 商品新旧度
+     * @param quantity 商品数量
+     * @param images 商品图片文件数组（可选）
      * @return 是否更新成功
      */
-    public boolean updateCommodityInfo(CommodityUpdateRequest request) {
-        logger.info("尝试更新商品信息: {}", request);
+    public boolean updateCommodityInfoWithImages(String commodityId, String sellerId, 
+                                               String commodityName, String commodityDescription,
+                                               BigDecimal currentPrice, String newness, 
+                                               Integer quantity, MultipartFile[] images) {
+        logger.info("尝试更新商品信息（支持图片上传）: commodityId={}, sellerId={}", commodityId, sellerId);
         
         try {
             Optional<Commodity> commodityOpt = commodityRepository.findByCommodityIdAndSellerId(
-                request.getCommodityId(), request.getSellerId());
+                commodityId, sellerId);
             
             if (!commodityOpt.isPresent()) {
-                logger.warn("未找到对应商品: commodityId={}, sellerId={}", 
-                           request.getCommodityId(), request.getSellerId());
+                logger.warn("未找到对应商品: commodityId={}, sellerId={}", commodityId, sellerId);
                 return false;
             }
             
@@ -317,44 +326,81 @@ public class CommodityService {
             boolean updated = false;
             
             // 更新商品名称
-            if (request.getCommodityName() != null && !request.getCommodityName().trim().isEmpty()) {
-                commodity.setCommodityName(request.getCommodityName());
+            if (commodityName != null && !commodityName.trim().isEmpty()) {
+                commodity.setCommodityName(commodityName);
                 updated = true;
             }
             
             // 更新商品描述
-            if (request.getCommodityDescription() != null) {
-                commodity.setCommodityDescription(request.getCommodityDescription());
+            if (commodityDescription != null) {
+                commodity.setCommodityDescription(commodityDescription);
                 updated = true;
             }
             
             // 更新商品价格
-            if (request.getCurrentPrice() != null) {
-                commodity.setCurrentPrice(request.getCurrentPrice());
+            if (currentPrice != null) {
+                commodity.setCurrentPrice(currentPrice);
                 updated = true;
             }
             
             // 更新商品新旧度
-            if (request.getNewness() != null && !request.getNewness().trim().isEmpty()) {
-                commodity.setNewness(request.getNewness());
+            if (newness != null && !newness.trim().isEmpty()) {
+                commodity.setNewness(newness);
                 updated = true;
+            }
+            
+            // 更新商品数量
+            if (quantity != null) {
+                commodity.setQuantity(quantity);
+                updated = true;
+            }
+            
+            // 处理图片上传（如果提供了新图片）
+            if (images != null && images.length > 0) {
+                // 上传新图片到OSS
+                List<String> imageUrls = ossUtil.uploadCommodityImages(Arrays.asList(images), sellerId);
+                
+                if (imageUrls != null && !imageUrls.isEmpty()) {
+                    // 为所有URL添加https前缀
+                    List<String> httpsImageUrls = new ArrayList<>();
+                    for (String url : imageUrls) {
+                        String httpsUrl = "https://" + url;
+                        httpsImageUrls.add(httpsUrl);
+                    }
+                    
+                    // 第一张图片作为主图
+                    String mainImageUrl = httpsImageUrls.get(0);
+                    commodity.setMainImageUrl(mainImageUrl);
+                    
+                    // 构建图片列表JSON
+                    StringBuilder imageListBuilder = new StringBuilder("[");
+                    for (int i = 0; i < httpsImageUrls.size(); i++) {
+                        if (i > 0) {
+                            imageListBuilder.append(",");
+                        }
+                        imageListBuilder.append("\"").append(httpsImageUrls.get(i)).append("\"");
+                    }
+                    imageListBuilder.append("]");
+                    commodity.setImageList(imageListBuilder.toString());
+                    
+                    updated = true;
+                    logger.info("商品图片更新成功: commodityId={}, 图片数量={}", commodityId, httpsImageUrls.size());
+                }
             }
             
             if (updated) {
                 commodity.setUpdatedAt(LocalDateTime.now());
                 commodityRepository.save(commodity);
-                logger.info("商品信息更新成功: commodityId={}, sellerId={}", 
-                           request.getCommodityId(), request.getSellerId());
+                logger.info("商品信息更新成功: commodityId={}, sellerId={}", commodityId, sellerId);
                 return true;
             } else {
-                logger.info("没有需要更新的字段: commodityId={}, sellerId={}", 
-                           request.getCommodityId(), request.getSellerId());
+                logger.info("没有需要更新的字段: commodityId={}, sellerId={}", commodityId, sellerId);
                 return false;
             }
             
         } catch (Exception e) {
             logger.error("商品信息更新异常: commodityId={}, sellerId={}, error={}", 
-                        request.getCommodityId(), request.getSellerId(), e.getMessage(), e);
+                        commodityId, sellerId, e.getMessage(), e);
             throw new RuntimeException("商品信息更新失败: " + e.getMessage(), e);
         }
     }

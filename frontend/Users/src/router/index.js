@@ -15,6 +15,7 @@ import PasswordReset from '../views/PasswordReset.vue'
 import WalletManagement from '../views/WalletManagement.vue'
 import SellerProfile from '../views/SellerProfile.vue'
 import RecommendedProducts from '../views/RecommendedProducts.vue'
+import ProductBrowse from '../views/ProductBrowse.vue'
 
 const routes = [
   {
@@ -106,7 +107,12 @@ const routes = [
     path: '/recommended',
     name: 'RecommendedProducts',
     component: RecommendedProducts
-  }
+  },
+  {
+    path: '/browse',
+    name: 'ProductBrowse',
+    component: ProductBrowse
+   }
 ]
 
 const router = createRouter({

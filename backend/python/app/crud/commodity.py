@@ -91,7 +91,7 @@ def get_commodity_recommendation(db: Session,user_id: str) -> List[Commodity_use
         commodity_data['user_name'] = user_name
         commodity_data['avatar_url'] = avatar_url
         results_commendation.append(Commodity_username_avatar(**commodity_data))
-
+    random.shuffle(results_commendation)
     return results_commendation
 
 
@@ -148,7 +148,6 @@ def get_commodities_by_search(db: Session,request: SearchCommodityRequest) -> Li
             commodity_data['avatar_url'] = avatar_url
             results.append(Commodity_username_avatar(**commodity_data))
             
-    random.shuffle(results)
     return results
 
 def register_user(db: Session,request:RegisterRequest):

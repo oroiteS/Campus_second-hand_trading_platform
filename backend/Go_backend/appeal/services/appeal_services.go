@@ -114,3 +114,51 @@ func (s *AppealService) BatchGetAppealStatusByOrderIds(orderIds []string) (map[s
 
 	return statusMap, nil
 }
+
+// BatchGetAppeals BatchGetAppeals批量查询申诉
+func (s *AppealService) BatchGetAppeals(orderIds []string) ([]models.Appeal, error) {
+	var appeals []models.Appeal
+	if len(orderIds) == 0 {
+		// 如果没有提供订单ID，返回空列表
+		return appeals, nil
+	}
+
+	err := s.db.Where("order_id IN ?", orderIds).Find(&appeals).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return appeals, nil
+}
+
+// GetAllAppeals 获取所有申诉记录
+func (s *AppealService) GetAllAppeals() ([]models.Appeal, error) {
+	var appeals []models.Appeal
+	err := s.db.Find(&appeals).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return appeals, nil
+}
+
+// GetAllAppealsWithPagination 分页获取所有申诉记录
+func (s *AppealService) GetAllAppealsWithPagination(page, pageSize int) ([]models.Appeal, int64, error) {
+	var appeals []models.Appeal
+	var total int64
+
+	// 计算总数
+	err := s.db.Model(&models.Appeal{}).Count(&total).Error
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// 分页查询
+	offset := (page - 1) * pageSize
+	err = s.db.Offset(offset).Limit(pageSize).Find(&appeals).Error
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return appeals, total, nil
+}

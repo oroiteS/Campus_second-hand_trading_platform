@@ -313,36 +313,102 @@ public class CommodityController {
     }
     
     /**
-     * 更新商品信息（名称、描述、价格、新旧度）
-     * @param request 更新请求
-     * @param bindingResult 验证结果
+     * 更新商品信息（名称、描述、价格、新旧度、数量、图片）
+     * @param commodityId 商品ID
+     * @param sellerId 卖家ID
+     * @param commodityName 商品名称
+     * @param commodityDescription 商品描述
+     * @param currentPrice 商品价格
+     * @param newness 商品新旧度
+     * @param quantity 商品数量
+     * @param images 商品图片文件（可选）
      * @return 响应结果
      */
-    @PostMapping("/update-info")
+    @Operation(summary = "更新商品信息", description = "更新商品的基本信息，支持直接上传新的商品图片")
+    @PostMapping(value = "/update-info", consumes = "multipart/form-data")
     public ResponseEntity<ApiResponse<Void>> updateCommodityInfo(
-            @Valid @RequestBody CommodityUpdateRequest request,
-            BindingResult bindingResult) {
+            @Parameter(description = "商品ID", required = true)
+            @RequestParam("commodityId") String commodityId,
+            @Parameter(description = "卖家ID", required = true)
+            @RequestParam("sellerId") String sellerId,
+            @Parameter(description = "商品名称")
+            @RequestParam(value = "commodityName", required = false) String commodityName,
+            @Parameter(description = "商品描述")
+            @RequestParam(value = "commodityDescription", required = false) String commodityDescription,
+            @Parameter(description = "商品价格")
+            @RequestParam(value = "currentPrice", required = false) BigDecimal currentPrice,
+            @Parameter(description = "商品新旧度")
+            @RequestParam(value = "newness", required = false) String newness,
+            @Parameter(description = "商品数量")
+            @RequestParam(value = "quantity", required = false) Integer quantity,
+            @Parameter(description = "商品图片文件，支持多张图片上传（可选）")
+            @RequestParam(value = "images", required = false) MultipartFile[] images) {
         
-        logger.info("收到更新商品信息请求: {}", request);
+        logger.info("收到更新商品信息请求: commodityId={}, sellerId={}", commodityId, sellerId);
         
-        // 参数验证
-        if (bindingResult.hasErrors()) {
-            String errorMessage = bindingResult.getFieldErrors().get(0).getDefaultMessage();
-            logger.warn("更新商品信息参数验证失败: {}", errorMessage);
+        // 基本参数验证
+        if (commodityId == null || commodityId.trim().isEmpty()) {
             return ResponseEntity.badRequest()
-                    .body(ApiResponse.error("参数验证失败: " + errorMessage, "VALIDATION_ERROR"));
+                    .body(ApiResponse.error("商品ID不能为空", "VALIDATION_ERROR"));
+        }
+        if (sellerId == null || sellerId.trim().isEmpty()) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("卖家ID不能为空", "VALIDATION_ERROR"));
+        }
+        
+        // 验证价格
+        if (currentPrice != null && currentPrice.compareTo(BigDecimal.ZERO) <= 0) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("商品价格必须大于0", "VALIDATION_ERROR"));
+        }
+        
+        // 验证数量
+        if (quantity != null && quantity <= 0) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("商品数量必须大于0", "VALIDATION_ERROR"));
+        }
+        
+        // 验证图片文件（如果提供）
+        if (images != null && images.length > 0) {
+            // 过滤掉空的文件项
+            List<MultipartFile> validImages = new ArrayList<>();
+            for (MultipartFile img : images) {
+                if (img != null && !img.isEmpty()) {
+                    validImages.add(img);
+                }
+            }
+            
+            // 验证图片格式和大小
+            for (int i = 0; i < validImages.size(); i++) {
+                MultipartFile image = validImages.get(i);
+                String contentType = image.getContentType();
+                if (contentType == null || !contentType.startsWith("image/")) {
+                    logger.warn("第{}张文件格式不正确: {}", (i + 1), contentType);
+                    return ResponseEntity.badRequest()
+                            .body(ApiResponse.error("第" + (i + 1) + "张文件不是有效的图片格式，支持的格式：jpg, jpeg, png, gif, webp", "INVALID_IMAGE_FORMAT"));
+                }
+                
+                if (image.getSize() > 10 * 1024 * 1024) { // 10MB限制
+                    logger.warn("第{}张图片文件过大: {} bytes", (i + 1), image.getSize());
+                    return ResponseEntity.badRequest()
+                            .body(ApiResponse.error("第" + (i + 1) + "张图片文件过大，请上传小于10MB的图片", "IMAGE_TOO_LARGE"));
+                }
+            }
+            
+            // 更新有效图片数组
+            images = validImages.toArray(new MultipartFile[0]);
         }
         
         try {
-            boolean success = commodityService.updateCommodityInfo(request);
+            boolean success = commodityService.updateCommodityInfoWithImages(
+                commodityId, sellerId, commodityName, commodityDescription, 
+                currentPrice, newness, quantity, images);
             
             if (success) {
-                logger.info("商品信息更新成功: commodityId={}, sellerId={}", 
-                           request.getCommodityId(), request.getSellerId());
+                logger.info("商品信息更新成功: commodityId={}, sellerId={}", commodityId, sellerId);
                 return ResponseEntity.ok(ApiResponse.success("商品信息更新成功"));
             } else {
-                logger.warn("商品信息更新失败，商品不存在或无权限: commodityId={}, sellerId={}", 
-                           request.getCommodityId(), request.getSellerId());
+                logger.warn("商品信息更新失败，商品不存在或无权限: commodityId={}, sellerId={}", commodityId, sellerId);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(ApiResponse.error("商品不存在或您无权限操作此商品", "COMMODITY_NOT_FOUND"));
             }

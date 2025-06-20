@@ -16,7 +16,6 @@ type Appeal struct {
 	Status     string    `gorm:"column:status;type:enum('finish','refuse','process');default:process" json:"status"`
 }
 
-
 // CreateAppealRequest 创建申诉请求
 type CreateAppealRequest struct {
 	Argue1Id string  `json:"argue1Id" binding:"required"`
@@ -34,10 +33,32 @@ type AppealStatusResponse struct {
 // AdminUpdateAppealRequest 管理员更新申诉请求
 type AdminUpdateAppealRequest struct {
 	Status string `json:"status" binding:"required"`
-	RootId string `json:"rootId" binding:"required"` // 修复字段名
+	RootId string `json:"rootId" binding:"required"`
 }
 
 // BatchGetAppealStatusRequest 批量获取申诉状态请求
 type BatchGetAppealStatusRequest struct {
-	OrderIds []string `json:"orderIds" binding:"required"` // 修复字段名，改为小写开头
+	OrderIds []string `json:"orderIds" binding:"required"`
+}
+
+// AppealListResponse 申诉列表响应
+type AppealListResponse struct {
+	Appeals []Appeal `json:"appeals"`
+	Count   int      `json:"count"`
+}
+
+// AdminUpdateResponse 管理员更新响应
+type AdminUpdateResponse struct {
+	Message string `json:"message"`
+	Appeal  Appeal `json:"appeal"`
+}
+
+// ErrorResponse 错误响应
+type ErrorResponse struct {
+	Error string `json:"error"`
+}
+
+// SuccessResponse 成功响应
+type SuccessResponse struct {
+	Message string `json:"message"`
 }
