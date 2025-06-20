@@ -172,10 +172,12 @@
                 <div class="field-info">可选字段，更新商品库存数量（必须为正整数）</div>
             </div>
 
+
+
             <div class="form-group">
                 <label for="images">商品图片 <span class="optional">(可选)</span></label>
-                <input type="file" id="images" name="images" multiple accept="image/jpeg,image/jpg,image/png,image/gif">
-                <div class="field-info">可选字段，支持上传多张图片文件（jpg, jpeg, png, gif格式，每张图片最大5MB）</div>
+                <input type="file" id="images" name="images" multiple accept="image/jpeg,image/jpg,image/png,image/gif,image/webp">
+                <div class="field-info">可选字段，支持上传多张图片文件（jpg, jpeg, png, gif, webp格式，每张图片最大10MB）。如果提供图片，将直接替换原有的所有图片</div>
             </div>
 
             <button type="submit">更新商品信息</button>
@@ -202,6 +204,7 @@
             const currentPrice = document.getElementById('currentPrice').value.trim();
             const newness = document.getElementById('newness').value.trim();
             const quantity = document.getElementById('quantity').value.trim();
+
             const images = document.getElementById('images').files;
             
             // 验证必填字段
@@ -221,23 +224,25 @@
             if (newness) formData.append('newness', newness);
             if (quantity) formData.append('quantity', quantity);
             
+
+            
             // 验证图片文件
             if (images.length > 0) {
-                const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-                const maxSize = 5 * 1024 * 1024; // 5MB
+                const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+                const maxSize = 10 * 1024 * 1024; // 10MB
                 
                 for (let i = 0; i < images.length; i++) {
                     const file = images[i];
                     
                     // 检查文件类型
                     if (!allowedTypes.includes(file.type)) {
-                        showResponse(`图片文件 "${file.name}" 格式不支持，请选择 jpg、jpeg、png 或 gif 格式的图片`, 'error');
+                        showResponse(`图片文件 "${file.name}" 格式不支持，请选择 jpg、jpeg、png、gif 或 webp 格式的图片`, 'error');
                         return;
                     }
                     
                     // 检查文件大小
                     if (file.size > maxSize) {
-                        showResponse(`图片文件 "${file.name}" 大小超过5MB限制`, 'error');
+                        showResponse(`图片文件 "${file.name}" 大小超过10MB限制`, 'error');
                         return;
                     }
                     

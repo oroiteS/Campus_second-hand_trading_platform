@@ -244,24 +244,10 @@ http://localhost:8084/swagger-ui.html
 
 - **URL**: `/api/commodity/update-info`
 - **方法**: `POST`
-- **描述**: 更新商品的详细信息，包括名称、描述、价格、新旧度、数量和图片。支持部分字段更新。
-- **Content-Type**: `application/json`
+- **描述**: 更新商品的详细信息，包括名称、描述、价格、新旧度、数量和图片。支持部分字段更新和图片文件直接上传。
+- **Content-Type**: `multipart/form-data`
 
 **请求参数**:
-
-```json
-{
-  "commodityId": "string",
-  "sellerId": "string",
-  "commodityName": "string",
-  "commodityDescription": "string",
-  "currentPrice": 0.00,
-  "newness": "string",
-  "quantity": 1,
-  "mainImageUrl": "string",
-  "imageList": "string"
-}
-```
 
 | 参数名               | 类型    | 必填 | 描述         | 验证规则                    |
 |---------------------|---------|------|--------------|-----------------------------|
@@ -272,8 +258,19 @@ http://localhost:8084/swagger-ui.html
 | currentPrice        | decimal | 否   | 当前价格     | 可选，必须为正数            |
 | newness             | string  | 否   | 商品新旧度   | 可选，提供时不能为空字符串，支持：全新、95新、9成新、8成新、7成新 |
 | quantity            | integer | 否   | 商品数量     | 可选，必须为正整数          |
-| mainImageUrl        | string  | 否   | 主图片URL    | 可选，商品主要展示图片的URL |
-| imageList           | string  | 否   | 图片列表     | 可选，JSON格式的图片URL数组字符串 |
+
+| images              | file[]  | 否   | 商品图片文件 | 可选，支持多张图片上传，格式：jpg/jpeg/png/gif/webp，单个文件不超过10MB |
+
+**图片更新逻辑说明**:
+
+1. **提供新图片** (提供 `images` 参数):
+   - 直接使用新提供的图片文件替换原有的所有图片
+   - 上传新图片文件到服务器
+   - 更新商品的图片列表和主图片URL
+
+2. **不提供图片** (不提供 `images` 参数):
+   - 保持原有图片不变
+   - 不对图片进行任何修改
 
 **响应示例**:
 

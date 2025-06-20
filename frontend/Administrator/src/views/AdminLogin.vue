@@ -37,13 +37,6 @@
           />
         </div>
         
-        <div class="form-group">
-          <label class="remember-checkbox">
-            <input type="checkbox" v-model="loginForm.remember" />
-            <span class="checkbox-text">记住登录状态</span>
-          </label>
-        </div>
-        
         <button type="submit" class="login-btn" :disabled="isLoading">
           <span v-if="isLoading" class="loading-spinner"></span>
           {{ isLoading ? '登录中...' : '登录' }}
@@ -66,8 +59,7 @@ export default {
     return {
       loginForm: {
         username: '',
-        password: '',
-        remember: false
+        password: ''
       },
       isLoading: false
     }
@@ -108,10 +100,7 @@ export default {
           localStorage.setItem('adminToken', response.token)
           localStorage.setItem('adminUsername', response.username || this.loginForm.username)
           
-          if (this.loginForm.remember) {
-            localStorage.setItem('adminRememberLogin', 'true')
-          }
-          
+          alert('登录成功！')
           // 跳转到管理面板
           this.$router.push('/AdminDashboard')
         } else {
@@ -119,17 +108,7 @@ export default {
         }
       } catch (error) {
         console.error('登录错误:', error)
-        
-        // 模拟登录验证（开发环境）
-        if (this.loginForm.username === 'admin' && this.loginForm.password === 'admin123') {
-          localStorage.setItem('isAdminLoggedIn', 'true')
-          localStorage.setItem('adminToken', 'mock-admin-token')
-          localStorage.setItem('adminUsername', 'admin')
-          
-          this.$router.push('/AdminDashboard')
-        } else {
-          alert('登录失败，请检查用户名和密码')
-        }
+        alert('登录失败：' + (error.message || '网络连接错误'))
       } finally {
         this.isLoading = false
       }
@@ -223,19 +202,6 @@ export default {
   outline: none;
   border-color: #667eea;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-.remember-checkbox {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  font-size: 14px;
-  color: #57606f;
-}
-
-.remember-checkbox input[type="checkbox"] {
-  margin-right: 8px;
-  transform: scale(1.1);
 }
 
 .checkbox-text {

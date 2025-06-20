@@ -116,25 +116,54 @@ const userService = {
   /**
    * 管理员登录
    * @param {Object} loginData - 登录数据
-   * @param {string} loginData.username - 管理员用户名
+   * @param {string} loginData.username - 管理员用户名（将映射为rootId）
    * @param {string} loginData.password - 密码
    * @returns {Promise}
    */
   adminLogin(loginData) {
-    // 测试管理员账号验证
-    if (loginData.username === '00000000' && loginData.password === '00000000') {
-      return new Promise((resolve) => {
-        // 模拟网络延迟
-        setTimeout(() => {
-          resolve({
-            token: 'admin-test-token-' + Date.now(),
-            username: loginData.username
-          });
-        }, 500);
-      });
-    }
-    // 如果不是测试账号，则调用实际API
-    return api.post('/admin/login', loginData);
+    // 将username映射为rootId以匹配后端接口
+    const requestData = {
+      rootId: loginData.username,
+      password: loginData.password
+    };
+    
+    // 直接调用后端8094端口的管理员登录接口
+    return fetch('http://localhost:8094/api/admin/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(requestData)
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(result => {
+      // 根据后端返回的格式处理响应
+      if (result.code === 200) {
+        return {
+          success: true,
+          token: 'admin-token-' + Date.now(), // 生成一个token
+          username: loginData.username,
+          message: result.message
+        };
+      } else {
+        return {
+          success: false,
+          message: result.message || '登录失败'
+        };
+      }
+    })
+    .catch(error => {
+      console.error('管理员登录请求失败:', error);
+      return {
+        success: false,
+        message: '网络连接失败，请检查后端服务是否启动'
+      };
+    });
   },
 
   /**

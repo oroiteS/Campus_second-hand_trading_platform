@@ -12,7 +12,6 @@
         <result column="current_price" property="currentPrice"/>
         <result column="commodity_status" property="commodityStatus"/>
         <result column="seller_id" property="sellerId"/>
-        <result column="main_image_url" property="mainImageUrl"/>
         <result column="image_list" property="imageList" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
         <result column="created_at" property="createdAt"/>
         <result column="updated_at" property="updatedAt"/>
@@ -32,7 +31,6 @@
             c.current_price,
             c.commodity_status,
             c.seller_id,
-            c.main_image_url,
             c.image_list,
             c.created_at,
             c.updated_at,

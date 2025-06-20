@@ -132,6 +132,7 @@ public class CommodityUpdateRequest {
                 ", quantity=" + quantity +
                 ", mainImageUrl='" + mainImageUrl + '\'' +
                 ", imageList='" + imageList + '\'' +
+
                 '}';
     }
 }

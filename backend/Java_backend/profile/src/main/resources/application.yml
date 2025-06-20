@@ -79,11 +79,4 @@ logging:
     org.apache.ibatis: debug
 
 
-aliyun:
-  oss:
-    endpoint: https://oss-cn-shanghai.aliyuncs.com  # OSS endpoint
-    access-key-id:    LTAI5tGVpQGuxXuhSkRF3ak4         # AccessKey ID
-    access-key-secret:  i2Sg1uOtRR3UihOtWoQJMgAPMAVZGO    # AccessKey Secret
-    bucket-name: avatars-bysuepsw25                   # bucket名称
-    domain: avatars-bysuepsw25.oss-cn-shanghai.aliyuncs.com  # 你的bucket域名
 

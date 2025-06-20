@@ -60,11 +60,6 @@ public class CommodityDetailDTO {
     private String sellerId;
 
     /**
-     * 商品图片链接
-     */
-    private String mainImageUrl;
-
-    /**
      * 多图链接数组
      */
     private List<String> imageList;
