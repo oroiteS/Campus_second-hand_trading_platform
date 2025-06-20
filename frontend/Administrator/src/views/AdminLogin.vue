@@ -112,6 +112,7 @@ export default {
             localStorage.setItem('adminRememberLogin', 'true')
           }
           
+          alert('登录成功！')
           // 跳转到管理面板
           this.$router.push('/AdminDashboard')
         } else {
@@ -119,17 +120,7 @@ export default {
         }
       } catch (error) {
         console.error('登录错误:', error)
-        
-        // 模拟登录验证（开发环境）
-        if (this.loginForm.username === 'admin' && this.loginForm.password === 'admin123') {
-          localStorage.setItem('isAdminLoggedIn', 'true')
-          localStorage.setItem('adminToken', 'mock-admin-token')
-          localStorage.setItem('adminUsername', 'admin')
-          
-          this.$router.push('/AdminDashboard')
-        } else {
-          alert('登录失败，请检查用户名和密码')
-        }
+        alert('登录失败：' + (error.message || '网络连接错误'))
       } finally {
         this.isLoading = false
       }
