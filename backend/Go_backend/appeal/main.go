@@ -9,6 +9,21 @@ import (
 	"log"
 )
 
+// @title 申诉服务 API
+// @version 1.0
+// @description 校园二手交易平台申诉模块API文档
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name API Support
+// @contact.url http://www.swagger.io/support
+// @contact.email support@swagger.io
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host localhost:8080
+// @BasePath /api/v1
+// @schemes http https
 func main() {
 	// 加载配置
 	cfg := config.Load()
@@ -27,22 +42,38 @@ func main() {
 
 	// 初始化Gin路由
 	r := gin.Default()
+	
+	// 添加CORS中间件
+	r.Use(func(c *gin.Context) {
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+		c.Next()
+	})
 
 	// 设置路由
 	api := r.Group("/api/v1")
 	{
 		appeals := api.Group("/appeals")
 		{
-			// 通过订单ID查看申诉状态 - 修复路由
+			// 通过订单ID查看申诉状态
 			appeals.GET("/order/:orderId", appealHandler.GetAppealStatusByOrderId)
 			// 批量查询申诉状态
 			appeals.POST("/batch-status", appealHandler.BatchGetAppealStatusByOrderIds)
 			// 发起申诉请求
-			appeals.POST("", appealHandler.CreateAppeal) // 移除末尾的斜杠
+			appeals.POST("", appealHandler.CreateAppeal)
 			// 取消申诉
 			appeals.PUT("/:argumentId/cancel", appealHandler.CancelAppeal)
 			// 管理员更新申诉状态
 			appeals.PUT("/:argumentId/admin-update", appealHandler.AdminUpdateAppealStatus)
+			// 获取所有申诉记录
+			appeals.GET("/all", appealHandler.GetAllAppeals)
+			// 批量查询申诉记录详情
+			appeals.POST("/batch-appeals", appealHandler.BatchGetAppeals)
 		}
 	}
 

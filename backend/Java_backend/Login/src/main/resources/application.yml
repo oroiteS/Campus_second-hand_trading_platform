@@ -23,7 +23,6 @@ mybatis-plus:
       logic-not-delete-value: 0
 
 # JWT配置 - 敏感信息移到application-local.yml
-jwt:
   # secret和expiration配置在application-local.yml中
 
 # 日志配置

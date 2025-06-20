@@ -101,6 +101,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   name: 'FavoritesPage',
   data() {
@@ -120,58 +122,13 @@ export default {
         { id: 'beauty', name: '美妆护肤' },
         { id: 'others', name: '其它物品' }
       ],
-      favoriteProducts: [
-        {
-          id: 1,
-          name: 'iPhone 13 Pro 128GB',
-          price: 4999,
-          image: 'https://via.placeholder.com/200x200/FF6B35/FFFFFF?text=手机',
-          seller: '张同学',
-          school: '计算机学院',
-          status: '在售中',
-          statusClass: 'available',
-          category: 'electronics', // 对应"电子设备"
-          favoriteTime: '2024年1月15日收藏'
-        },
-        {
-          id: 2,
-          name: '高等数学教材（第七版）',
-          price: 25,
-          image: 'https://via.placeholder.com/200x200/4CAF50/FFFFFF?text=教材',
-          seller: '李同学',
-          school: '数学学院',
-          status: '在售中',
-          statusClass: 'available',
-          category: 'books', // 对应"教材书籍"
-          favoriteTime: '2024年1月10日收藏'
-        },
-        {
-          id: 3,
-          name: 'Nike运动鞋 42码',
-          price: 299,
-          image: 'https://via.placeholder.com/200x200/2196F3/FFFFFF?text=鞋子',
-          seller: '王同学',
-          school: '体育学院',
-          status: '已售出',
-          statusClass: 'sold',
-          category: 'clothing', // 对应"服装配饰"
-          favoriteTime: '2024年1月8日收藏'
-        },
-        {
-          id: 4,
-          name: '小米台灯护眼版',
-          price: 89,
-          image: 'https://via.placeholder.com/200x200/9C27B0/FFFFFF?text=台灯',
-          seller: '赵同学',
-          school: '设计学院',
-          status: '在售中',
-          statusClass: 'available',
-          category: 'daily', // 对应"生活用品"
-          favoriteTime: '2024年1月5日收藏'
-        }
-      ]
+      favoriteProducts: []
     }
   },
+  mounted() {
+    this.fetchCartCommodities()
+  },
+
   computed: {
     filteredProducts() {
       let products = this.favoriteProducts
@@ -226,21 +183,112 @@ export default {
         this.selectedProducts.push(productId)
       }
     },
-    removeFavorite(productId) {
-      const index = this.favoriteProducts.findIndex(p => p.id === productId)
-      if (index > -1) {
-        this.favoriteProducts.splice(index, 1)
-        this.$message?.success('已取消收藏')
+    
+    
+    async fetchCartCommodities() {
+      try {
+        const res = await axios.get('/cart/commodities', {
+          params: {
+            userId: localStorage.getItem('userId'),
+            category: this.activeCategory === 'all' ? '全部' : this.getCategoryNameById(this.activeCategory)
+          }
+        })
+        this.favoriteProducts = res.data.map(item => ({
+          id: item.commodityId,
+          name: item.commodityName,
+          price: item.currentPrice,
+          image: item.mainImageUrl || 'https://via.placeholder.com/200',
+          seller: item.sellerId,
+          status: this.mapStatus(item.commodityStatus),
+          statusClass: item.commodityStatus === 'sold' ? 'sold' : 'available',
+          category: this.mapCategoryIdToFrontend(item.categoryId),
+          favoriteTime: item.createdAt?.substring(0, 10) || '未知时间'
+        }))
+      } catch (err) {
+        console.error('获取购物车商品失败', err)
       }
     },
-    batchRemoveFavorites() {
-      this.favoriteProducts = this.favoriteProducts.filter(
-        product => !this.selectedProducts.includes(product.id)
-      )
-      this.selectedProducts = []
-      this.isSelectMode = false
-      this.$message?.success(`已取消收藏 ${this.selectedProducts.length} 件商品`)
+    async addToCart(commodityId) {
+      try {
+        const res = await axios.post('/cart/add', null, {
+          params: {
+            userId: localStorage.getItem('userId'),
+            commodityId
+          }
+        })
+        if (res.data.success) {
+          this.$message?.success('加入购物车成功')
+          this.fetchCartCommodities()
+        } else {
+          this.$message?.error('加入失败')
+        }
+      } catch (err) {
+        console.error('添加失败', err)
+      }
+    },
+    async removeFavorite(commodityId) {
+    try {
+      const res = await axios.post('/cart/remove', null, {
+        params: {
+          userId: localStorage.getItem('userId'),
+          commodityId
+        }
+      })
+      if (res.data.success) {
+        this.$message?.success('已取消收藏')
+        this.fetchCartCommodities()
+      }
+    } catch (err) {
+      console.error('移除失败', err)
     }
+  },
+  async batchRemoveFavorites() {
+    const removed = []
+    for (const id of this.selectedProducts) {
+      const res = await axios.post('/cart/remove', null, {
+        params: {
+          userId:localStorage.getItem('userId'),
+          commodityId: id
+        }
+      })
+      if (res.data.success) {
+        removed.push(id)
+      }
+    }
+    this.selectedProducts = []
+    this.isSelectMode = false
+    this.$message?.success(`已取消收藏 ${removed.length} 件商品`)
+    this.fetchCartCommodities()
+  },
+  mapStatus(status) {
+    switch (status) {
+      case 'on_sale': return '在售中'
+      case 'sold': return '已售出'
+      case 'off_sale': return '已下架'
+      default: return '未知状态'
+    }
+  },
+  getCategoryNameById(id) {
+    const cat = this.categories.find(c => c.id === id)
+    return cat ? cat.name : '全部'
+  },
+  mapCategoryIdToFrontend(categoryId) {
+    // 建议从后端返回时直接携带分类名
+    const map = {
+      1: 'electronics',
+      2: 'books',
+      3: 'daily',
+      4: 'sports',
+      5: 'clothing',
+      6: 'beauty',
+      7: 'foods',
+      8: 'furniture',
+      9: 'stationery',
+      10: 'others'
+    }
+    return map[categoryId] || 'others'
+  }
+
   }
 }
 </script>

@@ -43,11 +43,12 @@ func main() {
 		log.Fatalf("初始化Redis失败: %v", err)
 	}
 
+	/*
 	// 自动迁移数据库表
 	err = db.AutoMigrate(&models.Comment{})
 	if err != nil {
 		log.Fatalf("数据库迁移失败: %v", err)
-	}
+	}*/
 
 	// 初始化服务
 	commentService := services.NewCommentService(db, rdb)
