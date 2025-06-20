@@ -82,12 +82,12 @@
         <div class="hobby-tags">
           <div 
             v-for="hobby in hobbies" 
-            :key="hobby"
+            :key="hobby.id"
             class="hobby-tag"
-            :class="{ 'selected': selectedHobbies.includes(hobby) }"
-            @click="toggleHobby(hobby)"
+            :class="{ 'selected': selectedHobbies.includes(hobby.id) }"
+            @click="toggleHobby(hobby.id)"
           >
-            {{ hobby }}
+            {{ hobby.name }}
           </div>
         </div>
         <div class="register-input-tip" v-if="hobbyTip">{{ hobbyTip }}</div>
@@ -129,8 +129,23 @@ export default {
       hobbyTip: '',
       isLoading: false,
       hobbies: [
-        '阅读', '运动', '音乐', '电影', '旅行', '摄影', '绘画', '编程',
-        '游戏', '美食', '购物', '健身', '瑜伽', '舞蹈', '唱歌', '书法',
+        { id: 1, name: 'vivo' },
+        { id: 2, name: '耳机' },
+        { id: 3, name: 'Nintendo' },
+        { id: 95, name: '中信图书' },
+        { id: 96, name: '博集天卷' },
+        { id: 97, name: '后浪' },
+        { id: 165, name: '垃圾桶' },
+        { id: 166, name: '餐巾纸' },
+        { id: 167, name: '剪刀' },
+        { id: 330, name: '跑步鞋' },
+        { id: 331, name: '篮球鞋' },
+        { id: 332, name: '足球鞋' },
+        { id: 385, name: '晨光' },
+        { id: 386, name: '得力' },
+        { id: 387, name: '齐心' },
+        { id: 547, name: '雅诗兰黛' },
+        { id: 548, name: '兰蔻' }
       ],
       selectedHobbies: []
     }
@@ -186,8 +201,8 @@ export default {
     },
     
     // 切换爱好选择
-    toggleHobby(hobby) {
-      const index = this.selectedHobbies.indexOf(hobby)
+    toggleHobby(hobbyId) {
+      const index = this.selectedHobbies.indexOf(hobbyId)
       if (index > -1) {
         // 如果已选择，则取消选择
         this.selectedHobbies.splice(index, 1)
@@ -198,7 +213,7 @@ export default {
           this.hobbyTip = '最多只能选择5个爱好'
           return
         }
-        this.selectedHobbies.push(hobby)
+        this.selectedHobbies.push(hobbyId)
         this.hobbyTip = ''
       }
     },
@@ -262,8 +277,38 @@ export default {
         })
         
         if (response.data.code === 200 && response.data.data && response.data.data.success) {
-          alert('注册成功!')
-          this.$router.push('/login')
+          // 注册成功后，提交用户喜好
+          try {
+            // 如果选择的爱好不足5个，自动补充
+            let finalHobbies = [...this.selectedHobbies]
+            if (finalHobbies.length < 5) {
+              // 从爱好列表前面开始补充
+              for (let i = 0; i < this.hobbies.length && finalHobbies.length < 5; i++) {
+                const hobbyId = this.hobbies[i].id
+                if (!finalHobbies.includes(hobbyId)) {
+                  finalHobbies.push(hobbyId)
+                }
+              }
+            }
+            // 在控制台输出like_tags信息
+            console.log('提交的爱好标签:', finalHobbies)
+            const likeResponse = await axios.post('http://localhost:8000/api/v1/commodities/register', {
+              user_id: this.userId,
+              like_tags: finalHobbies,
+            })
+            if (likeResponse.data.code === 0) {
+              alert('注册成功!')
+              this.$router.push('/login')
+            } else {
+              console.error('提交喜好失败:', likeResponse.data)
+              alert('注册成功，但提交喜好失败')
+              this.$router.push('/login')
+            }
+          } catch (likeError) {
+            console.error('提交喜好出错:', likeError)
+            alert('注册成功，但提交喜好失败')
+            this.$router.push('/login')
+          }
         } else {
           this.errorMessage = (response.data.data && response.data.data.message) || response.data.message || '注册失败'
         }
