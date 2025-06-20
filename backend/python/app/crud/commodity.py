@@ -82,7 +82,7 @@ def get_commodity_recommendation(db: Session,user_id: str) -> List[Commodity_use
     #返回
     query = select(Commodity, User.user_name, User.avatar_url).join(User, Commodity.seller_id == User.user_id).where(Commodity.commodity_id.in_(results_commendation_cid))
     results = db.execute(query).all()
-    
+    print(results)
     # 将元组结果转换为Commodity_username_avatar对象列表
     results_commendation = []
     for row in results:
@@ -230,8 +230,8 @@ def buy_commodity(db:Session,request:BuyCommodityRequest):
     #查找用户的画像
     user_doc = mongo_collection.find_one({"user_id": user_id,"action":"like"})
     if user_doc:
-        # 计算新的嵌入向量(利用0.8与0.2的权重更新)
-        new_embedding = 0.8*np.array(user_doc["embedding"]) + 0.2*np.array(embedding_sum)
+        # 计算新的嵌入向量(利用0.7与0.3的权重更新)
+        new_embedding = 0.7*np.array(user_doc["embedding"]) + 0.3*np.array(embedding_sum)
         # 更新用户文档
         mongo_collection.update_one(
             {"_id": user_doc["_id"]},
@@ -283,8 +283,8 @@ def add_cart(request:AddCartRequest,db: Session):#add与click可以考虑优化�
     #1.2-更新用户画像
     user_doc = mongo_collection.find_one({"user_id": user_id,"action":"like"})
     if user_doc:
-        # 计算新的嵌入向量(利用0.9与0.1的权重更新)
-        new_embedding = 0.9*np.array(user_doc["embedding"]) + 0.1*np.array(commodity_embedding)
+        # 计算新的嵌入向量(利用0.7与0.3的权重更新)
+        new_embedding = 0.85*np.array(user_doc["embedding"]) + 0.15*np.array(commodity_embedding)
         # 更新用户文档
         now = datetime.datetime.now()
         mongo_collection.update_one(

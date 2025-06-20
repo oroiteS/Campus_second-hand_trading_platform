@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '.env'))
 
 folder = "./embedding_folder"
-collection_name = "categories"
+collection_name = "commodities"
 
 # 连接到ChromaDB
 chromadb_client = chromadb.PersistentClient(path=folder)

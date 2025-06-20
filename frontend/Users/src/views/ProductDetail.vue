@@ -745,7 +745,6 @@ export default {
             },
             timeout: 5000 // 5秒超时
           })
-          
           if (cartResponse.data && cartResponse.data.success) {
             // 购物车添加成功后，更新用户画像
             try {
@@ -758,7 +757,6 @@ export default {
                 },
                 timeout: 30000
               })
-              
               if (profileResponse.data && profileResponse.data.code === 0) {
                 this.isFavorited = true
                 alert('收藏成功！商品已添加到购物车，用户画像已更新')
