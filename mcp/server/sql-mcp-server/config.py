@@ -5,8 +5,8 @@
 
 # 配置允许查询的表列表（安全控制）
 ALLOWED_TABLES = {
-    'users',
-    'commodities'
+    'commodities',
+    'books'
 }
 
 # MySQL 云端数据库连接配置
