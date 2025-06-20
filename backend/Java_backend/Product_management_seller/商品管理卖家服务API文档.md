@@ -97,11 +97,11 @@ http://localhost:8084/swagger-ui.html
 
 ### 接口列表
 
-#### 1. 创建并上架商品（带图片上传）
+#### 1. 创建商品（待审核）
 
 - **URL**: `/api/commodity/create-and-put-on-sale`
 - **方法**: `POST`
-- **描述**: 创建新商品并直接设置为在售状态，支持同时上传商品图片到OSS。
+- **描述**: 创建新商品并设置为待审核状态(to_sale)，需要管理员审核后才能正式上架。支持同时上传商品图片到OSS。
 - **Content-Type**: `multipart/form-data`
 
 **请求参数**:
@@ -130,7 +130,7 @@ http://localhost:8084/swagger-ui.html
 ```json
 {
   "success": true,
-  "message": "商品创建并上架成功",
+  "message": "商品创建成功，等待管理员审核",
   "data": {
     "commodityId": "12345678-1234-1234-1234-123456789012",
     "commodityName": "二手iPhone 13",
@@ -140,7 +140,7 @@ http://localhost:8084/swagger-ui.html
     "currentPrice": 4500.00,
     "quantity": 1,
     "newness": "九成新",
-    "commodityStatus": "ON_SALE",
+    "commodityStatus": "TO_SALE",
     "sellerId": "202100001",
     "mainImageUrl": "https://your-oss-domain.com/commodities/202100001/20241217_220000_abc123.jpg",
     "imageList": "[\"https://your-oss-domain.com/commodities/202100001/20241217_220000_abc123.jpg\", \"https://your-oss-domain.com/commodities/202100001/20241217_220001_def456.jpg\"]",
@@ -150,11 +150,11 @@ http://localhost:8084/swagger-ui.html
 }
 ```
 
-#### 2. 商品上架
+#### 2. 申请上架商品（设置状态为待审核）
 
 - **URL**: `/api/commodity/put-on-sale`
 - **方法**: `POST`
-- **描述**: 将商品状态设置为 `on_sale`（在售）。
+- **描述**: 申请上架商品，将商品状态设置为 `to_sale`（待审核），等待管理员审核。
 - **Content-Type**: `application/json`
 
 **请求参数**:
@@ -176,7 +176,7 @@ http://localhost:8084/swagger-ui.html
 ```json
 {
   "success": true,
-  "message": "商品上架成功"
+  "message": "商品申请上架成功，状态已设为待审核"
 }
 ```
 
@@ -357,7 +357,7 @@ http://localhost:8084/swagger-ui.html
 | 参数名   | 类型   | 必填 | 描述     | 可选值 |
 |----------|--------|------|----------|--------|
 | sellerId | string | 是   | 卖家ID   | - |
-| status   | string | 是   | 商品状态 | "on_sale", "off_sale", "sold" |
+| status   | string | 是   | 商品状态 | "to_sale", "on_sale", "off_sale", "sold" |
 
 **响应示例**: (同上)
 
@@ -624,7 +624,19 @@ mvn verify
 
 ### v0.0.1-SNAPSHOT (2024年12月)
 
-#### 最新更新：新增商品已售状态管理
+#### 最新更新：商品状态管理重构
+- **重要变更**: 修改商品创建和上架逻辑，引入审核机制
+- **状态变更**: 
+  - 新增 `to_sale`（待审核）状态
+  - 商品创建后默认状态为 `to_sale`，需要管理员审核
+  - 管理员审核通过后状态变为 `on_sale`（在售）
+- **影响接口**:
+  - 创建商品接口：商品创建后状态为 `to_sale`
+  - 上架接口：现在用于管理员审核通过，将状态从 `to_sale` 改为 `on_sale`
+  - 状态查询接口：支持查询 `to_sale` 状态的商品
+- **业务价值**: 增强平台管理能力，确保商品质量，防止违规商品直接上架
+
+#### 新增商品已售状态管理
 - **新增功能**: 添加商品标记为已售接口 `POST /api/commodity/mark-as-sold`
 - **功能描述**: 将商品状态设置为 `sold`（已售）
 - **参数要求**: 只需要传入 `commodityId` 和 `sellerId`

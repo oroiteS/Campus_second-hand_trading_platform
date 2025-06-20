@@ -32,6 +32,7 @@ logging:
 
 # aliyun oss配置移到application-local.yml
 
+<<<<<<< HEAD
 aliyun:
   oss:
     endpoint: https://oss-cn-shanghai.aliyuncs.com  # OSS endpoint
@@ -39,3 +40,5 @@ aliyun:
     access-key-secret:  i2Sg1uOtRR3UihOtWoQJMgAPMAVZGO    # AccessKey Secret
     bucket-name: avatars-bysuepsw25                   # bucket名称
     domain: avatars-bysuepsw25.oss-cn-shanghai.aliyuncs.com  # 你的bucket域名
+=======
+>>>>>>> 82c8434586f7e443260b7ca1055eddbab06ecd09

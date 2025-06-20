@@ -12,7 +12,7 @@
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
   }
   
-  .header-content {
+  .order-management .header-content {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -21,7 +21,7 @@
     margin: 0 auto;
   }
   
-  .header-btn {
+  .order-management .header-btn {
     background: rgba(255,255,255,0.2);
     color: white;
     border: none;
@@ -31,18 +31,18 @@
     transition: all 0.3s;
   }
   
-  .header-btn:hover {
+  .order-management .header-btn:hover {
     background: rgba(255,255,255,0.3);
   }
   
-  .page-title {
+  .order-management .page-title {
     color: white;
     font-size: 20px;
     font-weight: bold;
     margin: 0;
   }
   
-  .header-placeholder {
+  .order-management .header-placeholder {
     width: 80px;
   }
   
@@ -63,7 +63,7 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   }
   
-  .tab-btn {
+  .order-management .tab-btn {
     flex: 1;
     padding: 12px 20px;
     border: none;
@@ -74,12 +74,12 @@
     font-weight: 500;
   }
   
-  .tab-btn.active {
+  .order-management .tab-btn.active {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
   }
   
-  .tab-count {
+  .order-management .tab-count {
     font-size: 12px;
     opacity: 0.8;
   }
@@ -91,20 +91,20 @@
     gap: 16px;
   }
   
-  .order-card {
+  .order-management .order-card {
     background: white;
     border-radius: 12px;
     padding: 20px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     transition: all 0.3s;
   }
-  
-  .order-card:hover {
+
+  .order-management .order-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 16px rgba(0,0,0,0.15);
   }
-  
-  .order-header-info {
+
+  .order-management .order-header-info {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -112,86 +112,86 @@
     padding-bottom: 12px;
     border-bottom: 1px solid #eee;
   }
-  
-  .order-number {
+
+  .order-management .order-number {
     font-size: 14px;
     color: #666;
   }
-  
-  .order-status {
+
+  .order-management .order-status {
     padding: 4px 12px;
     border-radius: 12px;
     font-size: 12px;
     font-weight: bold;
   }
-  
-  .order-status.pending {
+
+  .order-management .order-status.pending {
     background: #fff3cd;
     color: #856404;
   }
-  
-  .order-status.shipped {
+
+  .order-management .order-status.shipped {
     background: #d1ecf1;
     color: #0c5460;
   }
-  
-  .order-status.completed {
+
+  .order-management .order-status.completed {
     background: #d4edda;
     color: #155724;
   }
-  
-  .order-status.not-shipped {
+
+  .order-management .order-status.not-shipped {
     background: #f8d7da;
     color: #721c24;
   }
-  
-  .order-content {
+
+  .order-management .order-content {
     display: flex;
     gap: 16px;
     margin-bottom: 16px;
   }
-  
-  .product-image {
+
+  .order-management .product-image {
     width: 80px;
     height: 80px;
     border-radius: 8px;
     object-fit: cover;
   }
   
-  .product-info {
+  .order-management .product-info {
     flex: 1;
   }
   
-  .product-name {
+  .order-management .product-name {
     font-size: 16px;
     font-weight: bold;
     margin: 0 0 8px 0;
     color: #333;
   }
-  
-  .product-desc {
+
+  .order-management .product-desc {
     font-size: 14px;
     color: #666;
     margin: 0 0 12px 0;
   }
-  
-  .order-details {
+
+  .order-management .order-details {
     display: flex;
     gap: 20px;
   }
-  
-  .order-price {
+
+  .order-management .order-price {
     font-size: 18px;
     font-weight: bold;
     color: #e74c3c;
   }
-  
-  .order-quantity {
+
+  .order-management .order-quantity {
     font-size: 14px;
     color: #666;
   }
   
-  .order-meta {
+  .order-management .order-meta {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -199,18 +199,18 @@
     border-top: 1px solid #eee;
   }
   
-  .order-time {
+  .order-management .order-time {
     font-size: 14px;
     color: #666;
   }
   
-  .order-actions {
+  .order-management .order-actions {
     display: flex;
     gap: 12px;
     flex-wrap: wrap;
   }
   
-  .action-btn {
+  .order-management .action-btn {
     padding: 6px 16px;
     border: 1px solid #ddd;
     background: white;
@@ -221,52 +221,52 @@
     white-space: nowrap;
   }
   
-  .action-btn:hover {
+  .order-management .action-btn:hover {
     background: #f8f9fa;
   }
   
-  .action-btn.confirm {
+  .order-management .action-btn.confirm {
     background: #28a745;
     color: white;
     border-color: #28a745;
   }
   
-  .action-btn.confirm:hover {
+  .order-management .action-btn.confirm:hover {
     background: #218838;
   }
   
-  .action-btn.appeal {
+  .order-management .action-btn.appeal {
     background: #ffc107;
     color: #212529;
     border-color: #ffc107;
   }
   
-  .action-btn.appeal:hover {
+  .order-management .action-btn.appeal:hover {
     background: #e0a800;
   }
   
-  .action-btn.refund {
+  .order-management .action-btn.refund {
     background: #dc3545;
     color: white;
     border-color: #dc3545;
   }
   
-  .action-btn.refund:hover {
+  .order-management .action-btn.refund:hover {
     background: #c82333;
   }
   
-  .action-btn.shipping {
+  .order-management .action-btn.shipping {
     background: #17a2b8;
     color: white;
     border-color: #17a2b8;
   }
   
-  .action-btn.shipping:hover {
+  .order-management .action-btn.shipping:hover {
     background: #138496;
   }
   
   /* 空状态 */
-  .empty-state {
+  .order-management .empty-state {
     text-align: center;
     padding: 60px 20px;
     background: white;
@@ -274,19 +274,19 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   }
   
-  .empty-icon {
+  .order-management .empty-icon {
     font-size: 48px;
     margin-bottom: 16px;
   }
   
-  .empty-text {
+  .order-management .empty-text {
     font-size: 16px;
     color: #666;
     margin: 0;
   }
   
   /* 弹窗样式 */
-  .modal-overlay {
+  .order-management .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -299,7 +299,7 @@
     z-index: 1000;
   }
   
-  .modal-content {
+  .order-management .modal-content {
     background: white;
     border-radius: 12px;
     width: 90%;
@@ -309,7 +309,7 @@
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   }
   
-  .modal-header {
+  .order-management .modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -317,13 +317,13 @@
     border-bottom: 1px solid #eee;
   }
   
-  .modal-header h3 {
+  .order-management .modal-header h3 {
     margin: 0;
     font-size: 18px;
     font-weight: bold;
   }
   
-  .close-btn {
+  .order-management .close-btn {
     background: none;
     border: none;
     font-size: 24px;
@@ -337,15 +337,15 @@
     justify-content: center;
   }
   
-  .close-btn:hover {
+  .order-management .close-btn:hover {
     color: #333;
   }
   
-  .modal-body {
+  .order-management .modal-body {
     padding: 20px;
   }
   
-  .modal-footer {
+  .order-management .modal-footer {
     display: flex;
     justify-content: flex-end;
     gap: 12px;
@@ -353,18 +353,18 @@
     border-top: 1px solid #eee;
   }
   
-  .form-group {
+  .order-management .form-group {
     margin-bottom: 20px;
   }
   
-  .form-group label {
+  .order-management .form-group label {
     display: block;
     margin-bottom: 8px;
     font-weight: 500;
     color: #333;
   }
   
-  .form-control {
+  .order-management .form-control {
     width: 100%;
     padding: 10px 12px;
     border: 1px solid #ddd;
@@ -374,58 +374,42 @@
     box-sizing: border-box;
   }
   
-  .form-control:focus {
+  .order-management .form-control:focus {
     outline: none;
     border-color: #667eea;
     box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
   }
   
-  .file-tips, .form-tips {
+  .order-management .file-tips, .order-management .form-tips {
     font-size: 12px;
     color: #666;
     margin-top: 4px;
   }
   
-  .refund-info, .shipping-info, .appeal-info {
+  .order-management .refund-info, .order-management .shipping-info, .order-management .appeal-info {
     background: #f8f9fa;
     padding: 16px;
     border-radius: 8px;
     margin-bottom: 20px;
   }
   
-  .refund-info p, .shipping-info p, .appeal-info p {
+  .order-management .refund-info p, .order-management .shipping-info p, .order-management .appeal-info p {
     margin: 0 0 8px 0;
     font-size: 14px;
   }
   
-  .refund-info p:last-child, .shipping-info p:last-child, .appeal-info p:last-child {
-    margin-bottom: 0;
-  }
-  
-  .appeal-info {
-    background: #f8f9fa;
-    padding: 16px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-  }
-  
-  .appeal-info p {
-    margin: 0 0 8px 0;
-    font-size: 14px;
-  }
-  
-  .appeal-info p:last-child {
+  .order-management .refund-info p:last-child, .order-management .shipping-info p:last-child, .order-management .appeal-info p:last-child {
     margin-bottom: 0;
   }
   
   /* 发货状态选择样式 */
-  .status-options {
+  .order-management .status-options {
     display: flex;
     flex-direction: column;
     gap: 12px;
   }
   
-  .status-option {
+  .order-management .status-option {
     display: flex;
     align-items: flex-start;
     gap: 12px;
@@ -436,40 +420,40 @@
     transition: all 0.3s;
   }
   
-  .status-option:hover {
+  .order-management .status-option:hover {
     border-color: #667eea;
     background: #f8f9ff;
   }
   
-  .status-option input[type="radio"] {
+  .order-management .status-option input[type="radio"] {
     margin: 0;
     margin-top: 2px;
   }
   
-  .status-option input[type="radio"]:checked + .status-content .status-label {
+  .order-management .status-option input[type="radio"]:checked + .status-content .status-label {
     color: #667eea;
     font-weight: bold;
   }
   
-  .status-content {
+  .order-management .status-content {
     display: flex;
     flex-direction: column;
   }
   
-  .status-label {
+  .order-management .status-label {
     font-size: 16px;
     font-weight: 500;
     color: #333;
     margin-bottom: 4px;
   }
   
-  .status-desc {
+  .order-management .status-desc {
     font-size: 12px;
     color: #666;
     display: block;
   }
   
-  .btn {
+  .order-management .btn {
     padding: 10px 20px;
     border: none;
     border-radius: 6px;
@@ -479,26 +463,26 @@
     transition: all 0.3s;
   }
   
-  .btn:disabled {
+  .order-management .btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
   }
   
-  .btn-cancel {
+  .order-management .btn-cancel {
     background: #6c757d;
     color: white;
   }
   
-  .btn-cancel:hover:not(:disabled) {
+  .order-management .btn-cancel:hover:not(:disabled) {
     background: #5a6268;
   }
   
-  .btn-primary {
+  .order-management .btn-primary {
     background: #667eea;
     color: white;
   }
   
-  .btn-primary:hover:not(:disabled) {
+  .order-management .btn-primary:hover:not(:disabled) {
     background: #5a6fd8;
   }
   

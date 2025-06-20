@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.crud import commodity as crud_commodity
-from app.schemas.commodity import Commodity,Commodity_username,Commodity_id
+from app.schemas.commodity import Commodity,Commodity_username,Commodity_id,Commodity_username_avatar
 from app.schemas.SearchCommodityRequest import SearchCommodityRequest
 from app.schemas.Response import ResponseBase
 from app.schemas.register_Request import RegisterRequest
@@ -52,14 +52,14 @@ def update_commodity_status(
     else:
         return {"code": "1"}
 
-@router.get("/recommendation/{user_id}",response_model=List[Commodity])
+@router.get("/recommendation/{user_id}",response_model=List[Commodity_username_avatar])
 def get_recommendation_commodity_recommendation(user_id:str,db: Session= Depends(get_db)):
     """给指定用户推送推荐的商品"""
     commodity_list = crud_commodity.get_commodity_recommendation(db,user_id)
     return commodity_list
     
 
-@router.post("/search",response_model=List[Commodity])
+@router.post("/search",response_model=List[Commodity_username_avatar])
 def get_commodities_by_search(request: SearchCommodityRequest,db: Session = Depends(get_db)):
     """根据用户搜索的商品进行模糊查询、相似度查询与兴趣推荐"""
     results = crud_commodity.get_commodities_by_search(db,request)
@@ -119,3 +119,12 @@ def delete_commodity(request:Commodity_id,db: Session = Depends(get_db)):
         return {"code": 0}
     else:
         return {"code": 1}
+
+@router.get("/get_username/{user_id}")
+def get_username(user_id: str, db: Session = Depends(get_db)):
+    """根据用户ID获取用户名"""
+    username = crud_commodity.get_username(user_id,db)
+    if username:
+        return {"code": 0, "username": username}
+    else:
+        return {"code": 1, "message": "用户不存在"}

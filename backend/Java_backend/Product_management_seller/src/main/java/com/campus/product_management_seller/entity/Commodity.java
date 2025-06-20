@@ -40,7 +40,7 @@ public class Commodity {
     
     @Convert(converter = CommodityStatusConverter.class)
     @Column(name = "commodity_status", nullable = false)
-    private CommodityStatus commodityStatus = CommodityStatus.ON_SALE;
+    private CommodityStatus commodityStatus = CommodityStatus.TO_SALE;
     
     @NotBlank(message = "卖家ID不能为空")
     @Column(name = "seller_id", length = 9, nullable = false)
@@ -71,6 +71,7 @@ public class Commodity {
     
     // 商品状态枚举
     public enum CommodityStatus {
+        TO_SALE("to_sale"),
         ON_SALE("on_sale"),
         SOLD("sold"),
         OFF_SALE("off_sale");

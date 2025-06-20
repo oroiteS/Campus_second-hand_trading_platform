@@ -12,6 +12,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/announcements")
+@CrossOrigin(origins = "http://localhost:8079", allowCredentials = "true")
 public class AnnouncementController {
 
     @Autowired

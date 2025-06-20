@@ -14,6 +14,7 @@ import NoticeDetail from '../views/NoticeDetail.vue'
 import PasswordReset from '../views/PasswordReset.vue'
 import WalletManagement from '../views/WalletManagement.vue'
 import SellerProfile from '../views/SellerProfile.vue'
+import RecommendedProducts from '../views/RecommendedProducts.vue'
 
 const routes = [
   {
@@ -72,11 +73,15 @@ const routes = [
     component: PublishProduct
   },
   {
-    path: '/notice/:id',
+    path: '/notice',
     name: 'NoticeDetail',
     component: NoticeDetail
   },
+<<<<<<< HEAD
   {    
+=======
+  {
+>>>>>>> 82c8434586f7e443260b7ca1055eddbab06ecd09
     path: '/chat-list/:userId',
     name: 'ChatList',
     component: () => import('../views/ChatList.vue')
@@ -100,6 +105,11 @@ const routes = [
     path: '/sellerprofile/:sellerId',
     name: 'SellerProfile',
     component: SellerProfile
+  },
+  {
+    path: '/recommended',
+    name: 'RecommendedProducts',
+    component: RecommendedProducts
   }
 ]
 

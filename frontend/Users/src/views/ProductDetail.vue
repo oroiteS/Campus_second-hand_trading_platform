@@ -246,6 +246,7 @@
             <textarea v-model="editingProduct.description" class="form-textarea" placeholder="请输入商品描述"></textarea>
           </div>
           <div class="form-group">
+<<<<<<< HEAD
             <label>成色</label>
             <select v-model="editingProduct.condition" class="form-select">
               <option value="全新">全新</option>
@@ -254,6 +255,15 @@
               <option value="8成新">8成新</option>
               <option value="7成新">7成新</option>
             </select>
+=======
+            <label>交易地点</label>
+            <input v-model="editingProduct.location" type="text" class="form-input" placeholder="请输入交易地点">
+          </div>
+          <div class="form-group">
+            <label>详细描述</label>
+            <textarea v-model="editingProduct.detailDescription" class="form-textarea large" placeholder="请输入详细描述，每行一段"
+              rows="6"></textarea>
+>>>>>>> 82c8434586f7e443260b7ca1055eddbab06ecd09
           </div>
         </div>
         <div class="modal-footer">
