@@ -468,8 +468,48 @@ export default {
       this.$message?.info(`查看订单 ${order.orderNumber} 的评价`) || alert(`查看订单 ${order.orderNumber} 的评价`)
     },
     contactUser(order) {
-      console.log('联系用户:', order.orderNumber)
-      this.$message?.info(`联系订单 ${order.orderNumber} 的相关用户`) || alert(`联系订单 ${order.orderNumber} 的相关用户`)
+      // 获取当前用户ID
+      const userId = localStorage.getItem('userId');
+
+      if (!userId) {
+        // 如果用户未登录，提示登录
+        this.$message?.error('请先登录后联系用户') || alert('请先登录后联系用户');
+        this.$router.push('/login');
+        return;
+      }
+
+      // 判断当前用户是买家还是卖家，确定要联系的对象
+      let targetUserId;
+      let targetUserType;
+
+      if (userId === order.buyerId.toString()) {
+        // 当前用户是买家，要联系卖家
+        targetUserId = order.sellerId;
+        targetUserType = '卖家';
+      } else if (userId === order.sellerId.toString()) {
+        // 当前用户是卖家，要联系买家
+        targetUserId = order.buyerId;
+        targetUserType = '买家';
+      } else {
+        // 异常情况：当前用户既不是买家也不是卖家
+        this.$message?.error('无法确定联系对象') || alert('无法确定联系对象');
+        return;
+      }
+
+      if (!targetUserId) {
+        this.$message?.error(`无法获取${targetUserType}信息`) || alert(`无法获取${targetUserType}信息`);
+        return;
+      }
+
+      // 跳转到聊天页面
+      this.$router.push({
+        path: '/chat-list',
+        query: {
+          sellerId: order.sellerId,
+          buyerId: order.buyerId,
+          autoCreate: 'true'
+        }
+      });
     },
 
     // 申诉相关方法
@@ -571,7 +611,7 @@ export default {
     // 修正：获取被申诉者ID的方法
     getOppositeUserId() {
       const orderType = this.getOrderType(this.currentOrder.id);
-      
+
       // 根据订单类型和实际数据结构来获取对方用户ID
       if (orderType === 'buy') {
         // 买家申诉卖家
@@ -580,7 +620,7 @@ export default {
         // 卖家申诉买家
         return this.currentOrder.buyerId || this.currentOrder.buyer_id || null;
       }
-      
+
       return null;
     },
 
