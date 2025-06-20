@@ -22,10 +22,9 @@ mybatis-plus:
       logic-delete-value: 1
       logic-not-delete-value: 0
 
-# JWT配置
+# JWT配置 - 敏感信息移到application-local.yml
 jwt:
-  secret: campus-secondhand-platform-secret-key-2024
-  expiration: 3600000  # 24小时
+  # secret和expiration配置在application-local.yml中
 
 # 日志配置
 logging:
