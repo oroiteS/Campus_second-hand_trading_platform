@@ -32,16 +32,11 @@ public class CommodityUpdateRequest {
     
     private String imageList;
     
-    /**
-     * 是否删除原有图片（true=删除原有图片，false=保留原有图片）
-     */
-    private Boolean deleteExistingImages;
-    
     public CommodityUpdateRequest() {}
     
     public CommodityUpdateRequest(String commodityId, String sellerId, String commodityName, 
                                  String commodityDescription, BigDecimal currentPrice, String newness,
-                                 Integer quantity, String mainImageUrl, String imageList, Boolean deleteExistingImages) {
+                                 Integer quantity, String mainImageUrl, String imageList) {
         this.commodityId = commodityId;
         this.sellerId = sellerId;
         this.commodityName = commodityName;
@@ -51,7 +46,6 @@ public class CommodityUpdateRequest {
         this.quantity = quantity;
         this.mainImageUrl = mainImageUrl;
         this.imageList = imageList;
-        this.deleteExistingImages = deleteExistingImages;
     }
     
     public String getCommodityId() {
@@ -126,14 +120,6 @@ public class CommodityUpdateRequest {
         this.imageList = imageList;
     }
     
-    public Boolean getDeleteExistingImages() {
-        return deleteExistingImages;
-    }
-    
-    public void setDeleteExistingImages(Boolean deleteExistingImages) {
-        this.deleteExistingImages = deleteExistingImages;
-    }
-    
     @Override
     public String toString() {
         return "CommodityUpdateRequest{" +
@@ -146,7 +132,7 @@ public class CommodityUpdateRequest {
                 ", quantity=" + quantity +
                 ", mainImageUrl='" + mainImageUrl + '\'' +
                 ", imageList='" + imageList + '\'' +
-                ", deleteExistingImages=" + deleteExistingImages +
+
                 '}';
     }
 }

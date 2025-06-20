@@ -258,27 +258,19 @@ http://localhost:8084/swagger-ui.html
 | currentPrice        | decimal | 否   | 当前价格     | 可选，必须为正数            |
 | newness             | string  | 否   | 商品新旧度   | 可选，提供时不能为空字符串，支持：全新、95新、9成新、8成新、7成新 |
 | quantity            | integer | 否   | 商品数量     | 可选，必须为正整数          |
-| deleteExistingImages| boolean | 否   | 是否删除原有图片 | 可选，默认false。true=删除原有图片，false=保留原有图片 |
+
 | images              | file[]  | 否   | 商品图片文件 | 可选，支持多张图片上传，格式：jpg/jpeg/png/gif/webp，单个文件不超过10MB |
 
 **图片更新逻辑说明**:
 
-1. **保留原有图片 + 新增图片** (`deleteExistingImages=false` 且提供 `images`):
-   - 保留商品的所有原有图片
-   - 将新上传的图片添加到图片列表末尾
-   - 第一张图片（原有或新增）作为主图
+1. **提供新图片** (提供 `images` 参数):
+   - 直接使用新提供的图片文件替换原有的所有图片
+   - 上传新图片文件到服务器
+   - 更新商品的图片列表和主图片URL
 
-2. **删除原有图片 + 新增图片** (`deleteExistingImages=true` 且提供 `images`):
-   - 删除商品的所有原有图片
-   - 使用新上传的图片替换
-   - 第一张新图片作为主图
-
-3. **仅删除原有图片** (`deleteExistingImages=true` 且不提供 `images`):
-   - 删除商品的所有原有图片
-   - 清空主图和图片列表
-
-4. **不更改图片** (`deleteExistingImages=false` 且不提供 `images`):
+2. **不提供图片** (不提供 `images` 参数):
    - 保持原有图片不变
+   - 不对图片进行任何修改
 
 **响应示例**:
 

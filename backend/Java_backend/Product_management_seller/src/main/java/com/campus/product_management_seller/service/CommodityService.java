@@ -304,8 +304,8 @@ public class CommodityService {
      * @param currentPrice 商品价格
      * @param newness 商品新旧度
      * @param quantity 商品数量
-     * @param deleteExistingImages 是否删除原有图片
-     * @param images 商品图片文件数组（可选）
+     * @param deleteExistingImages 已废弃，传入null即可
+     * @param images 商品图片文件数组（如果提供则直接替换原有图片）（可选）
      * @return 是否更新成功
      */
     public boolean updateCommodityInfoWithImages(String commodityId, String sellerId, 
@@ -356,54 +356,19 @@ public class CommodityService {
                 updated = true;
             }
             
-            // 处理图片更新逻辑
-            boolean imageUpdated = false;
-            List<String> finalImageUrls = new ArrayList<>();
-            
-            // 如果不删除原有图片，先获取原有图片列表
-            if (deleteExistingImages == null || !deleteExistingImages) {
-                String existingImageList = commodity.getImageList();
-                if (existingImageList != null && !existingImageList.trim().isEmpty() && !"[]".equals(existingImageList.trim())) {
-                    try {
-                        // 解析现有图片JSON数组
-                        String cleanImageList = existingImageList.trim();
-                        if (cleanImageList.startsWith("[") && cleanImageList.endsWith("]")) {
-                            cleanImageList = cleanImageList.substring(1, cleanImageList.length() - 1);
-                            if (!cleanImageList.trim().isEmpty()) {
-                                String[] existingUrls = cleanImageList.split(",");
-                                for (String url : existingUrls) {
-                                    String cleanUrl = url.trim().replaceAll("^\"|\"$", "");
-                                    if (!cleanUrl.isEmpty()) {
-                                        finalImageUrls.add(cleanUrl);
-                                    }
-                                }
-                            }
-                        }
-                    } catch (Exception e) {
-                        logger.warn("解析现有图片列表失败: commodityId={}, imageList={}, error={}", 
-                                   commodityId, existingImageList, e.getMessage());
-                    }
-                }
-            }
-            
-            // 如果有新图片，上传并添加到列表
+            // 处理图片更新逻辑 - 如果有新图片则直接替换
             if (images != null && images.length > 0) {
                 List<String> newImageUrls = ossUtil.uploadCommodityImages(Arrays.asList(images), sellerId);
                 
                 if (newImageUrls != null && !newImageUrls.isEmpty()) {
+                    List<String> finalImageUrls = new ArrayList<>();
+                    
                     // 为新图片URL添加https前缀
                     for (String url : newImageUrls) {
                         String httpsUrl = "https://" + url;
                         finalImageUrls.add(httpsUrl);
                     }
-                    imageUpdated = true;
-                    logger.info("新增商品图片成功: commodityId={}, 新增图片数量={}", commodityId, newImageUrls.size());
-                }
-            }
-            
-            // 如果删除了原有图片或有新图片，更新图片信息
-            if ((deleteExistingImages != null && deleteExistingImages) || imageUpdated) {
-                if (!finalImageUrls.isEmpty()) {
+                    
                     // 第一张图片作为主图
                     String mainImageUrl = finalImageUrls.get(0);
                     commodity.setMainImageUrl(mainImageUrl);
@@ -419,14 +384,9 @@ public class CommodityService {
                     imageListBuilder.append("]");
                     commodity.setImageList(imageListBuilder.toString());
                     
-                    logger.info("商品图片更新成功: commodityId={}, 最终图片数量={}", commodityId, finalImageUrls.size());
-                } else {
-                    // 如果删除了所有图片且没有新图片，清空图片字段
-                    commodity.setMainImageUrl(null);
-                    commodity.setImageList("[]");
-                    logger.info("商品图片已清空: commodityId={}", commodityId);
+                    updated = true;
+                    logger.info("商品图片更新成功: commodityId={}, 图片数量={}", commodityId, finalImageUrls.size());
                 }
-                updated = true;
             }
             
             if (updated) {

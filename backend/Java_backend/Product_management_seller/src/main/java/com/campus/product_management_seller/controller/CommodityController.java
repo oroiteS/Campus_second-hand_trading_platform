@@ -321,8 +321,7 @@ public class CommodityController {
      * @param currentPrice 商品价格
      * @param newness 商品新旧度
      * @param quantity 商品数量
-     * @param deleteExistingImages 是否删除原有图片
-     * @param images 商品图片文件（可选）
+     * @param images 商品图片文件（可选，如果提供则直接替换原有图片）
      * @return 响应结果
      */
     @Operation(summary = "更新商品信息", description = "更新商品的基本信息，支持直接上传新的商品图片")
@@ -342,9 +341,7 @@ public class CommodityController {
             @RequestParam(value = "newness", required = false) String newness,
             @Parameter(description = "商品数量")
             @RequestParam(value = "quantity", required = false) Integer quantity,
-            @Parameter(description = "是否删除原有图片（true=删除，false=保留，默认false）")
-            @RequestParam(value = "deleteExistingImages", required = false, defaultValue = "false") Boolean deleteExistingImages,
-            @Parameter(description = "商品图片文件，支持多张图片上传（可选）")
+            @Parameter(description = "商品图片文件，支持多张图片上传（可选，如果提供则直接替换原有图片）")
             @RequestParam(value = "images", required = false) MultipartFile[] images) {
         
         logger.info("收到更新商品信息请求: commodityId={}, sellerId={}", commodityId, sellerId);
@@ -405,7 +402,7 @@ public class CommodityController {
         try {
             boolean success = commodityService.updateCommodityInfoWithImages(
                 commodityId, sellerId, commodityName, commodityDescription, 
-                currentPrice, newness, quantity, deleteExistingImages, images);
+                currentPrice, newness, quantity, null, images);
             
             if (success) {
                 logger.info("商品信息更新成功: commodityId={}, sellerId={}", commodityId, sellerId);

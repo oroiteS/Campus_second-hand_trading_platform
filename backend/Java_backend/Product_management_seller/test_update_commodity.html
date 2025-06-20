@@ -172,19 +172,12 @@
                 <div class="field-info">可选字段，更新商品库存数量（必须为正整数）</div>
             </div>
 
-            <div class="form-group">
-                <label for="deleteExistingImages">删除原有图片 <span class="optional">(可选)</span></label>
-                <select id="deleteExistingImages" name="deleteExistingImages">
-                    <option value="false">否 - 保留原有图片</option>
-                    <option value="true">是 - 删除原有图片</option>
-                </select>
-                <div class="field-info">可选字段，选择是否删除商品的原有图片。选择"否"时新图片会追加到原有图片后面，选择"是"时新图片会替换所有原有图片</div>
-            </div>
+
 
             <div class="form-group">
                 <label for="images">商品图片 <span class="optional">(可选)</span></label>
                 <input type="file" id="images" name="images" multiple accept="image/jpeg,image/jpg,image/png,image/gif,image/webp">
-                <div class="field-info">可选字段，支持上传多张图片文件（jpg, jpeg, png, gif, webp格式，每张图片最大10MB）</div>
+                <div class="field-info">可选字段，支持上传多张图片文件（jpg, jpeg, png, gif, webp格式，每张图片最大10MB）。如果提供图片，将直接替换原有的所有图片</div>
             </div>
 
             <button type="submit">更新商品信息</button>
@@ -211,7 +204,7 @@
             const currentPrice = document.getElementById('currentPrice').value.trim();
             const newness = document.getElementById('newness').value.trim();
             const quantity = document.getElementById('quantity').value.trim();
-            const deleteExistingImages = document.getElementById('deleteExistingImages').value;
+
             const images = document.getElementById('images').files;
             
             // 验证必填字段
@@ -231,8 +224,7 @@
             if (newness) formData.append('newness', newness);
             if (quantity) formData.append('quantity', quantity);
             
-            // 添加删除原有图片参数
-            formData.append('deleteExistingImages', deleteExistingImages);
+
             
             // 验证图片文件
             if (images.length > 0) {
