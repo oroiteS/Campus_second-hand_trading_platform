@@ -10,7 +10,7 @@
         <div class="home-search-container">
           <div class="home-search-bar">
             <input type="text" placeholder="搜索校园好物..." v-model="searchQuery" class="home-search-input" />
-            <button @click="searchProducts" class="home-search-btn">
+            <button @click="searchProducts();goToSearchResults();" class="home-search-btn">
               <i class="home-search-icon">🔍</i>
             </button>
           </div>
@@ -77,15 +77,15 @@
               <p>让闲置物品重新焕发价值，让校园生活更加便利</p>
               <div class="home-stats">
                 <div class="home-stat-item">
-                  <span class="home-stat-number">1,234</span>
+                  <span class="home-stat-number">{{ stats.totalProducts.toLocaleString() }}</span>
                   <span class="home-stat-label">在售商品</span>
                 </div>
                 <div class="home-stat-item">
-                  <span class="home-stat-number">567</span>
+                  <span class="home-stat-number">{{ stats.activeUsers.toLocaleString() }}</span>
                   <span class="home-stat-label">活跃用户</span>
                 </div>
                 <div class="home-stat-item">
-                  <span class="home-stat-number">890</span>
+                  <span class="home-stat-number">{{ stats.completedOrders.toLocaleString() }}</span>
                   <span class="home-stat-label">成功交易</span>
                 </div>
               </div>
@@ -212,13 +212,20 @@ export default {
       isLoadingNewProducts: false,
       // 添加用户数据缓存
       usersCache: [],
-      usersCacheTime: null // 添加缓存时间戳
+      usersCacheTime: null, // 添加缓存时间戳
+      stats: {
+        totalProducts: 1234,
+        activeUsers: 567,
+        completedOrders: 0
+      }
     }
   },
 
   async mounted() {
     // 检查用户登录状态
     this.checkLoginStatus();
+    // 获取统计数据
+    await this.fetchStatistics();
     // 自动加载最新商品数据
     await this.loadLatestProducts();
     // 获取校园公告
@@ -247,6 +254,15 @@ export default {
   methods: {
     searchProducts() {
       console.log('搜索:', this.searchQuery)
+    },
+    // 跳转到查询结果页面
+    goToSearchResults(){
+      this.$router.push({
+        path: `/search`,
+        query: {
+          q: this.searchQuery
+        }
+      });
     },
     // 跳转到分类浏览页面
     goToCategoryBrowse(categoryId) {
@@ -638,6 +654,41 @@ export default {
         console.error('获取未读消息数量失败:', error);
         // 发生错误时不改变当前的未读数量，避免误导用户
       }
+    },
+    async fetchCompletedOrdersCount() {
+      try {
+        console.log('开始获取成功交易数量...');
+        const response = await axios.post('http://localhost:8095/api/orders/query/by-status', {
+          status: 'completed'
+        });
+        
+        console.log('API响应:', response.data);
+        
+        if (response.data && response.data.code === 200) {
+          const completedOrders = response.data.data;
+          console.log('成功交易订单:', completedOrders);
+          console.log('订单数量:', completedOrders.length);
+          this.stats.completedOrders = Array.isArray(completedOrders) ? completedOrders.length : 0;
+          console.log('更新后的stats.completedOrders:', this.stats.completedOrders);
+        }
+      } catch (error) {
+        console.error('获取成功交易数量失败:', error);
+      }
+    },  // <- 添加这个逗号
+    
+    // 获取所有统计数据
+    async fetchStatistics() {
+      try {
+        // 并行获取各种统计数据
+        await Promise.all([
+          this.fetchCompletedOrdersCount(),
+          // 可以在这里添加其他统计数据的获取方法
+          // this.fetchTotalProducts(),
+          // this.fetchActiveUsers()
+        ]);
+      } catch (error) {
+        console.error('获取统计数据失败:', error);
+      }  // <- 这里不需要逗号，因为methods是最后一个属性
     }
   }
 }

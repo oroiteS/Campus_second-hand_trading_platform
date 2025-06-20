@@ -15,6 +15,7 @@ import PasswordReset from '../views/PasswordReset.vue'
 import WalletManagement from '../views/WalletManagement.vue'
 import SellerProfile from '../views/SellerProfile.vue'
 import RecommendedProducts from '../views/RecommendedProducts.vue'
+import SearchResult from '../views/SearchResult.vue'
 
 const routes = [
   {
@@ -111,6 +112,11 @@ const routes = [
     path: '/browse',
     name: 'ProductBrowse',
     component: ProductBrowse
+   },
+   {
+    path: '/search',
+    name: 'SearchResult',
+    component: SearchResult
    }
 ]
 

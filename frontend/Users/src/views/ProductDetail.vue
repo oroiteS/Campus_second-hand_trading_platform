@@ -228,7 +228,34 @@
           <h3>编辑商品信息</h3>
           <button @click="closeEditModal" class="close-btn">×</button>
         </div>
+        <!-- 在编辑商品弹窗的 modal-body 中添加图片编辑部分 -->
         <div class="modal-body">
+          <!-- 添加图片编辑部分 -->
+          <div class="form-group">
+            <label>商品图片</label>
+            <div class="image-upload-container">
+              <div class="current-images">
+                <div v-for="(image, index) in editingImages" :key="index" class="image-item">
+                  <img :src="image.url || image" :alt="`商品图片${index + 1}`" class="edit-image-preview">
+                  <button @click="removeEditImage(index)" class="remove-image-btn">×</button>
+                </div>
+              </div>
+              <div class="add-image-section">
+                <input 
+                  ref="imageInput" 
+                  type="file" 
+                  accept="image/*" 
+                  multiple 
+                  @change="handleImageSelect" 
+                  style="display: none"
+                >
+                <button @click="selectImages" class="add-image-btn" type="button">
+                  <span>+ 选择图片</span>
+                </button>
+                <p class="image-tip">最多可上传5张图片，支持JPG、PNG格式</p>
+              </div>
+            </div>
+          </div>
           <div class="form-group">
             <label>商品名称</label>
             <input v-model="editingProduct.name" type="text" class="form-input" placeholder="请输入商品名称">
@@ -254,13 +281,6 @@
               <option value="8成新">8成新</option>
               <option value="7成新">7成新</option>
             </select>
-            <label>交易地点</label>
-            <input v-model="editingProduct.location" type="text" class="form-input" placeholder="请输入交易地点">
-          </div>
-          <div class="form-group">
-            <label>详细描述</label>
-            <textarea v-model="editingProduct.detailDescription" class="form-textarea large" placeholder="请输入详细描述，每行一段"
-              rows="6"></textarea>
           </div>
         </div>
         <div class="modal-footer">
@@ -280,84 +300,88 @@ export default {
   name: 'ProductDetail',
   data() {
     return {
+      // 添加图片编辑相关数据
+      editingImages: [], // 编辑时的图片列表
+      newImages: [], // 新选择的图片文件
+      editingProduct: {}, // 只保留一个editingProduct声明
       currentImageIndex: 0,
       isFavorited: false,
       isEditable: false,
       showEditModal: false,
-      editingProduct: {},
       loading: true, // 添加加载状态
       error: null, // 添加错误状态
 
-      // 评论相关数据
-      comments: [],
-      commentTotal: 0,
-      currentPage: 1,
-      commentPageSize: 10,
-      totalPages: 0,
-      loadingComments: false,
+    // 评论相关数据
+    comments: [],
+    commentTotal: 0,
+    currentPage: 1,
+    commentPageSize: 10,
+    totalPages: 0,
+    loadingComments: false,
 
-      // 评论输入
-      newComment: '',
-      replyContent: '',
-      replyingTo: null,
-      submittingComment: false,
-      submittingReply: false,
+    // 评论输入
+    newComment: '',
+    replyContent: '',
+    replyingTo: null,
+    submittingComment: false,
+    submittingReply: false,
 
-      // 用户信息缓存
-      userCache: {},
+    // 用户信息缓存
+    userCache: {},
 
-      currentUser: {
-        id: localStorage.getItem('userId') || '',
-        name: '当前用户',
-        avatar: 'https://via.placeholder.com/40x40/4CAF50/FFFFFF?text=我'
-      },
+    currentUser: {
+      id: localStorage.getItem('userId') || '',
+      name: '当前用户',
+      avatar: 'https://via.placeholder.com/40x40/4CAF50/FFFFFF?text=我'
+    },
 
-      product: {
-        // 初始化为空对象，将通过API获取
+    product: {
+      // 初始化为空对象，将通过API获取
+      id: '',
+      name: '',
+      price: 0,
+      condition: '',
+      publishTime: '',
+      quantity: 1,
+      description: '',
+      detailDescription: [],
+      images: ['/测试图片.jpg'],
+      status: '',
+      sellerId: '',
+      seller: {
         id: '',
         name: '',
-        price: 0,
-        condition: '',
-        publishTime: '',
-        quantity: 1,
-        description: '',
-        detailDescription: [],
-        images: ['/测试图片.jpg'],
-        status: '',
-        sellerId: '',
-        seller: {
-          id: '',
-          name: '',
-          avatar: ''
-        }
+        avatar: ''
+      }
+    },
+    relatedProducts: [
+      {
+        id: 2,
+        name: '电吉他拾音器',
+        price: 120,
+        image: 'https://via.placeholder.com/150x150/FF9800/FFFFFF?text=拾音器'
       },
-      relatedProducts: [
-        {
-          id: 2,
-          name: '电吉他拾音器',
-          price: 120,
-          image: 'https://via.placeholder.com/150x150/FF9800/FFFFFF?text=拾音器'
-        },
-        {
-          id: 3,
-          name: '吉他调音器',
-          price: 45,
-          image: 'https://via.placeholder.com/150x150/E91E63/FFFFFF?text=调音器'
-        },
-        {
-          id: 4,
-          name: '音箱连接线',
-          price: 25,
-          image: 'https://via.placeholder.com/150x150/607D8B/FFFFFF?text=连接线'
-        },
-        {
-          id: 5,
-          name: '电子节拍器',
-          price: 80,
-          image: 'https://via.placeholder.com/150x150/795548/FFFFFF?text=节拍器'
-        }
-      ]
-    }
+      {
+        id: 3,
+        name: '吉他调音器',
+        price: 45,
+        image: 'https://via.placeholder.com/150x150/E91E63/FFFFFF?text=调音器'
+      },
+      {
+        id: 4,
+        name: '音箱连接线',
+        price: 25,
+        image: 'https://via.placeholder.com/150x150/607D8B/FFFFFF?text=连接线'
+      },
+      {
+        id: 5,
+        name: '电子节拍器',
+        price: 80,
+        image: 'https://via.placeholder.com/150x150/795548/FFFFFF?text=节拍器'
+      }
+    ]
+  }
+
   },
   computed: {
     currentImage() {
@@ -778,41 +802,171 @@ export default {
         id: this.product.id,
         name: this.product.name,
         price: this.product.price,
-        originalPrice: this.product.originalPrice,
         description: this.product.description,
         condition: this.product.condition,
-        brand: this.product.brand,
-        location: this.product.location,
-        detailDescription: this.product.detailDescription.join('\n')
+        // 在 editProduct 方法中删除这些行：
+        // location: this.product.location,
+        // detailDescription: this.product.detailDescription.join('\n')
       }
+      // 复制当前图片到编辑状态
+      this.editingImages = [...this.product.images]
+      this.newImages = []
       this.showEditModal = true
     },
-
-    // 关闭编辑弹窗
+    selectImages() {
+      this.$refs.imageInput.click()
+    },
+    handleImageSelect(event) {
+      const files = Array.from(event.target.files)
+      const maxImages = 5
+      const currentImageCount = this.editingImages.length
+      
+      if (currentImageCount + files.length > maxImages) {
+        alert(`最多只能上传${maxImages}张图片`)
+        return
+      }
+  
+      files.forEach(file => {
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader()
+          reader.onload = (e) => {
+            this.editingImages.push(e.target.result)
+            this.newImages.push(file)
+          }
+          reader.readAsDataURL(file)
+        }
+      })
+      
+      // 清空input值，允许重复选择同一文件
+      event.target.value = ''
+    },
+    removeEditImage(index) {
+      this.editingImages.splice(index, 1)
+      // 如果删除的是新添加的图片，也要从newImages中删除
+      if (index >= this.product.images.length) {
+        const newImageIndex = index - this.product.images.length
+        this.newImages.splice(newImageIndex, 1)
+      }
+    },
     closeEditModal() {
       this.showEditModal = false
       this.editingProduct = {}
+      this.editingImages = []
+      this.newImages = []
     },
-
     // 保存商品信息
-    saveProductChanges() {
-      // 更新商品信息
-      this.product.name = this.editingProduct.name
-      this.product.price = this.editingProduct.price
-      this.product.originalPrice = this.editingProduct.originalPrice
-      this.product.description = this.editingProduct.description
-      this.product.condition = this.editingProduct.condition
-      this.product.brand = this.editingProduct.brand
-      this.product.location = this.editingProduct.location
-      this.product.detailDescription = this.editingProduct.detailDescription.split('\n').filter(line => line.trim())
-
-      this.closeEditModal()
-
-      // 实际项目中这里会调用API保存到后端
-      alert('商品信息已更新！')
+    async saveProductChanges() {
+      try {
+        // 使用FormData格式，模仿测试页面的处理方式
+        const formData = new FormData()
+        
+        // 添加必填字段
+        formData.append('commodityId', this.product.id)
+        formData.append('sellerId', this.product.sellerId || this.currentUser.id)
+        
+        // 添加可选字段（只有非空时才添加）
+        if (this.editingProduct.name && this.editingProduct.name.trim()) {
+          formData.append('commodityName', this.editingProduct.name.trim())
+        }
+        if (this.editingProduct.description && this.editingProduct.description.trim()) {
+          formData.append('commodityDescription', this.editingProduct.description.trim())
+        }
+        if (this.editingProduct.price) {
+          formData.append('currentPrice', parseFloat(this.editingProduct.price).toString())
+        }
+        if (this.editingProduct.condition && this.editingProduct.condition.trim()) {
+          formData.append('newness', this.editingProduct.condition.trim())
+        }
+        if (this.editingProduct.quantity) {
+          formData.append('quantity', parseInt(this.editingProduct.quantity).toString())
+        }
+        
+        // 处理图片文件（如果有新上传的图片）
+        if (this.newImages && this.newImages.length > 0) {
+          // 验证图片文件
+          const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif']
+          const maxSize = 5 * 1024 * 1024 // 5MB
+          
+          for (let i = 0; i < this.newImages.length; i++) {
+            const file = this.newImages[i]
+            
+            // 检查文件类型
+            if (!allowedTypes.includes(file.type)) {
+              alert(`图片文件 "${file.name}" 格式不支持，请选择 jpg、jpeg、png 或 gif 格式的图片`)
+              return
+            }
+            
+            // 检查文件大小
+            if (file.size > maxSize) {
+              alert(`图片文件 "${file.name}" 大小超过5MB限制`)
+              return
+            }
+            
+            formData.append('images', file)
+          }
+        }
+        
+        console.log('正在发送更新请求...')
+        
+        // 调用后端API更新商品信息 - 使用FormData格式
+        const response = await axios.post('http://localhost:8084/api/commodity/update-info', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        })
+        
+        if (response.data && response.data.success) {
+          // 更新成功，同步本地数据
+          this.product.name = this.editingProduct.name
+          this.product.price = this.editingProduct.price
+          this.product.description = this.editingProduct.description
+          this.product.condition = this.editingProduct.condition
+          this.product.quantity = this.editingProduct.quantity
+          
+          // 如果有新图片，更新图片列表
+          if (this.newImages && this.newImages.length > 0) {
+            // 这里可以根据后端返回的图片URL更新本地图片列表
+            // 或者重新获取商品详情
+            await this.fetchProductDetail(this.product.id)
+          }
+          
+          alert('商品信息更新成功！')
+          this.closeEditModal()
+        } else {
+          console.error('更新失败:', response.data)
+          alert('更新失败：' + (response.data?.message || '未知错误'))
+        }
+        
+      } catch (error) {
+        console.error('更新商品信息时发生错误:', error)
+        if (error.response) {
+          alert(`更新失败：${error.response.status} - ${error.response.data?.message || error.response.statusText}`)
+        } else if (error.request) {
+          alert('网络错误：无法连接到服务器，请检查网络连接和服务器状态')
+        } else {
+          alert('更新失败：' + error.message)
+        }
+      }
+    },  // 在这里添加逗号
+    // 上传图片到服务器的方法（示例）
+    async uploadImages(imageFiles) {
+      const formData = new FormData()
+      imageFiles.forEach((file) => {  // 移除未使用的index参数
+        formData.append(`images`, file)
+      })
+      
+      try {
+        const response = await axios.post('/api/upload/images', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        })
+        return response.data.urls // 假设服务器返回图片URL数组
+      } catch (error) {
+        console.error('图片上传失败:', error)
+        throw error
+      }
     },
-
-    // 在methods中更新
     viewSellerProfile() {
       this.$router.push({
         path: `/sellerprofile/${this.product.sellerId}`,
@@ -826,3 +980,5 @@ export default {
 <style scoped>
 @import '../styles/ProductDetail.css';
 </style>
+
+
