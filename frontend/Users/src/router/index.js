@@ -16,6 +16,7 @@ import WalletManagement from '../views/WalletManagement.vue'
 import SellerProfile from '../views/SellerProfile.vue'
 import RecommendedProducts from '../views/RecommendedProducts.vue'
 import SearchResult from '../views/SearchResult.vue'
+import ChatList from '../views/ChatList.vue'
 
 const routes = [
   {
@@ -81,12 +82,12 @@ const routes = [
   {    
     path: '/chat-list/:userId',
     name: 'ChatList',
-    component: () => import('../views/ChatList.vue')
+    component: ChatList
   },
   {
     path: '/chat-list',
     name: 'ChatListQuery',
-    component: () => import('../views/ChatList.vue')
+    component: ChatList
   },
   {
     path: '/password-reset',
@@ -108,16 +109,16 @@ const routes = [
     name: 'RecommendedProducts',
     component: RecommendedProducts
   },
-  {
-    path: '/browse',
-    name: 'ProductBrowse',
-    component: ProductBrowse
-   },
    {
     path: '/search',
     name: 'SearchResult',
     component: SearchResult
-   }
+  },
+  {
+    path: '/browse/:categoryId',
+    name: 'ProductBrowseByCategory',
+    component: ProductBrowse
+  }
 ]
 
 const router = createRouter({

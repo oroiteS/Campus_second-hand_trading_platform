@@ -7,20 +7,19 @@
           ← 返回
         </button>
         <h1 class="page-title">{{ categoryName }}</h1>
-        <!-- 删除筛选按钮 -->
         <div class="header-actions">
         </div>
       </div>
     </header>
 
     <div class="browse-container">
-      <!-- 筛选栏 - 移除 v-show 条件，让它始终显示 -->
+      <!-- 筛选栏 -->
       <div class="filter-section">
         <div class="filter-row">
           <div class="filter-group">
             <label>价格范围：</label>
-            <select v-model="priceRange" @change="filterProducts">
-              <option value="all">不限</option>
+            <select v-model="priceRange" @change="resetAndLoadProducts">
+              <option value="">不限</option>
               <option value="0-50">0-50元</option>
               <option value="50-200">50-200元</option>
               <option value="200-500">200-500元</option>
@@ -30,21 +29,29 @@
           </div>
           <div class="filter-group">
             <label>商品状态：</label>
-            <select v-model="condition" @change="filterProducts">
-              <option value="all">不限</option>
+            <select v-model="newness" @change="resetAndLoadProducts">
+              <option value="">不限</option>
               <option value="全新">全新</option>
-              <option value="9成新">9成新</option>
-              <option value="8成新">8成新</option>
-              <option value="7成新">7成新</option>
+              <option value="95新">95新</option>
+              <option value="9新">9新</option>
             </select>
           </div>
           <div class="filter-group">
             <label>排序方式：</label>
-            <select v-model="sortBy" @change="sortProducts">
-              <option value="time">发布时间</option>
-              <option value="price-asc">价格从低到高</option>
-              <option value="price-desc">价格从高到低</option>
-              <option value="popularity">热度</option>
+            <select v-model="sortBy" @change="resetAndLoadProducts">
+              <option value="time_desc">发布时间（新到旧）</option>
+              <option value="time_asc">发布时间（旧到新）</option>
+              <option value="price_asc">价格从低到高</option>
+              <option value="price_desc">价格从高到低</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>每页显示：</label>
+            <select v-model="pageSize" @change="resetAndLoadProducts">
+              <option value="10">10条</option>
+              <option value="20">20条</option>
+              <option value="50">50条</option>
+              <option value="100">100条</option>
             </select>
           </div>
         </div>
@@ -53,43 +60,79 @@
       <!-- 商品列表 -->
       <div class="products-section">
         <div class="products-header">
-          <span class="products-count">共找到 {{ filteredProducts.length }} 件商品</span>
+          <span class="products-count">共找到 {{ totalCount }} 件商品，当前第 {{ currentPage }} 页，共 {{ totalPages }} 页</span>
         </div>
-        
-        <div class="products-grid" v-if="filteredProducts.length > 0">
-          <div 
-            class="product-card" 
-            v-for="product in filteredProducts" 
-            :key="product.id"
-            @click="goToProductDetail(product.id)"
-          >
+
+        <!-- 加载状态 -->
+        <div v-if="loading" class="loading-state">
+          <p>正在加载商品数据...</p>
+        </div>
+
+        <div class="products-grid" v-else-if="products.length > 0">
+          <div class="product-card" v-for="product in products" :key="product.commodityId"
+            @click="goToProductDetail(product.commodityId)">
             <div class="product-image-container">
-              <img :src="product.image" :alt="product.name" class="product-image" />
-              <div class="product-badge" v-if="product.badge">{{ product.badge }}</div>
+              <img :src="product.mainImageUrl || '/测试图片.jpg'" :alt="product.commodityName" class="product-image" />
+              <div class="product-badge" v-if="product.commodityStatus === 'ON_SALE'">在售</div>
             </div>
             <div class="product-info">
-              <h4 class="product-title">{{ product.name }}</h4>
+              <h4 class="product-title">{{ product.commodityName }}</h4>
               <div class="product-price">
-                <span class="current-price">¥{{ product.price }}</span>
-                <span class="original-price" v-if="product.originalPrice">¥{{ product.originalPrice }}</span>
+                <span class="current-price">¥{{ product.currentPrice }}</span>
               </div>
               <div class="product-details">
-                <span class="product-condition">{{ product.condition }}</span>
-                <span class="product-location">📍 {{ product.location }}</span>
+                <span class="product-condition">{{ product.newness }}</span>
+                <span class="product-status">{{ product.commodityStatusDescription }}</span>
               </div>
-              <div class="seller-info">
-                <img :src="product.sellerAvatar" class="seller-avatar" />
-                <span class="seller-name">{{ product.sellerName }}</span>
-                <span class="seller-school">{{ product.sellerSchool }}</span>
+              <div class="product-meta">
+                <span class="product-time">{{ formatTime(product.createdAt) }}</span>
+                <span class="product-quantity" v-if="product.quantity > 1">数量: {{ product.quantity }}</span>
               </div>
             </div>
           </div>
         </div>
-        
+
         <div class="empty-state" v-else>
           <div class="empty-icon">📦</div>
           <p class="empty-text">暂无相关商品</p>
           <p class="empty-subtext">试试调整筛选条件或浏览其他分类</p>
+        </div>
+
+        <!-- 分页 -->
+        <div class="pagination" v-if="totalPages > 1">
+          <button @click="changePage(1)" :disabled="currentPage === 1" class="page-btn">
+            首页
+          </button>
+          <button @click="changePage(currentPage - 1)" :disabled="!hasPrevious" class="page-btn">
+            上一页
+          </button>
+
+          <!-- 页码显示 -->
+          <div class="page-numbers">
+            <span v-for="page in getPageNumbers()" :key="page" @click="changePage(page)"
+              :class="['page-number', { active: page === currentPage, disabled: page === '...' }]">
+              {{ page }}
+            </span>
+          </div>
+
+          <button @click="changePage(currentPage + 1)" :disabled="!hasNext" class="page-btn">
+            下一页
+          </button>
+          <button @click="changePage(totalPages)" :disabled="currentPage === totalPages" class="page-btn">
+            末页
+          </button>
+        </div>
+
+        <!-- 调试信息 -->
+        <div class="debug-info" v-if="showDebug">
+          <p>调试信息：</p>
+          <p>当前页: {{ currentPage }}</p>
+          <p>每页大小: {{ pageSize }}</p>
+          <p>总数量: {{ totalCount }}</p>
+          <p>总页数: {{ totalPages }}</p>
+          <p>有下一页: {{ hasNext }}</p>
+          <p>有上一页: {{ hasPrevious }}</p>
+          <p>商品数量: {{ products.length }}</p>
         </div>
       </div>
     </div>
@@ -97,23 +140,30 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   name: 'ProductBrowse',
   data() {
     return {
       categoryId: null,
       categoryName: '商品浏览',
-      // 可以删除 showFilter 变量，因为不再需要控制显示隐藏
-      // showFilter: false,
-      priceRange: 'all',
-      condition: 'all',
-      sortBy: 'time',
-      allProducts: [],
-      filteredProducts: []
+      priceRange: '',
+      newness: '',
+      sortBy: 'time_desc',
+      products: [],
+      loading: false,
+      showDebug: false, // 可以设置为true来显示调试信息
+      // 分页相关
+      currentPage: 1,
+      pageSize: 20,
+      totalCount: 0,
+      totalPages: 0,
+      hasNext: false,
+      hasPrevious: false
     }
   },
   mounted() {
-    // 从路由参数中获取categoryId，而不是从query参数
     this.categoryId = this.$route.params.categoryId || this.$route.query.category
     this.loadCategoryData()
     this.loadProducts()
@@ -122,14 +172,10 @@ export default {
     goBack() {
       this.$router.go(-1)
     },
-    toggleFilter() {
-      this.showFilter = !this.showFilter
-    },
     loadCategoryData() {
-      // 根据分类ID设置分类名称
       const categoryMap = {
         '1': '数码电子',
-        '2': '教材书籍', 
+        '2': '教材书籍',
         '3': '生活用品',
         '4': '服装配饰',
         '5': '运动器材',
@@ -139,101 +185,141 @@ export default {
       }
       this.categoryName = categoryMap[this.categoryId] || '商品浏览'
     },
-    loadProducts() {
-      // 模拟加载商品数据，实际项目中应该从API获取
-      this.allProducts = [
-        {
-          id: 1,
-          name: 'iPhone 13 Pro 128G',
-          price: 4999,
-          originalPrice: 6999,
-          condition: '9成新',
-          location: '东校区',
-          image: '/测试图片.jpg',
-          badge: '热销',
-          sellerName: '张同学',
-          sellerSchool: '计算机学院',
-          sellerAvatar: 'https://via.placeholder.com/30x30/4CAF50/FFFFFF?text=张',
-          category: '1',
-          publishTime: new Date('2024-01-15')
-        },
-        {
-          id: 2,
-          name: '高等数学教材（第七版）',
-          price: 25,
-          originalPrice: 45,
-          condition: '8成新',
-          location: '西校区',
-          image: 'https://via.placeholder.com/200x150/F0F0F0/666666?text=教材',
-          badge: '推荐',
-          sellerName: '李同学',
-          sellerSchool: '数学学院',
-          sellerAvatar: 'https://via.placeholder.com/30x30/2196F3/FFFFFF?text=李',
-          category: '2',
-          publishTime: new Date('2024-01-14')
-        },
-        {
-          id: 3,
-          name: 'MacBook Air M1',
-          price: 6500,
-          originalPrice: 8999,
-          condition: '9成新',
-          location: '南校区',
-          image: 'https://via.placeholder.com/200x150/F0F0F0/666666?text=MacBook',
-          sellerName: '王同学',
-          sellerSchool: '设计学院',
-          sellerAvatar: 'https://via.placeholder.com/30x30/FF9800/FFFFFF?text=王',
-          category: '1',
-          publishTime: new Date('2024-01-13')
+    // 重置页码并加载商品
+    resetAndLoadProducts() {
+      this.currentPage = 1
+      this.loadProducts()
+    },
+    async loadProducts() {
+      if (!this.categoryId) {
+        console.error('分类ID不能为空')
+        return
+      }
+
+      this.loading = true
+
+      try {
+        // 构建请求参数
+        const requestData = {
+          categoryId: parseInt(this.categoryId),
+          pageNum: this.currentPage,
+          pageSize: parseInt(this.pageSize), // 确保是数字类型
+          sortBy: this.sortBy
         }
-        // 可以添加更多商品数据
-      ]
-      this.filterProducts()
-    },
-    filterProducts() {
-      let products = this.allProducts
-      
-      // 按分类筛选
-      if (this.categoryId && this.categoryId !== 'all') {
-        products = products.filter(product => product.category === this.categoryId)
-      }
-      
-      // 按价格筛选
-      if (this.priceRange !== 'all') {
-        const [min, max] = this.priceRange.split('-').map(p => p.replace('+', ''))
-        products = products.filter(product => {
-          if (this.priceRange === '1000+') {
-            return product.price >= 1000
+
+        // 添加可选的筛选条件
+        if (this.priceRange) {
+          requestData.priceRange = this.priceRange
+        }
+        if (this.newness) {
+          requestData.newness = this.newness
+        }
+
+        console.log('请求参数:', requestData)
+
+        // 调用后端API
+        const response = await axios.post(
+          'http://localhost:8096/product-query/api/v1/commodities/category',
+          requestData,
+          {
+            headers: {
+              'Content-Type': 'application/json'
+            }
           }
-          return product.price >= parseInt(min) && product.price <= parseInt(max)
-        })
+        )
+
+        console.log('API响应:', response.data)
+
+        if (response.data.success) {
+          const data = response.data.data
+          this.products = data.commodities || []
+          this.currentPage = data.currentPage || 1
+          this.totalCount = data.totalCount || 0
+          this.totalPages = data.totalPages || 0
+          this.hasNext = data.hasNext || false
+          this.hasPrevious = data.hasPrevious || false
+
+          console.log('分页信息更新:', {
+            currentPage: this.currentPage,
+            totalPages: this.totalPages,
+            totalCount: this.totalCount,
+            productsLength: this.products.length
+          })
+        } else {
+          console.error('API返回错误:', response.data.message)
+          this.showError('加载商品失败: ' + response.data.message)
+        }
+      } catch (error) {
+        console.error('请求失败:', error)
+        this.showError('网络请求失败，请检查后端服务是否启动')
+      } finally {
+        this.loading = false
       }
-      
-      // 按状态筛选
-      if (this.condition !== 'all') {
-        products = products.filter(product => product.condition === this.condition)
-      }
-      
-      this.filteredProducts = products
-      this.sortProducts()
     },
-    sortProducts() {
-      switch (this.sortBy) {
-        case 'price-asc':
-          this.filteredProducts.sort((a, b) => a.price - b.price)
-          break
-        case 'price-desc':
-          this.filteredProducts.sort((a, b) => b.price - a.price)
-          break
-        case 'popularity':
-          // 可以根据浏览量、收藏量等排序
-          this.filteredProducts.sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0))
-          break
-        case 'time':
-        default:
-          this.filteredProducts.sort((a, b) => new Date(b.publishTime) - new Date(a.publishTime))
-          break
+    changePage(page) {
+      if (page >= 1 && page <= this.totalPages && page !== '...') {
+        this.currentPage = page
+        this.loadProducts()
+        // 滚动到顶部
+        window.scrollTo({ top: 0, behavior: 'smooth' })
       }
+    },
+    // 获取页码数组（用于分页显示）
+    getPageNumbers() {
+      const pages = []
+      const total = this.totalPages
+      const current = this.currentPage
+
+      if (total <= 7) {
+        // 如果总页数小于等于7，显示所有页码
+        for (let i = 1; i <= total; i++) {
+          pages.push(i)
+        }
+      } else {
+        // 复杂分页逻辑
+        if (current <= 4) {
+          for (let i = 1; i <= 5; i++) {
+            pages.push(i)
+          }
+          pages.push('...')
+          pages.push(total)
+        } else if (current >= total - 3) {
+          pages.push(1)
+          pages.push('...')
+          for (let i = total - 4; i <= total; i++) {
+            pages.push(i)
+          }
+        } else {
+          pages.push(1)
+          pages.push('...')
+          for (let i = current - 1; i <= current + 1; i++) {
+            pages.push(i)
+          }
+          pages.push('...')
+          pages.push(total)
+        }
+      }
+
+      return pages
+    },
+    formatTime(timeStr) {
+      if (!timeStr) return ''
+      const date = new Date(timeStr)
+      const now = new Date()
+      const diff = now - date
+
+      if (diff < 60000) {
+        return '刚刚'
+      } else if (diff < 3600000) {
+        return Math.floor(diff / 60000) + '分钟前'
+      } else if (diff < 86400000) {
+        return Math.floor(diff / 3600000) + '小时前'
+      } else {
+        return Math.floor(diff / 86400000) + '天前'
+      }
+    },
+    showError(message) {
+      alert(message)
     },
     goToProductDetail(productId) {
       this.$router.push(`/product/${productId}`)
@@ -242,8 +328,9 @@ export default {
   watch: {
     '$route'() {
       this.categoryId = this.$route.params.categoryId || this.$route.query.category
+      this.currentPage = 1 // 重置页码
       this.loadCategoryData()
-      this.filterProducts()
+      this.loadProducts()
     }
   }
 }

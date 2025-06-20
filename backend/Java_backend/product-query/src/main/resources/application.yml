@@ -1,8 +1,8 @@
 server:
-  port: 8200
+  port: 8096
   servlet:
     context-path: /product-query
-  base-url: http://localhost:8200
+  base-url: http://localhost:8096
 
 spring:
   profiles:
