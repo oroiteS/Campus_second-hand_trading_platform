@@ -37,13 +37,6 @@
           />
         </div>
         
-        <div class="form-group">
-          <label class="remember-checkbox">
-            <input type="checkbox" v-model="loginForm.remember" />
-            <span class="checkbox-text">记住登录状态</span>
-          </label>
-        </div>
-        
         <button type="submit" class="login-btn" :disabled="isLoading">
           <span v-if="isLoading" class="loading-spinner"></span>
           {{ isLoading ? '登录中...' : '登录' }}
@@ -66,8 +59,7 @@ export default {
     return {
       loginForm: {
         username: '',
-        password: '',
-        remember: false
+        password: ''
       },
       isLoading: false
     }
@@ -107,10 +99,6 @@ export default {
           localStorage.setItem('isAdminLoggedIn', 'true')
           localStorage.setItem('adminToken', response.token)
           localStorage.setItem('adminUsername', response.username || this.loginForm.username)
-          
-          if (this.loginForm.remember) {
-            localStorage.setItem('adminRememberLogin', 'true')
-          }
           
           alert('登录成功！')
           // 跳转到管理面板
