@@ -19,12 +19,12 @@ class CommodityBase(BaseModel):
     commodity_name: str
     commodity_description: Optional[str] = None
     category_id: int
-    tags_id: Optional[List[int]] = None
+    tags_Id: Optional[list[int]] = None
     current_price: Decimal
     commodity_status: str # Was CommodityStatus = CommodityStatus.ON_SALE
     seller_id: str
     main_image_url: Optional[str] = None
-    image_list: Optional[List[str]] = None
+    image_list: Optional[list[str]] = None
     quantity: int
     newness: str
 
