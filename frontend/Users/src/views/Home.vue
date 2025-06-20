@@ -294,7 +294,7 @@ export default {
     },
     // 跳转到分类浏览页面
     goToCategoryBrowse(categoryId) {
-      this.$router.push(`/browse?category=${categoryId}`);
+      this.$router.push(`/browse/${categoryId}`);
     },
     // 检查登录状态
     checkLoginStatus() {

@@ -7,6 +7,7 @@ import UserProfile from '../views/UserProfile.vue'
 import Favorites from '../views/Favorites.vue'
 import NearbyUsers from '../views/NearbyUsers.vue'
 import ProductDetail from '../views/ProductDetail.vue'
+import ProductBrowse from '../views/ProductBrowse.vue'
 import OrderManagement from '../views/OrderManagement.vue'
 import PublishProduct from '../views/PublishProduct.vue'
 import NoticeDetail from '../views/NoticeDetail.vue'
@@ -56,6 +57,11 @@ const routes = [
     component: ProductDetail
   },
   {
+    path: '/browse/:categoryId?',
+    name: 'ProductBrowse',
+    component: ProductBrowse
+  },
+  {
     path: '/orders',
     name: 'OrderManagement',
     component: OrderManagement
@@ -70,8 +76,14 @@ const routes = [
     name: 'NoticeDetail',
     component: NoticeDetail
   },
-  {    path: '/chat-list/:userId',
+  {    
+    path: '/chat-list/:userId',
     name: 'ChatList',
+    component: () => import('../views/ChatList.vue')
+  },
+  {
+    path: '/chat-list',
+    name: 'ChatListQuery',
     component: () => import('../views/ChatList.vue')
   },
   {

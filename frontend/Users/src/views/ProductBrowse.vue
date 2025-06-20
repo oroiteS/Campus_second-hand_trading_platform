@@ -7,17 +7,15 @@
           ← 返回
         </button>
         <h1 class="page-title">{{ categoryName }}</h1>
+        <!-- 删除筛选按钮 -->
         <div class="header-actions">
-          <button class="header-btn filter-btn" @click="toggleFilter">
-            筛选
-          </button>
         </div>
       </div>
     </header>
 
     <div class="browse-container">
-      <!-- 筛选栏 -->
-      <div class="filter-section" v-show="showFilter">
+      <!-- 筛选栏 - 移除 v-show 条件，让它始终显示 -->
+      <div class="filter-section">
         <div class="filter-row">
           <div class="filter-group">
             <label>价格范围：</label>
@@ -105,7 +103,8 @@ export default {
     return {
       categoryId: null,
       categoryName: '商品浏览',
-      showFilter: false,
+      // 可以删除 showFilter 变量，因为不再需要控制显示隐藏
+      // showFilter: false,
       priceRange: 'all',
       condition: 'all',
       sortBy: 'time',
@@ -114,7 +113,8 @@ export default {
     }
   },
   mounted() {
-    this.categoryId = this.$route.params.categoryId
+    // 从路由参数中获取categoryId，而不是从query参数
+    this.categoryId = this.$route.params.categoryId || this.$route.query.category
     this.loadCategoryData()
     this.loadProducts()
   },
@@ -241,7 +241,7 @@ export default {
   },
   watch: {
     '$route'() {
-      this.categoryId = this.$route.params.categoryId
+      this.categoryId = this.$route.params.categoryId || this.$route.query.category
       this.loadCategoryData()
       this.filterProducts()
     }

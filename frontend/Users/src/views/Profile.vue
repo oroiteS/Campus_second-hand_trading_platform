@@ -58,35 +58,42 @@
               :key="tab.id"
               class="profile-tab-btn"
               :class="{active: activeTab === tab.id}"
-              @click="activeTab = tab.id"
+              @click="switchTab(tab.id)"
             >
               {{ tab.name }}
             </button>
           </div>
         </div>
         
-        <div class="profile-products-grid" v-if="currentProducts.length > 0">
-          <div class="profile-product-card" v-for="product in currentProducts" :key="product.id">
-            <img :src="product.image" :alt="product.name" class="profile-product-image" @click="goToProductDetail(product.id)" />
-            <div class="profile-product-info" @click="goToProductDetail(product.id)">
-              <h4 class="profile-product-title">{{ product.name }}</h4>
-              <p class="profile-product-price">¥{{ product.price }}</p>
-              <p class="profile-product-status">{{ product.status }}</p>
+        <!-- 加载状态 -->
+        <div v-if="isLoadingProducts" class="loading-container">
+          <div class="loading-spinner"></div>
+          <p>正在加载商品...</p>
+        </div>
+        
+        <!-- 商品列表 -->
+        <div class="profile-products-grid" v-else-if="currentProducts.length > 0">
+          <div class="profile-product-card" v-for="product in currentProducts" :key="product.commodityId">
+            <img :src="product.mainImageUrl || '/测试图片.jpg'" :alt="product.commodityName" class="profile-product-image" @click="goToProductDetail(product.commodityId)" />
+            <div class="profile-product-info" @click="goToProductDetail(product.commodityId)">
+              <h4 class="profile-product-title">{{ product.commodityName }}</h4>
+              <p class="profile-product-price">¥{{ product.currentPrice }}</p>
+              <p class="profile-product-status">{{ getStatusText(product.commodityStatus) }}</p>
             </div>
             <!-- 商品操作按钮 -->
             <div class="profile-product-actions">
               <div class="profile-status-buttons">
                 <button 
                   class="profile-status-btn" 
-                  :class="{ active: getProductStatus(product) === 'selling' }"
-                  @click.stop="changeProductStatus(product, 'selling')"
+                  :class="{ active: product.commodityStatus === 'ON_SALE' }"
+                  @click.stop="changeProductStatus(product, 'on_sale')"
                   title="设为在售"
                 >
                   在售
                 </button>
                 <button 
                   class="profile-status-btn" 
-                  :class="{ active: getProductStatus(product) === 'sold' }"
+                  :class="{ active: product.commodityStatus === 'SOLD' }"
                   @click.stop="changeProductStatus(product, 'sold')"
                   title="设为已售"
                 >
@@ -94,20 +101,13 @@
                 </button>
                 <button 
                   class="profile-status-btn" 
-                  :class="{ active: getProductStatus(product) === 'offline' }"
-                  @click.stop="changeProductStatus(product, 'offline')"
+                  :class="{ active: product.commodityStatus === 'OFF_SALE' }"
+                  @click.stop="changeProductStatus(product, 'off_sale')"
                   title="设为已下架"
                 >
                   下架
                 </button>
               </div>
-              <button 
-                class="profile-delete-btn" 
-                @click.stop="deleteProduct(product)"
-                title="删除商品"
-              >
-                🗑️
-              </button>
             </div>
           </div>
         </div>
@@ -144,6 +144,7 @@ export default {
     return {
       activeTab: 'selling',
       userId: '',
+      isLoadingProducts: false, // 添加商品加载状态
       userInfo: {
         username: '默认用户',
         avatar: '/测试图片.jpg',
@@ -159,29 +160,13 @@ export default {
         { id: 6, name: '密码修改', icon: '🔒', color: '#9370DB', action: 'password' }
       ],
       productTabs: [
-        { id: 'selling', name: '在售' },
-        { id: 'sold', name: '已售' },
-        { id: 'offline', name: '已下架' }
+        { id: 'selling', name: '在售', apiStatus: 'on_sale' },
+        { id: 'sold', name: '已售', apiStatus: 'sold' },
+        { id: 'offline', name: '已下架', apiStatus: 'off_sale' }
       ],
       products: {
-        selling: [
-          {
-            id: 1,
-            name: 'iPhone 13 Pro',
-            price: 4999,
-            image: 'https://via.placeholder.com/150x150/FF6B35/FFFFFF?text=手机',
-            status: '在售中'
-          }
-        ],
-        sold: [
-          {
-            id: 2,
-            name: '高等数学教材',
-            price: 25,
-            image: 'https://via.placeholder.com/150x150/4CAF50/FFFFFF?text=教材',
-            status: '已售出'
-          }
-        ],
+        selling: [],
+        sold: [],
         offline: []
       }
     }
@@ -191,7 +176,7 @@ export default {
       return this.products[this.activeTab] || []
     }
   },
-  created() {
+  async created() {
     // 从路由参数中获取userId和name
     if (this.$route.query.userId) {
       console.log('Profile页面获取到的userId:', this.$route.query.userId);
@@ -200,6 +185,9 @@ export default {
       
       // 获取用户头像URL
       this.fetchUserAvatar();
+      
+      // 加载商品数据
+      await this.loadAllProducts();
     }
     
     // 如果传递了name参数，更新userInfo中的username
@@ -231,6 +219,142 @@ export default {
       .catch(error => {
         console.error('获取头像URL请求出错:', error);
       });
+    },
+    
+    // 加载所有状态的商品
+    async loadAllProducts() {
+      if (!this.userId) {
+        console.error('无法加载商品：用户ID不存在');
+        return;
+      }
+      
+      this.isLoadingProducts = true;
+      
+      try {
+        // 并行加载所有状态的商品
+        const promises = this.productTabs.map(tab => 
+          this.fetchProductsByStatus(tab.apiStatus, tab.id)
+        );
+        
+        await Promise.all(promises);
+        console.log('所有商品加载完成:', this.products);
+      } catch (error) {
+        console.error('加载商品失败:', error);
+        this.$message?.error('加载商品失败，请重试');
+      } finally {
+        this.isLoadingProducts = false;
+      }
+    },
+    
+    // 根据状态获取商品列表
+    async fetchProductsByStatus(apiStatus, tabId) {
+      try {
+        const response = await axios.get(
+          `http://localhost:8084/api/commodity/list/${this.userId}/status/${apiStatus}`
+        );
+        
+        if (response.data.success) {
+          this.products[tabId] = response.data.data || [];
+          console.log(`${apiStatus}状态商品加载成功:`, response.data.data);
+        } else {
+          console.error(`获取${apiStatus}状态商品失败:`, response.data.message);
+          this.products[tabId] = [];
+        }
+      } catch (error) {
+        console.error(`获取${apiStatus}状态商品请求失败:`, error);
+        this.products[tabId] = [];
+      }
+    },
+    
+    // 切换标签页
+    async switchTab(tabId) {
+      this.activeTab = tabId;
+      // 如果当前标签页的商品为空，重新加载
+      if (this.products[tabId].length === 0) {
+        const tab = this.productTabs.find(t => t.id === tabId);
+        if (tab) {
+          this.isLoadingProducts = true;
+          await this.fetchProductsByStatus(tab.apiStatus, tabId);
+          this.isLoadingProducts = false;
+        }
+      }
+    },
+    
+    // 获取状态文本
+    getStatusText(commodityStatus) {
+      const statusMap = {
+        'ON_SALE': '在售中',
+        'SOLD': '已售出',
+        'OFF_SALE': '已下架'
+      };
+      return statusMap[commodityStatus] || '未知状态';
+    },
+    
+    // 修改商品状态
+    async changeProductStatus(product, newApiStatus) {
+      try {
+        let apiUrl = '';
+        let successMessage = '';
+        
+        // 根据新状态选择对应的API接口
+        switch(newApiStatus) {
+          case 'on_sale':
+            apiUrl = 'http://localhost:8084/api/commodity/put-on-sale';
+            successMessage = '商品上架成功';
+            break;
+          case 'off_sale':
+            apiUrl = 'http://localhost:8084/api/commodity/put-off-sale';
+            successMessage = '商品下架成功';
+            break;
+          case 'sold':
+            apiUrl = 'http://localhost:8084/api/commodity/mark-as-sold';
+            successMessage = '商品已标记为已售';
+            break;
+          default:
+            this.$message?.error('无效的商品状态');
+            return;
+        }
+        
+        // 调用对应的API接口
+        const response = await axios.post(apiUrl, {
+          commodityId: product.commodityId,
+          sellerId: this.userId
+        });
+        
+        if (response.data.success) {
+          // 重新加载所有商品数据
+          await this.loadAllProducts();
+          this.$message?.success(successMessage);
+        } else {
+          this.$message?.error(response.data.message || '商品状态更新失败');
+        }
+      } catch (error) {
+        console.error('更新商品状态失败:', error);
+        this.$message?.error('商品状态更新失败，请重试');
+      }
+    },
+    
+    // 删除商品
+    async deleteProduct(product) {
+      if (confirm(`确定要删除商品"${product.commodityName}"吗？此操作不可撤销。`)) {
+        try {
+          // 这里需要调用删除商品的API
+          const response = await axios.delete(
+            `http://localhost:8084/api/commodity/${product.commodityId}`
+          );
+          
+          if (response.data.success) {
+            // 重新加载所有商品数据
+            await this.loadAllProducts();
+            this.$message?.success('商品删除成功');
+          } else {
+            this.$message?.error('商品删除失败');
+          }
+        } catch (error) {
+          console.error('删除商品失败:', error);
+          this.$message?.error('商品删除失败，请重试');
+        }
+      }
     },
     
     goBack() {
@@ -289,45 +413,6 @@ export default {
           break
         default:
           console.log('未知操作:', action)
-      }
-    },
-    // 获取商品当前状态
-    getProductStatus(product) {
-      if (this.products.selling.find(p => p.id === product.id)) return 'selling'
-      if (this.products.sold.find(p => p.id === product.id)) return 'sold'
-      if (this.products.offline.find(p => p.id === product.id)) return 'offline'
-      return 'selling'
-    },
-    // 修改商品状态
-    changeProductStatus(product, newStatus) {
-      // 从所有状态数组中移除该商品
-      this.removeProductFromAllArrays(product.id)
-      
-      // 更新商品状态文本
-      const statusText = {
-        'selling': '在售中',
-        'sold': '已售出',
-        'offline': '已下架'
-      }
-      product.status = statusText[newStatus]
-      
-      // 添加到新的状态数组
-      this.products[newStatus].push(product)
-      
-      // 显示成功提示
-      this.$message?.success(`商品状态已更新为：${statusText[newStatus]}`)
-    },
-    // 从所有状态数组中移除商品
-    removeProductFromAllArrays(productId) {
-      Object.keys(this.products).forEach(status => {
-        this.products[status] = this.products[status].filter(p => p.id !== productId)
-      })
-    },
-    // 删除商品
-    deleteProduct(product) {
-      if (confirm(`确定要删除商品"${product.name}"吗？此操作不可撤销。`)) {
-        this.removeProductFromAllArrays(product.id)
-        this.$message?.success('商品已删除')
       }
     },
     async handleNearbyClick() {
@@ -399,4 +484,29 @@ export default {
 
 <style scoped>
 @import '../styles/Profile.css';
+
+/* 添加加载状态样式 */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: #666;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 </style>
