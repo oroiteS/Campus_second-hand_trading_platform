@@ -1,0 +1,15 @@
+[project]
+name = "sql-mcp-server"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "dbutils>=3.1.1",
+    "dotenv>=0.9.9",
+    "fastmcp>=2.8.1",
+    "matplotlib>=3.10.3",
+    "pymysql>=1.1.1",
+    "python-dateutil>=2.9.0.post0",
+    "qwen-agent[code-interpreter,gui]>=0.0.26",
+]

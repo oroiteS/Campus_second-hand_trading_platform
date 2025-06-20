@@ -213,7 +213,11 @@ export default {
           user_id: userId,
           commodity_id: commodityId
         });
-        
+        // 调用新的购物车添加API
+        await axios.post('http://localhost:8085/api/cart/add', {
+          userId: userId,
+          commodityId: commodityId
+        });
         alert('商品已成功加入购物车！');
         console.log('加入购物车成功:', { userId, commodityId });
         
