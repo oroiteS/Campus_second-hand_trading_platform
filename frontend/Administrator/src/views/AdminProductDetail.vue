@@ -152,15 +152,13 @@
           上架商品
         </button>
         <button 
-          v-if="product.status === 'approved' || product.status === 'pending'"
+          v-if="product.status === 'approved' || product.status === 'pending'" 
           class="action-btn reject-btn" 
           @click="rejectProduct"
         >
           下架商品
         </button>
-        <button class="action-btn contact-btn" @click="contactSeller">
-          联系卖家
-        </button>
+        <!-- 已删除联系卖家按钮 -->
       </div>
     </div>
 
@@ -197,12 +195,24 @@ export default {
       const productId = this.$route.params.id
       
       try {
-        // 使用新的 productService 获取商品详情
         const result = await productService.getCommodityDetail(productId)
         if (result.success && result.data.code === 200) {
           const commodityData = result.data.data
           
-          // 映射API返回的数据到组件需要的格式
+          // 安全处理图片列表
+          let imageList = []
+          try {
+            imageList = commodityData.imageList ? JSON.parse(commodityData.imageList) : []
+          } catch (e) {
+            console.warn('解析图片列表失败:', e)
+            imageList = []
+          }
+          
+          // 确保至少有一张图片
+          if (imageList.length === 0 && commodityData.mainImageUrl) {
+            imageList = [commodityData.mainImageUrl]
+          }
+          
           this.product = {
             id: commodityData.commodityId,
             name: commodityData.commodityName,
@@ -212,12 +222,11 @@ export default {
             condition: commodityData.newness,
             category: commodityData.categoryName,
             sellerId: commodityData.sellerId,
-            image: commodityData.mainImageUrl,
-            images: commodityData.imageList ? JSON.parse(commodityData.imageList) : [commodityData.mainImageUrl],
+            image: commodityData.mainImageUrl || imageList[0] || '/default-product.png',
+            images: imageList,
             publishTime: new Date(commodityData.createdAt).toLocaleString(),
-            viewCount: 0, // API未提供，设为默认值
+            viewCount: 0,
             quantity: commodityData.quantity,
-            // 卖家信息需要从其他API获取或设置默认值
             sellerName: '卖家信息',
             sellerAvatar: '/default-avatar.png',
             sellerSchool: '未知学校',
@@ -225,9 +234,11 @@ export default {
           }
         } else {
           console.error('获取商品详情失败:', result.message)
+          alert('获取商品详情失败：' + (result.message || '未知错误'))
         }
       } catch (error) {
         console.error('获取商品详情出错:', error)
+        alert('获取商品详情失败，请检查网络连接')
       }
     },
     
@@ -243,9 +254,9 @@ export default {
     },
     
     goBack() {
-      // 直接跳转到 AdminDashboard 的商品管理页面
+      // 修正路径为正确的 AdminDashboard 路由
       this.$router.push({ 
-        path: '/admin/dashboard',
+        path: '/AdminDashboard',
         query: { activeMenu: 'products' }
       })
     },
@@ -254,60 +265,87 @@ export default {
       this.currentImageIndex = index
     },
     
-    approveProduct() {
-      if (confirm('确定要上架这个商品吗？')) {
-        commodityService.updateCommodityStatus(this.product.id, 'approved')
-          .then(() => {
-            this.product.status = 'approved'
-            // 添加审核记录
-            if (!this.product.auditHistory) {
-              this.product.auditHistory = []
-            }
-            this.product.auditHistory.push({
-              id: this.product.auditHistory.length + 1,
-              time: new Date().toLocaleString(),
-              action: '审核通过',
-              operator: '管理员',
-              reason: '商品审核通过，允许上架'
-            })
-            alert('商品已成功上架')
-          })
-          .catch(error => {
-            console.error('更新商品状态失败:', error)
-            alert('操作失败，请重试')
-          })
+    async approveProduct() {
+      console.log('=== 开始审核通过操作 ===');
+      console.log('商品ID:', this.product.id);
+      
+      if (confirm('确定要通过审核并上架这个商品吗？')) {
+        try {
+          console.log('准备调用 updateCommodityStatus，参数:', {
+            productId: this.product.id,
+            newStatus: 'on_sale'  // 修正：使用正确的状态值
+          });
+          
+          const result = await commodityService.updateCommodityStatus(this.product.id, 'on_sale');
+          console.log('API调用成功，返回结果:', result);
+          
+          this.product.status = 'approved'; // 前端显示状态保持不变
+          // 添加审核记录
+          if (!this.product.auditHistory) {
+            this.product.auditHistory = [];
+          }
+          this.product.auditHistory.push({
+            id: this.product.auditHistory.length + 1,
+            time: new Date().toLocaleString(),
+            action: '审核通过',
+            operator: '管理员',
+            reason: '商品审核通过，允许上架'
+          });
+          alert('商品审核通过，已上架！');
+          
+        } catch (error) {
+          console.error('=== 审核通过失败 ===');
+          console.error('错误详情:', error);
+          console.error('错误响应:', error.response);
+          console.error('错误状态码:', error.response?.status);
+          console.error('错误数据:', error.response?.data);
+          
+          alert(`操作失败：${error.response?.data?.message || error.message || '请稍后重试'}`);
+        }
       }
     },
     
-    rejectProduct() {
-      const reason = prompt('请输入下架原因:')
-      if (reason !== null) {
-        commodityService.updateCommodityStatus(this.product.id, 'rejected')
-          .then(() => {
-            this.product.status = 'rejected'
-            // 添加审核记录
-            if (!this.product.auditHistory) {
-              this.product.auditHistory = []
-            }
-            this.product.auditHistory.push({
-              id: this.product.auditHistory.length + 1,
-              time: new Date().toLocaleString(),
-              action: '审核拒绝',
-              operator: '管理员',
-              reason: reason || '不符合平台规范'
-            })
-            alert('商品已下架')
-          })
-          .catch(error => {
-            console.error('更新商品状态失败:', error)
-            alert('操作失败，请重试')
-          })
+    async rejectProduct() {
+      console.log('=== 开始下架操作 ===');
+      console.log('商品ID:', this.product.id);
+      
+      if (confirm('确定要下架这个商品吗？')) {
+        try {
+          console.log('准备调用 updateCommodityStatus，参数:', {
+            productId: this.product.id,
+            newStatus: 'off_sale'
+          });
+          
+          const result = await commodityService.updateCommodityStatus(this.product.id, 'off_sale');
+          console.log('API调用成功，返回结果:', result);
+          
+          this.product.status = 'rejected'; // 前端显示状态保持不变
+          // 添加审核记录
+          if (!this.product.auditHistory) {
+            this.product.auditHistory = [];
+          }
+          this.product.auditHistory.push({
+            id: this.product.auditHistory.length + 1,
+            time: new Date().toLocaleString(),
+            action: '审核拒绝',
+            operator: '管理员',
+            reason: '不符合平台规范'
+          });
+          alert('商品已下架！');
+          
+        } catch (error) {
+          console.error('=== 下架失败 ===');
+          console.error('错误详情:', error);
+          console.error('错误响应:', error.response);
+          console.error('错误状态码:', error.response?.status);
+          console.error('错误数据:', error.response?.data);
+          
+          alert(`操作失败：${error.response?.data?.message || error.message || '请稍后重试'}`);
+        }
       }
     },
     
-    contactSeller() {
-      alert(`联系卖家: ${this.product.sellerContact || '联系方式未提供'}`)
-    }
+    // 删除了contactSeller方法
   }
 }
 </script>

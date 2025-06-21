@@ -99,6 +99,8 @@ export default {
           localStorage.setItem('isAdminLoggedIn', 'true')
           localStorage.setItem('adminToken', response.token)
           localStorage.setItem('adminUsername', response.username || this.loginForm.username)
+          // 使用返回的adminId
+          localStorage.setItem('adminId', response.adminId || this.loginForm.username)
           
           alert('登录成功！')
           // 跳转到管理面板

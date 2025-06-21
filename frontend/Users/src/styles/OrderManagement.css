@@ -533,3 +533,393 @@
       padding: 8px;
     }
   }
+
+/* 在现有CSS文件中添加以下样式，替换或补充状态筛选器相关样式 */
+
+/* 订单状态筛选器 - 优化版本 */
+.order-management .status-filter {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(102, 126, 234, 0.1);
+  transition: all 0.3s ease;
+}
+
+.order-management .status-filter:hover {
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.order-management .filter-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.order-management .filter-label::before {
+  content: "🔍";
+  font-size: 18px;
+}
+
+.order-management .filter-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.order-management .filter-btn {
+  position: relative;
+  padding: 10px 20px;
+  border: 2px solid transparent;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  color: #495057;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  min-width: 80px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.order-management .filter-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.5s;
+}
+
+.order-management .filter-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-color: transparent;
+}
+
+.order-management .filter-btn:hover::before {
+  left: 100%;
+}
+
+.order-management .filter-btn.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-color: transparent;
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+  transform: translateY(-1px);
+}
+
+.order-management .filter-btn.active::after {
+  content: "✓";
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 18px;
+  height: 18px;
+  background: #28a745;
+  color: white;
+  border-radius: 50%;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  box-shadow: 0 2px 6px rgba(40, 167, 69, 0.3);
+}
+
+/* 特殊状态按钮样式 */
+.order-management .filter-btn[data-status="pending_payment"] {
+  background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+  color: #2d3436;
+}
+
+.order-management .filter-btn[data-status="pending_payment"]:hover,
+.order-management .filter-btn[data-status="pending_payment"].active {
+  background: linear-gradient(135deg, #fdcb6e 0%, #e17055 100%);
+  color: white;
+}
+
+.order-management .filter-btn[data-status="pending_transaction"] {
+  background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+  color: white;
+}
+
+.order-management .filter-btn[data-status="pending_transaction"]:hover,
+.order-management .filter-btn[data-status="pending_transaction"].active {
+  background: linear-gradient(135deg, #0984e3 0%, #2d3436 100%);
+}
+
+.order-management .filter-btn[data-status="completed"] {
+  background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+  color: white;
+}
+
+.order-management .filter-btn[data-status="completed"]:hover,
+.order-management .filter-btn[data-status="completed"].active {
+  background: linear-gradient(135deg, #00cec9 0%, #74b9ff 100%);
+}
+
+/* 响应式设计优化 */
+@media (max-width: 768px) {
+  .order-management .status-filter {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .order-management .filter-options {
+    gap: 8px;
+  }
+  
+  .order-management .filter-btn {
+    padding: 8px 16px;
+    font-size: 13px;
+    min-width: 70px;
+  }
+  
+  .order-management .filter-label {
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .order-management .filter-options {
+    justify-content: center;
+  }
+  
+  .order-management .filter-btn {
+    flex: 1;
+    min-width: auto;
+    max-width: calc(50% - 6px);
+  }
+}
+
+/* 动画效果 */
+@keyframes filterPulse {
+  0% {
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+  }
+  50% {
+    box-shadow: 0 4px 25px rgba(102, 126, 234, 0.6);
+  }
+  100% {
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+  }
+}
+
+.order-management .filter-btn.active {
+  animation: filterPulse 2s infinite;
+}
+
+/* 申诉管理样式 */
+.appeals-list {
+  margin-top: 20px;
+}
+
+.appeal-card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e8e8e8;
+}
+
+.appeal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.appeal-id {
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+.appeal-status {
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.appeal-status.status-pending {
+  background-color: #fff7e6;
+  color: #fa8c16;
+  border: 1px solid #ffd591;
+}
+
+.appeal-status.status-completed {
+  background-color: #f6ffed;
+  color: #52c41a;
+  border: 1px solid #b7eb8f;
+}
+
+.appeal-status.status-cancelled {
+  background-color: #fff2f0;
+  color: #ff4d4f;
+  border: 1px solid #ffccc7;
+}
+
+.appeal-content {
+  margin-bottom: 16px;
+}
+
+.appeal-info .info-row {
+  display: flex;
+  margin-bottom: 8px;
+  align-items: flex-start;
+}
+
+.appeal-info .label {
+  min-width: 80px;
+  color: #666;
+  font-size: 14px;
+  margin-right: 12px;
+}
+
+.appeal-info .value {
+  color: #333;
+  font-size: 14px;
+  flex: 1;
+  word-break: break-all;
+}
+
+.appeal-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.appeal-actions .action-btn {
+  padding: 6px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.appeal-actions .action-btn.approve {
+  background-color: #52c41a;
+  color: white;
+}
+
+.appeal-actions .action-btn.approve:hover {
+  background-color: #389e0d;
+}
+
+.appeal-actions .action-btn.reject {
+  background-color: #ff4d4f;
+  color: white;
+}
+
+.appeal-actions .action-btn.reject:hover {
+  background-color: #cf1322;
+}
+
+.appeal-actions .action-btn.detail {
+  background-color: #1890ff;
+  color: white;
+}
+
+.appeal-actions .action-btn.detail:hover {
+  background-color: #096dd9;
+}
+
+/* 申诉详情弹窗样式 */
+/* 申诉详情弹窗样式 */
+.appeal-detail-modal {
+  max-width: 800px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.appeal-detail-info {
+  margin-bottom: 24px;
+}
+
+.appeal-detail-info h4,
+.related-order-info h4 {
+  margin: 0 0 16px 0;
+  color: #333;
+  font-size: 16px;
+  font-weight: 600;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 8px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+}
+
+.info-item.full-width {
+  grid-column: 1 / -1;
+  align-items: flex-start;
+}
+
+.info-item .label {
+  min-width: 80px;
+  color: #666;
+  font-size: 14px;
+  margin-right: 12px;
+}
+
+.info-item .value {
+  color: #333;
+  font-size: 14px;
+  flex: 1;
+  word-break: break-all;
+}
+
+.related-order-info {
+  border-top: 1px solid #f0f0f0;
+  padding-top: 24px;
+}
+
+.related-order-info .order-card {
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  padding: 16px;
+  background: #fafafa;
+}
+
+/* 处理中状态高亮 */
+.appeal-card .appeal-status.status-pending {
+  background-color: #fff7e6;
+  color: #fa8c16;
+  border: 1px solid #ffd591;
+  font-weight: 600;
+}
+
+/* 移除通过和拒绝按钮相关样式 */
+.appeal-actions .action-btn.approve,
+.appeal-actions .action-btn.reject {
+  display: none;
+}

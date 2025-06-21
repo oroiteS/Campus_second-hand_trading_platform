@@ -108,27 +108,48 @@ export const transformCommodityData = (commodities, users = []) => {
 };
 
 /**
- * 计算时间差
+ * 计算时间差 - 显示具体时间
  * @param {string} dateTime 时间字符串
- * @returns {string} 时间差描述
+ * @returns {string} 具体时间描述
  */
 function calculateTimeAgo(dateTime) {
-  const now = new Date();
-  const past = new Date(dateTime);
-  const diffMs = now - past;
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMs / 3600000);
-  const diffDays = Math.floor(diffMs / 86400000);
+  if (!dateTime) return '未知时间';
   
-  if (diffMins < 1) {
-    return '刚刚';
-  } else if (diffMins < 60) {
-    return `${diffMins}分钟前`;
-  } else if (diffHours < 24) {
-    return `${diffHours}小时前`;
-  } else {
-    return `${diffDays}天前`;
+  const publishDate = new Date(dateTime);
+  
+  // 检查日期是否有效
+  if (isNaN(publishDate.getTime())) {
+    return '未知时间';
   }
+  
+  const now = new Date();
+  const diffMs = now - publishDate;
+  const diffHours = Math.floor(diffMs / 3600000);
+  
+  // 如果是今天发布的，显示具体时间
+  if (diffHours < 24 && publishDate.toDateString() === now.toDateString()) {
+    const hours = String(publishDate.getHours()).padStart(2, '0');
+    const minutes = String(publishDate.getMinutes()).padStart(2, '0');
+    return `今天 ${hours}:${minutes}`;
+  }
+  // 如果是昨天发布的
+  else if (diffHours < 48) {
+    const yesterday = new Date(now);
+    yesterday.setDate(yesterday.getDate() - 1);
+    if (publishDate.toDateString() === yesterday.toDateString()) {
+      const hours = String(publishDate.getHours()).padStart(2, '0');
+      const minutes = String(publishDate.getMinutes()).padStart(2, '0');
+      return `昨天 ${hours}:${minutes}`;
+    }
+  }
+  
+  // 其他情况显示具体日期
+  const month = String(publishDate.getMonth() + 1).padStart(2, '0');
+  const day = String(publishDate.getDate()).padStart(2, '0');
+  const hours = String(publishDate.getHours()).padStart(2, '0');
+  const minutes = String(publishDate.getMinutes()).padStart(2, '0');
+  
+  return `${month}月${day}日 ${hours}:${minutes}`;
 }
 
 /**
@@ -207,28 +228,51 @@ export const getCommodityDetail = async (commodityId) => {
  * @returns {Object} 转换后的商品数据
  */
 export const transformCommodityDetailData = async (commodityData) => {
-  // 解析图片列表
+  // 处理图片列表 - 适配实际后端响应格式
   let imageList = [];
   try {
     if (commodityData.imageList) {
-      // 如果imageList已经是数组，直接使用；如果是字符串，则解析
+      // 如果imageList是数组格式
       if (Array.isArray(commodityData.imageList)) {
         imageList = commodityData.imageList.map(url => {
-          // 清理URL中的反引号和多余空格
           return typeof url === 'string' ? url.replace(/`/g, '').trim() : url;
         });
-      } else if (typeof commodityData.imageList === 'string') {
-        // 尝试解析JSON字符串
-        try {
-          const parsed = JSON.parse(commodityData.imageList);
-          imageList = Array.isArray(parsed) ? parsed.map(url => 
-            typeof url === 'string' ? url.replace(/`/g, '').trim() : url
-          ) : [];
-        } catch (parseError) {
-          // 如果JSON解析失败，尝试按逗号分割
-          imageList = commodityData.imageList.split(',').map(url => 
-            url.replace(/`/g, '').trim()
-          ).filter(url => url.length > 0);
+      } 
+      // 如果imageList是字符串格式
+      else if (typeof commodityData.imageList === 'string') {
+        // 检查是否是BLOB格式
+        if (commodityData.imageList.includes('<<BLOB>>')) {
+          console.warn('imageList是BLOB格式，无法解析');
+          imageList = [];
+        } else {
+          // 尝试解析JSON字符串
+          try {
+            const parsed = JSON.parse(commodityData.imageList);
+            imageList = Array.isArray(parsed) ? parsed.map(url => 
+              typeof url === 'string' ? url.replace(/`/g, '').trim() : url
+            ) : [];
+          } catch (parseError) {
+            // 如果JSON解析失败，尝试按逗号分割
+            imageList = commodityData.imageList.split(',').map(url => 
+              url.replace(/`/g, '').trim()
+            ).filter(url => url.length > 0);
+          }
+        }
+      }
+      // 如果imageList是BLOB或其他格式，尝试转换为字符串再处理
+      else {
+        console.warn('imageList格式未知，尝试转换为字符串:', commodityData.imageList);
+        const imageListStr = String(commodityData.imageList);
+        if (imageListStr && imageListStr !== '[object Object]' && !imageListStr.includes('<<BLOB>>')) {
+          try {
+            const parsed = JSON.parse(imageListStr);
+            imageList = Array.isArray(parsed) ? parsed : [];
+          } catch (e) {
+            // 如果解析失败，按逗号分割
+            imageList = imageListStr.split(',').map(url => 
+              url.replace(/`/g, '').trim()
+            ).filter(url => url.length > 0);
+          }
         }
       }
     }
@@ -237,37 +281,50 @@ export const transformCommodityDetailData = async (commodityData) => {
     imageList = [];
   }
   
-  // 构建图片数组，主图放在第一位
+  // 构建图片数组
   const images = [];
-  if (commodityData.mainImageUrl) {
-    // 清理主图URL中的反引号和多余空格
-    const cleanMainImageUrl = commodityData.mainImageUrl.replace(/`/g, '').trim();
-    if (cleanMainImageUrl) {
-      images.push(cleanMainImageUrl);
-    }
+  
+  // 首先添加主图（如果存在）
+  if (commodityData.mainImageUrl && 
+      commodityData.mainImageUrl.trim() !== '' && 
+      !commodityData.mainImageUrl.includes('<<BLOB>>')) {
+    const cleanMainImage = commodityData.mainImageUrl.replace(/`/g, '').trim();
+    images.push(cleanMainImage);
+    console.log('添加主图作为第一张图片:', cleanMainImage);
   }
   
-  // 添加所有图片，包括重复的
+  // 然后添加imageList中的其他图片（排除与主图重复的）
   imageList.forEach(img => {
     const cleanImg = typeof img === 'string' ? img.replace(/`/g, '').trim() : img;
-    if (cleanImg) {
-      images.push(cleanImg);
+    if (cleanImg && cleanImg.length > 0 && !cleanImg.includes('<<BLOB>>')) {
+      // 避免重复添加主图
+      if (!images.includes(cleanImg)) {
+        images.push(cleanImg);
+      }
     }
   });
   
-  // 如果没有图片，使用默认图片
-  if (images.length === 0) {
-    images.push('/测试图片.jpg');
-  }
+  console.log('最终图片数组:', images);
   
-  // 格式化发布时间
+  // 格式化发布时间 - 显示具体时间
   const formatPublishTime = (dateTime) => {
-    const date = new Date(dateTime);
-    return date.toLocaleDateString('zh-CN', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+    if (!dateTime) return '未知时间';
+    
+    const publishDate = new Date(dateTime);
+    
+    // 检查日期是否有效
+    if (isNaN(publishDate.getTime())) {
+      return '未知时间';
+    }
+    
+    // 格式化为具体时间：YYYY年MM月DD日 HH:mm
+    const year = publishDate.getFullYear();
+    const month = String(publishDate.getMonth() + 1).padStart(2, '0');
+    const day = String(publishDate.getDate()).padStart(2, '0');
+    const hours = String(publishDate.getHours()).padStart(2, '0');
+    const minutes = String(publishDate.getMinutes()).padStart(2, '0');
+    
+    return `${year}年${month}月${day}日 ${hours}:${minutes}`;
   };
   
   // 转换商品状态显示文本
@@ -300,6 +357,7 @@ export const transformCommodityDetailData = async (commodityData) => {
     console.warn('获取卖家信息失败，使用默认信息:', error);
   }
   
+  // 适配实际后端响应字段名
   return {
     id: commodityData.commodityId,
     name: commodityData.commodityName,
@@ -311,13 +369,12 @@ export const transformCommodityDetailData = async (commodityData) => {
     detailDescription: commodityData.commodityDescription ? 
       commodityData.commodityDescription.split('\n').filter(line => line.trim()) : 
       ['暂无详细描述'],
-    images: images,
+    images: images.length > 0 ? images : [], // 移除默认测试图片，让前端处理空图片情况
     status: getStatusText(commodityData.commodityStatus),
     sellerId: commodityData.sellerId,
-    categoryName: commodityData.categoryName,
+    categoryName: commodityData.categoryName || commodityData.category,
     createdAt: commodityData.createdAt,
     updatedAt: commodityData.updatedAt,
-    // 卖家信息（从API获取）
     seller: sellerInfo
   };
 };
