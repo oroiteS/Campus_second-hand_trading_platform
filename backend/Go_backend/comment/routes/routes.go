@@ -8,7 +8,7 @@ import (
 
 // SetupRoutes 设置路由
 func SetupRoutes(r *gin.Engine, commentHandler *handlers.CommentHandler) {
-	api := r.Group("/api/v1")
+	api := r.Group("/api-8091/v1")
 	{
 		// 评论相关路由
 		comments := api.Group("/comments")

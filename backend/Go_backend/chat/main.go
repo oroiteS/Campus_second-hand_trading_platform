@@ -62,7 +62,7 @@ func main() {
 	r.Use(middleware.CORS())
 
 	// API路由组
-	v1 := r.Group("/api/v1")
+	v1 := r.Group("/api-8088/v1")
 	{
 		// WebSocket连接
 		v1.GET("/ws/:user_id", chatHandler.HandleWebSocket)

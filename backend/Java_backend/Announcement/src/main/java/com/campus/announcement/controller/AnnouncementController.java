@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/announcements")
+@RequestMapping("/api-8092/announcements")
 @CrossOrigin(origins = "http://localhost:8079", allowCredentials = "true")
 public class AnnouncementController {
 

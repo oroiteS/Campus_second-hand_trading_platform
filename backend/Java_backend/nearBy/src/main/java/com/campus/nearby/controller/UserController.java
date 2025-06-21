@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api-8086/user")
 @CrossOrigin(origins = "http://localhost:8079", allowCredentials = "true")
 public class UserController {
 

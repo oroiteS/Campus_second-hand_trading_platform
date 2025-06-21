@@ -56,7 +56,7 @@ func main() {
 	}))
 
 	// 设置路由
-	api := r.Group("/api/v1")
+	api := r.Group("/api-8093/v1")
 	{
 		appeals := api.Group("/appeals")
 		{

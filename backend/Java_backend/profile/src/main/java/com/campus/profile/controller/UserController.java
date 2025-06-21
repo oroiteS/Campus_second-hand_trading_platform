@@ -34,7 +34,7 @@ import java.util.Map;
  */
 @Tag(name = "用户信息管理", description = "用户信息查询相关接口")
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api-8089/user")
 @CrossOrigin(origins = "*")
 public class UserController {
 

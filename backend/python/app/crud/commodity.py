@@ -56,7 +56,11 @@ def get_commodities_username(db: Session) -> List[Commodity_username]:
             Commodity.quantity,
             User.user_name
         )
+<<<<<<< HEAD
         .join(User, Commodity.seller_id == User.user_id)
+=======
+        .join(User, Commodity.seller_id == ser.user_id)
+>>>>>>> 83aeec51c5b819f8e21793540034f97c618e67c5
     )
     results = db.execute(stmt).all() # SQLAlchemy 2.0 风格的执行
 

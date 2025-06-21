@@ -6,7 +6,7 @@ Profile模块提供用户信息管理相关的API接口，包括用户信息查�
 
 ## 基础信息
 - **模块名称**: Profile用户信息管理模块
-- **基础路径**: `/api/user`
+- **基础路径**: `/api-8089/user`
 - **运行端口**: `8089
 - **技术栈**: Spring Boot + MyBatis Plus
 - **文档标准**: OpenAPI 3.0 (Swagger)
@@ -18,7 +18,7 @@ Profile模块提供用户信息管理相关的API接口，包括用户信息查�
 **接口描述**: 根据用户ID获取用户信息（脱敏处理）
 
 - **请求方式**: `POST`
-- **请求路径**: `/api/user/info`
+- **请求路径**: `/api-8089/user/info`
 - **请求头**: `Content-Type: application/json`
 
 **请求参数**:
@@ -60,7 +60,7 @@ Profile模块提供用户信息管理相关的API接口，包括用户信息查�
 **接口描述**: 管理员接口，获取包含敏感信息的完整用户数据
 
 - **请求方式**: `POST`
-- **请求路径**: `/api/user/admin/info`
+- **请求路径**: `/api-8089/user/admin/info`
 - **请求头**: `Content-Type: application/json`
 
 **请求参数**:
@@ -97,7 +97,7 @@ Profile模块提供用户信息管理相关的API接口，包括用户信息查�
 **接口描述**: 公开接口，获取用户基本信息（仅包含非敏感数据）
 
 - **请求方式**: `POST`
-- **请求路径**: `/api/user/basic`
+- **请求路径**: `/api-8089/user/basic`
 - **请求头**: `Content-Type: application/json`
 
 **请求参数**:
@@ -128,7 +128,7 @@ Profile模块提供用户信息管理相关的API接口，包括用户信息查�
 **接口描述**: 更新用户的用户名和电话号码
 
 - **请求方式**: `POST`
-- **请求路径**: `/api/user/update`
+- **请求路径**: `/api-8089/user/update`
 - **请求头**: `Content-Type: application/json`
 
 **请求参数**:
@@ -171,7 +171,7 @@ Profile模块提供用户信息管理相关的API接口，包括用户信息查�
 **接口描述**: 上传用户头像文件，支持JPG、PNG、GIF、WEBP格式，最大5MB
 
 - **请求方式**: `POST`
-- **请求路径**: `/api/user/avatar/upload`
+- **请求路径**: `/api-8089/user/avatar/upload`
 - **请求头**: `Content-Type: multipart/form-data`
 
 **请求参数**:
@@ -206,7 +206,7 @@ Profile模块提供用户信息管理相关的API接口，包括用户信息查�
 **接口描述**: 直接更新用户头像URL（不上传文件）
 
 - **请求方式**: `POST`
-- **请求路径**: `/api/user/avatar/update`
+- **请求路径**: `/api-8089/user/avatar/update`
 - **请求头**: `Content-Type: application/json`
 
 **请求参数**:

@@ -18,7 +18,7 @@ public class BanApplication {
         System.out.println("\n==================================");
         System.out.println("用户封号管理模块启动成功！");
         System.out.println("端口: 8082");
-        System.out.println("API文档: http://localhost:8082/api/ban");
+        System.out.println("API文档: http://localhost:8082/api-8082/ban");
         System.out.println("CORS限制: 仅允许9418端口调用");
         System.out.println("==================================");
     }

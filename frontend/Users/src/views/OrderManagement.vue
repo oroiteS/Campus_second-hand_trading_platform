@@ -36,7 +36,7 @@
       </div>
 
       <!-- 订单列表 -->
-      <div class="order-list" v-if="filteredOrders.length > 0">
+      <div class="order-list" v-if="activeTab !== 'appeals' && filteredOrders.length > 0">
         <div class="order-card" v-for="order in filteredOrders" :key="order.id">
           <div class="order-header-info">
             <div class="order-number">订单号：{{ order.orderNumber }}</div>
@@ -67,8 +67,64 @@
         </div>
       </div>
 
+      <!-- 申诉管理列表 -->
+      <div class="appeals-list" v-if="activeTab === 'appeals'">
+        <div v-if="sortedAppealsList.length > 0">
+          <div class="appeal-card" v-for="appeal in sortedAppealsList" :key="appeal.argumentId">
+            <div class="appeal-header">
+              <div class="appeal-id">申诉ID：{{ appeal.argumentId }}</div>
+              <div class="appeal-status" :class="getAppealStatusClass(appeal.status)">
+                {{ getAppealStatusText(appeal.status) }}
+              </div>
+            </div>
+            
+            <div class="appeal-content">
+              <div class="appeal-info">
+                <div class="info-row">
+                  <span class="label">订单ID：</span>
+                  <span class="value">{{ appeal.orderId }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">申诉方：</span>
+                  <span class="value">{{ appeal.argue1Id }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">被申诉方：</span>
+                  <span class="value">{{ appeal.argue2Id }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">申诉原因：</span>
+                  <span class="value">{{ appeal.reason }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">创建时间：</span>
+                  <span class="value">{{ formatDate(appeal.createdAt) }}</span>
+                </div>
+                <div class="info-row" v-if="appeal.rootId">
+                  <span class="label">处理人：</span>
+                  <span class="value">{{ appeal.rootId }}</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- 只保留查看详情按钮 -->
+            <div class="appeal-actions">
+              <button class="action-btn detail" @click="viewAppealDetail(appeal)">
+                查看详情
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 申诉列表空状态 -->
+        <div class="empty-state" v-else>
+          <div class="empty-icon">📋</div>
+          <p class="empty-text">暂无申诉记录</p>
+        </div>
+      </div>
+
       <!-- 空状态 -->
-      <div class="empty-state" v-else>
+      <div class="empty-state" v-if="activeTab !== 'appeals' && filteredOrders.length === 0">
         <div class="empty-icon">📋</div>
         <p class="empty-text">暂无{{ getTabName(activeTab) }}订单</p>
       </div>
@@ -178,6 +234,84 @@
       </div>
     </div>
 
+    <!-- 申诉详情弹窗 -->
+    <div v-if="showAppealDetailModal" class="modal-overlay" @click="closeAppealDetailModal">
+      <div class="modal-content appeal-detail-modal" @click.stop>
+        <div class="modal-header">
+          <h3>申诉详情</h3>
+          <button @click="closeAppealDetailModal" class="close-btn">×</button>
+        </div>
+        <div class="modal-body">
+          <!-- 申诉信息 -->
+          <div class="appeal-detail-info">
+            <h4>申诉信息</h4>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="label">申诉ID：</span>
+                <span class="value">{{ currentAppeal?.argumentId }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">申诉状态：</span>
+                <span class="value" :class="getAppealStatusClass(currentAppeal?.status)">
+                  {{ getAppealStatusText(currentAppeal?.status) }}
+                </span>
+              </div>
+              <div class="info-item">
+                <span class="label">申诉方：</span>
+                <span class="value">{{ currentAppeal?.argue1Id }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">被申诉方：</span>
+                <span class="value">{{ currentAppeal?.argue2Id }}</span>
+              </div>
+              <div class="info-item full-width">
+                <span class="label">申诉原因：</span>
+                <span class="value">{{ currentAppeal?.reason }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">创建时间：</span>
+                <span class="value">{{ formatDate(currentAppeal?.createdAt) }}</span>
+              </div>
+              <div class="info-item" v-if="currentAppeal?.rootId">
+                <span class="label">处理人：</span>
+                <span class="value">{{ currentAppeal?.rootId }}</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 相关订单信息 -->
+          <div class="related-order-info" v-if="currentAppealOrder">
+            <h4>相关订单</h4>
+            <div class="order-card">
+              <div class="order-header-info">
+                <div class="order-number">订单号：{{ currentAppealOrder.orderNumber }}</div>
+                <div class="order-status" :class="currentAppealOrder.statusClass">{{ currentAppealOrder.status }}</div>
+              </div>
+
+              <div class="order-content">
+                <img :src="currentAppealOrder.productImage" :alt="currentAppealOrder.productName" class="product-image" />
+                <div class="product-info">
+                  <h4 class="product-name">{{ currentAppealOrder.productName }}</h4>
+                  <p class="product-desc">{{ currentAppealOrder.productDesc }}</p>
+                  <div class="order-details">
+                    <span class="order-price">¥{{ currentAppealOrder.price }}</span>
+                    <span class="order-quantity">数量：{{ currentAppealOrder.quantity }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="order-meta">
+                <div class="order-time">{{ currentAppealOrder.createTime }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button @click="closeAppealDetailModal" class="btn btn-cancel">关闭</button>
+        </div>
+      </div>
+    </div>
+
     <!-- 发货状态调整弹窗 -->
     <div v-if="showShippingModal" class="modal-overlay" @click="closeShippingModal">
       <div class="modal-content" @click.stop>
@@ -251,69 +385,39 @@ export default {
       activeTab: 'buy',
       selectedStatus: 'all',
       statusOptions: [
-        { value: 'pending_payment', label: '待付款' },
         { value: 'pending_transaction', label: '待交易' },
         { value: 'completed', label: '已完成' }
       ],
       orderTabs: [
         { id: 'buy', name: '我买到的' },
         { id: 'sell', name: '我卖出的' },
-        { id: 'all', name: '全部订单' }
+        { id: 'all', name: '全部订单' },
+        { id: 'appeals', name: '申诉管理' } // 新增申诉管理标签
       ],
       showAppealModal: false,
       showRefundModal: false,
       showShippingModal: false,
+      showAppealDetailModal: false, // 新增申诉详情弹窗
       currentOrder: null,
+      currentAppeal: null, // 新增当前申诉记录
       newShippingStatus: '',
       shippingInfo: {
         trackingNumber: '',
         courier: ''
       },
-      // 添加appealForm的定义
       appealForm: {
         type: '',
         description: ''
       },
+      appealsList: [], // 新增申诉列表数据
+      currentAppealOrder: null, // 当前申诉相关的订单信息
       orders: {
-        buy: [], // 改为空数组，将通过API获取
+        buy: [],
         sell: [
-          {
-            id: 3,
-            orderNumber: 'ORD202312180001',
-            productName: 'iPhone 13 Pro',
-            productDesc: '128G，9成新',
-            productImage: '/测试图片.jpg',
-            price: 4999,
-            quantity: 1,
-            status: '已发货',
-            statusClass: 'shipped',
-            createTime: '2023-12-18 16:45',
-            actions: [
-              { type: 'shipping', text: '调整发货状态' },
-              { type: 'contact', text: '联系买家' },
-              { type: 'appeal', text: '申诉' }
-            ]
-          },
-          {
-            id: 4,
-            orderNumber: 'ORD202312170001',
-            productName: '小米台灯',
-            productDesc: '护眼版，全新',
-            productImage: 'https://via.placeholder.com/80x80/FF9800/FFFFFF?text=台灯',
-            price: 89,
-            quantity: 1,
-            status: '未发货',
-            statusClass: 'not-shipped',
-            createTime: '2023-12-17 09:20',
-            actions: [
-              { type: 'shipping', text: '调整发货状态' },
-              { type: 'contact', text: '联系买家' },
-              { type: 'appeal', text: '申诉' }
-            ]
-          }
+          // ... existing code ...
         ]
       },
-      loading: false // 添加加载状态
+      loading: false
     }
   },
   computed: {
@@ -337,12 +441,35 @@ export default {
       }
 
       return orders
+    },
+    // 新增：排序后的申诉列表，处理中的申诉置顶
+    sortedAppealsList() {
+      return [...this.appealsList].sort((a, b) => {
+        // 处理中的申诉排在前面
+        if (a.status === 'process' && b.status !== 'process') {
+          return -1
+        }
+        if (a.status !== 'process' && b.status === 'process') {
+          return 1
+        }
+        // 相同状态按创建时间倒序排列
+        return new Date(b.createdAt) - new Date(a.createdAt)
+      })
     }
   },
   mounted() {
+    console.log('OrderManagement组件已挂载，当前标签页:', this.activeTab);
     // 组件挂载时同时获取买家和卖家订单数据
     this.fetchBuyerOrders()
     this.fetchSellerOrders()
+    
+    // 始终获取申诉列表数据，确保统计数量正确显示
+    this.fetchAllAppeals();
+    
+    // 如果默认标签页是申诉管理，添加额外的调试日志
+    if (this.activeTab === 'appeals') {
+      console.log('默认标签页是申诉管理');
+    }
   },
   methods: {
     goBack() {
@@ -357,27 +484,30 @@ export default {
       // 根据订单状态描述映射到筛选值
       const statusMap = {
         '待交易': 'pending_transaction',
-        '待付款': 'pending_payment',
-        '已付款': 'pending_transaction',
-        '已发货': 'pending_transaction',
-        '已送达': 'pending_transaction',
-        '已完成': 'completed',
-        '已取消': 'completed', // 将已取消归类到已完成
-        '已退款': 'completed'  // 将已退款归类到已完成
+        '已完成': 'completed'
       }
-
-      return statusMap[order.status] || 'pending_payment'
+      return statusMap[order.status] || 'pending_transaction'
     },
 
     switchTab(tabId) {
+      console.log('切换标签页:', tabId); // 添加调试日志
       this.activeTab = tabId
       this.selectedStatus = 'all' // 切换标签时重置状态筛选
-      this.refreshOrders()
+      
+      // 根据标签页类型调用相应的数据获取方法
+      if (tabId === 'appeals') {
+        console.log('切换到申诉管理标签页，开始获取申诉列表'); // 添加调试日志
+        this.fetchAllAppeals(); // 添加申诉列表获取
+      } else {
+        this.refreshOrders();
+      }
     },
 
     getOrderCount(tabId) {
       if (tabId === 'all') {
         return this.orders.buy.length + this.orders.sell.length
+      } else if (tabId === 'appeals') {
+        return this.appealsList.length
       }
       return this.orders[tabId]?.length || 0
     },
@@ -398,9 +528,6 @@ export default {
           break
         case 'confirm':
           this.confirmReceive(order)
-          break
-        case 'review':
-          this.showReview(order)
           break
         case 'contact':
           this.contactUser(order)
@@ -451,65 +578,90 @@ export default {
       }
     },
 
-    confirmReceive(order) {
+    async confirmReceive(order) {
       if (confirm('确认收到商品吗？')) {
-        order.status = '已完成'
-        order.statusClass = 'completed'
-        order.actions = [
-          { type: 'review', text: '评价' },
-          { type: 'contact', text: '联系卖家' },
-          { type: 'appeal', text: '申诉' }
-        ]
-        this.$message?.success('确认收货成功！') || alert('确认收货成功！')
-      }
-    },
-    showReview(order) {
-      console.log('查看订单评价:', order.orderNumber)
-      this.$message?.info(`查看订单 ${order.orderNumber} 的评价`) || alert(`查看订单 ${order.orderNumber} 的评价`)
-    },
-    contactUser(order) {
-      // 获取当前用户ID
-      const userId = localStorage.getItem('userId');
+        try {
+          // 获取卖家ID
+          const sellerId = order.sellerId || order.seller_id
+          if (!sellerId) {
+            this.$message?.error('无法获取卖家信息') || alert('无法获取卖家信息')
+            return
+          }
 
-      if (!userId) {
-        // 如果用户未登录，提示登录
-        this.$message?.error('请先登录后联系用户') || alert('请先登录后联系用户');
-        this.$router.push('/login');
-        return;
-      }
+          // 调用确认收货API（同时完成卖家收款和订单状态更新）
+          const confirmReceiptResponse = await axios.post(
+            'http://localhost:8081/user/account/confirmReceipt',
+            {
+              userId: sellerId,  // 使用卖家ID
+              orderID: order.id
+            },
+            {
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              timeout: 10000
+            }
+          )
 
-      // 判断当前用户是买家还是卖家，确定要联系的对象
-      let targetUserId;
-      let targetUserType;
+          console.log('确认收货API响应:', confirmReceiptResponse.data)
 
-      if (userId === order.buyerId.toString()) {
-        // 当前用户是买家，要联系卖家
-        targetUserId = order.sellerId;
-        targetUserType = '卖家';
-      } else if (userId === order.sellerId.toString()) {
-        // 当前用户是卖家，要联系买家
-        targetUserId = order.buyerId;
-        targetUserType = '买家';
-      } else {
-        // 异常情况：当前用户既不是买家也不是卖家
-        this.$message?.error('无法确定联系对象') || alert('无法确定联系对象');
-        return;
-      }
+          // 更新本地订单状态
+          order.status = '已完成'
+          order.statusClass = 'completed'
+          order.actions = [
+            { type: 'contact', text: '联系卖家' },
+            { type: 'appeal', text: '申诉' }
+          ]
 
-      if (!targetUserId) {
-        this.$message?.error(`无法获取${targetUserType}信息`) || alert(`无法获取${targetUserType}信息`);
-        return;
-      }
-
-      // 跳转到聊天页面
-      this.$router.push({
-        path: '/chat-list',
-        query: {
-          sellerId: order.sellerId,
-          buyerId: order.buyerId,
-          autoCreate: 'true'
+          this.$message?.success('确认收货成功！订单已完成，款项已转入卖家账户') || alert('确认收货成功！订单已完成，款项已转入卖家账户')
+          
+          // 刷新订单列表
+          await this.fetchBuyerOrders()
+          
+        } catch (error) {
+          console.error('确认收货失败:', error)
+          
+          // 添加详细的调试信息
+          console.log('错误详情:')
+          console.log('- 请求URL:', error.config?.url)
+          console.log('- 请求方法:', error.config?.method)
+          console.log('- 请求数据:', error.config?.data)
+          console.log('- 请求头:', error.config?.headers)
+          console.log('- 响应状态:', error.response?.status)
+          console.log('- 响应数据:', error.response?.data)
+          console.log('- 完整错误对象:', error)
+          
+          let errorMessage = '确认收货失败'
+          
+          if (error.response) {
+            errorMessage = `确认收货失败：${error.response.status} ${error.response.statusText}`
+            if (error.response.data && error.response.data.message) {
+              errorMessage += ` - ${error.response.data.message}`
+            }
+            
+            // 针对404错误的特殊提示
+            if (error.response.status === 404) {
+              console.error('404错误分析:')
+              console.error('- 检查API端点是否正确:', error.config?.url)
+              console.error('- 检查订单ID是否存在:', JSON.parse(error.config?.data || '{}').orderID)
+              errorMessage += ' (API端点不存在或订单ID无效)'
+            }
+          } else if (error.request) {
+            errorMessage = '网络请求失败，请检查网络连接'
+            console.error('网络请求失败，无响应:', error.request)
+          } else {
+            errorMessage = `确认收货失败：${error.message}`
+            console.error('请求配置错误:', error.message)
+          }
+          
+          this.$message?.error(errorMessage) || alert(errorMessage)
         }
-      });
+      }
+    },
+
+    contactUser(order) {
+      console.log('联系用户:', order.orderNumber)
+      this.$message?.info(`联系订单 ${order.orderNumber} 的相关用户`) || alert(`联系订单 ${order.orderNumber} 的相关用户`)
     },
 
     // 申诉相关方法
@@ -538,30 +690,17 @@ export default {
           return;
         }
 
-        // 获取当前用户ID（需要从用户状态或localStorage中获取）
-        const currentUserId = this.getCurrentUserId(); // 需要实现这个方法
-        if (!currentUserId) {
-          this.$message.error('用户信息不完整');
-          return;
-        }
-
         // 构建申诉数据
         const appealData = {
-          argue1Id: currentUserId, // 申诉发起者（当前用户）
-          argue2Id: this.getOppositeUserId(), // 被申诉者
-          orderId: this.currentOrder.id.toString(), // 确保是字符串
-          reason: `${this.appealForm.type}: ${this.appealForm.description}`
+          argue1Id: this.currentOrder.buyerId, // 改为小写开头
+          argue2Id: this.currentOrder.sellerId, // 改为小写开头
+          orderId: this.currentOrder.id, // 改为小写开头
+          reason: `${this.appealForm.type}: ${this.appealForm.description}` // 改为小写开头
         };
 
-        console.log('提交申诉数据:', appealData);
+        console.log('提交申诉数据:', appealData); // 调试信息
 
-        // 验证必要字段
-        if (!appealData.argue1Id || !appealData.orderId) {
-          this.$message.error('申诉数据不完整');
-          return;
-        }
-
-        // 调用后端API
+        // 直接使用axios调用后端API
         const response = await axios.post('http://localhost:8093/api/v1/appeals', appealData, {
           headers: {
             'Content-Type': 'application/json'
@@ -570,13 +709,15 @@ export default {
 
         console.log('申诉提交响应:', response.data);
 
-        // 检查响应
-        if (response.status === 201) {
+        // 根据API文档，成功响应是201状态码
+        if (response.status === 201 && (response.data.argumentId || response.data.status === 'process')) {
           this.$message.success('申诉提交成功');
           this.closeAppealModal();
+
+          // 可选：刷新订单列表
           this.refreshOrders();
         } else {
-          throw new Error('申诉提交失败：响应状态码不正确');
+          throw new Error('申诉提交失败：响应格式不正确');
         }
       } catch (error) {
         console.error('提交申诉失败:', error);
@@ -585,7 +726,7 @@ export default {
 
         if (error.response) {
           // 服务器返回了错误响应
-          errorMessage = `申诉提交失败：${error.response.status} ${error.response.statusText}`; // 修正语法错误
+          errorMessage = `申诉提交失败：${error.response.status} ${error.response.statusText}`;
           if (error.response.data && error.response.data.error) {
             errorMessage += ` - ${error.response.data.error}`;
           }
@@ -601,27 +742,21 @@ export default {
       }
     },
 
-    // 新增：获取当前用户ID的方法
-    getCurrentUserId() {
-      // 从localStorage、vuex store或其他地方获取当前用户ID
-      // 这里需要根据你的用户认证系统来实现
-      return localStorage.getItem('userId') || this.$store?.state?.user?.id || null;
-    },
-
-    // 修正：获取被申诉者ID的方法
+    // 新增辅助方法：获取被申诉者ID
     getOppositeUserId() {
-      const orderType = this.getOrderType(this.currentOrder.id);
+      // 根据订单类型确定被申诉者
+      // 如果是买家申诉，被申诉者是卖家；如果是卖家申诉，被申诉者是买家
+      const orderType = this.getOrderType(this.currentOrder.id)
 
-      // 根据订单类型和实际数据结构来获取对方用户ID
       if (orderType === 'buy') {
-        // 买家申诉卖家
-        return this.currentOrder.sellerId || this.currentOrder.seller_id || null;
+        // 买家申诉卖家，返回卖家ID
+        return this.currentOrder.sellerId || this.currentOrder.seller_id
       } else if (orderType === 'sell') {
-        // 卖家申诉买家
-        return this.currentOrder.buyerId || this.currentOrder.buyer_id || null;
+        // 卖家申诉买家，返回买家ID  
+        return this.currentOrder.buyerId || this.currentOrder.buyer_id
       }
 
-      return null;
+      return null
     },
 
     // 辅助方法：判断订单类型
@@ -761,7 +896,7 @@ export default {
               console.log('订单原始数据:', orderData)
 
               // 转换API数据为组件需要的格式
-              this.orders.buy = this.transformOrderData(orderData)
+              this.orders.buy = this.transformOrderData(orderData, 'buy')
               console.log('转换后的订单数据:', this.orders.buy)
 
               this.$message?.success(`成功获取${this.orders.buy.length}个订单`) || console.log(`成功获取${this.orders.buy.length}个订单`)
@@ -842,7 +977,7 @@ export default {
 
               // 开始转换订单数据
               console.log('开始转换订单数据:', orderData)
-              const transformedOrders = this.transformOrderData(orderData)
+              const transformedOrders = this.transformOrderData(orderData, 'sell')
               console.log('转换后订单:', transformedOrders)
 
               // 更新卖家订单数据
@@ -871,8 +1006,8 @@ export default {
     },
 
     // 转换API数据为组件需要的格式
-    transformOrderData(apiData) {
-      console.log('开始转换订单数据:', apiData)
+    transformOrderData(apiData, viewType = 'buy') {
+      console.log('开始转换订单数据:', apiData, 'viewType:', viewType)
 
       if (!Array.isArray(apiData)) {
         console.warn('API数据不是数组格式:', apiData)
@@ -882,26 +1017,26 @@ export default {
       return apiData.map(order => {
         console.log('转换单个订单:', order)
 
-        // 根据订单状态和当前标签页生成操作按钮
-        const actions = this.generateOrderActions(order.orderStatus || 'pending_payment', this.activeTab)
+        // 根据订单状态和视图类型生成操作按钮
+        const actions = this.generateOrderActions(order.orderStatus || 'pending_transaction', viewType)
 
         return {
           id: order.orderId,
-          orderNumber: order.orderId, // 使用orderId作为订单号
-          productName: order.commodityName, // 使用API的commodityName字段
-          productImage: order.mainImageUrl || '/测试图片.jpg', // 使用API的mainImageUrl字段
-          price: order.money, // 使用API的money字段
-          quantity: order.buyQuantity, // 使用API的buyQuantity字段
-          status: order.orderStatusDescription, // 使用API的orderStatusDescription字段
-          statusClass: this.getStatusClass(order.orderStatus), // 使用API的orderStatus字段
-          createTime: order.createTime, // 使用API的createTime字段
-          saleTime: order.saleTime, // 添加销售时间
-          saleLocation: order.saleLocation, // 添加销售地点
-          buyerId: order.buyerId, // 添加买家ID
-          sellerId: order.sellerId, // 添加卖家ID
-          commodityId: order.commodityId, // 添加商品ID
-          buyerName: order.buyerName, // 添加买家名称
-          sellerName: order.sellerName, // 添加卖家名称
+          orderNumber: order.orderId,
+          productName: order.commodityName,
+          productImage: order.mainImageUrl || '/测试图片.jpg',
+          price: order.money,
+          quantity: order.buyQuantity,
+          status: order.orderStatusDescription,
+          statusClass: this.getStatusClass(order.orderStatus),
+          createTime: order.createTime,
+          saleTime: order.saleTime,
+          saleLocation: order.saleLocation,
+          buyerId: order.buyerId,
+          sellerId: order.sellerId,
+          commodityId: order.commodityId,
+          buyerName: order.buyerName,
+          sellerName: order.sellerName,
           actions: actions
         }
       })
@@ -913,18 +1048,9 @@ export default {
       if (viewType === 'sell') {
         // 卖家视角的操作按钮
         switch (orderStatus) {
-          case 'pending_payment':
-            // 待付款状态：只显示联系买家
+          case 'pending_transaction':
+            // 待交易状态：联系买家、申诉
             actions.push(
-              { type: 'contact', text: '联系买家' }
-            )
-            break
-          case 'paid':
-          case 'shipped':
-          case 'delivered':
-            // 待交易状态：联系买家、调整发货状态、申诉
-            actions.push(
-              { type: 'shipping', text: '调整发货状态' },
               { type: 'contact', text: '联系买家' },
               { type: 'appeal', text: '申诉' }
             )
@@ -942,33 +1068,19 @@ export default {
             )
         }
       } else {
-        // 买家视角的操作按钮（原有逻辑）
+        // 买家视角的操作按钮
         switch (orderStatus) {
-          case 'pending_payment':
+          case 'pending_transaction':
+            // 待交易状态：显示已收货按钮
             actions.push(
-              { type: 'pay', text: '立即付款' },
-              { type: 'cancel', text: '取消订单' },
-              { type: 'contact', text: '联系卖家' }
-            )
-            break
-          case 'paid':
-          case 'shipped':
-            actions.push(
-              { type: 'confirm', text: '确认收货' },
-              { type: 'contact', text: '联系卖家' },
-              { type: 'refund', text: '申请退款' }
-            )
-            break
-          case 'delivered':
-            actions.push(
-              { type: 'confirm', text: '确认收货' },
+              { type: 'confirm', text: '已收货' },
               { type: 'contact', text: '联系卖家' },
               { type: 'appeal', text: '申诉' }
             )
             break
           case 'completed':
+            // 已完成状态：联系卖家、申诉
             actions.push(
-              { type: 'review', text: '评价' },
               { type: 'contact', text: '联系卖家' },
               { type: 'appeal', text: '申诉' }
             )
@@ -985,30 +1097,227 @@ export default {
     },
 
     async refreshOrders() {
+      console.log('刷新订单数据，当前标签页:', this.activeTab); // 添加调试日志
       if (this.activeTab === 'buy') {
         await this.fetchBuyerOrders()
       } else if (this.activeTab === 'sell') {
         await this.fetchSellerOrders()
+      } else if (this.activeTab === 'appeals') {
+        console.log('刷新申诉列表'); // 添加调试日志
+        await this.fetchAllAppeals(); // 添加申诉列表刷新
       }
     },
 
     // 添加缺失的getStatusClass方法
     getStatusClass(status) {
       const statusMap = {
-        'pending_payment': 'status-pending',
-        'paid': 'status-paid',
-        'shipped': 'status-shipped',
-        'delivered': 'status-delivered',
+        'pending_transaction': 'status-pending',
         'completed': 'status-completed',
-        'cancelled': 'status-cancelled',
-        '待付款': 'status-pending',
-        '已付款': 'status-paid',
-        '已发货': 'status-shipped',
-        '已送达': 'status-delivered',
-        '已完成': 'status-completed',
-        '已取消': 'status-cancelled'
+        '待交易': 'status-pending',
+        '已完成': 'status-completed'
       }
       return statusMap[status] || 'status-default'
+    },
+
+    // 新增：获取所有申诉记录
+    async fetchAllAppeals() {
+      try {
+        this.loading = true
+        console.log('开始获取申诉记录...')
+        console.log('请求URL: http://localhost:8093/api/v1/appeals/all'); // 添加URL调试
+        
+        const response = await axios.get('http://localhost:8093/api/v1/appeals/all', {
+          timeout: 10000
+        })
+        
+        console.log('申诉API响应状态:', response.status); // 添加状态调试
+        console.log('申诉API响应头:', response.headers); // 添加响应头调试
+        console.log('申诉API响应数据:', response.data)
+        
+        if (response.status === 200 && response.data.appeals) {
+          this.appealsList = response.data.appeals
+          console.log('申诉列表数据:', this.appealsList); // 添加列表数据调试
+          console.log(`成功获取${response.data.count}条申诉记录`)
+          this.$message?.success(`成功获取${response.data.count}条申诉记录`) || console.log(`成功获取${response.data.count}条申诉记录`)
+        } else {
+          console.log('响应格式检查失败 - status:', response.status, 'appeals字段:', response.data.appeals); // 添加格式检查调试
+          throw new Error('获取申诉记录失败：响应格式不正确')
+        }
+      } catch (error) {
+        console.error('获取申诉记录失败:', error)
+        console.error('错误详情:', {
+          message: error.message,
+          response: error.response,
+          request: error.request,
+          config: error.config
+        }); // 添加详细错误信息
+        
+        let errorMessage = '获取申诉记录失败'
+        
+        if (error.response) {
+          console.log('服务器响应错误 - 状态码:', error.response.status); // 添加状态码调试
+          console.log('服务器响应数据:', error.response.data); // 添加响应数据调试
+          errorMessage = `获取申诉记录失败：${error.response.status} ${error.response.statusText}`
+          if (error.response.data && error.response.data.error) {
+            errorMessage += ` - ${error.response.data.error}`
+          }
+        } else if (error.request) {
+          console.log('网络请求错误:', error.request); // 添加网络错误调试
+          errorMessage = '无法连接到申诉服务器，请检查网络连接'
+        } else {
+          console.log('其他错误:', error.message); // 添加其他错误调试
+          errorMessage = `获取申诉记录失败：${error.message}`
+        }
+        
+        this.$message?.error(errorMessage) || alert(errorMessage)
+        this.appealsList = [] // 失败时清空列表
+      } finally {
+        this.loading = false
+        console.log('申诉记录获取完成，loading状态:', this.loading); // 添加完成状态调试
+      }
+    },
+
+    // 新增：处理申诉操作（通过/拒绝）
+    async handleAppealAction(appeal, action) {
+      try {
+        const actionText = action === 'finish' ? '通过' : '拒绝'
+        if (!confirm(`确认${actionText}此申诉吗？`)) {
+          return
+        }
+
+        const response = await axios.put(
+          `http://localhost:8093/api/v1/appeals/${appeal.argumentId}/admin-update`,
+          {
+            status: action,
+            rootId: localStorage.getItem('userId') || 'admin001' // 使用当前登录用户ID作为管理员ID
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            timeout: 10000
+          }
+        )
+
+        if (response.status === 200) {
+          this.$message?.success(`申诉${actionText}成功`) || alert(`申诉${actionText}成功`)
+          // 刷新申诉列表
+          await this.fetchAllAppeals()
+        } else {
+          throw new Error(`申诉${actionText}失败：响应格式不正确`)
+        }
+      } catch (error) {
+        console.error('处理申诉失败:', error)
+        const actionText = action === 'finish' ? '通过' : '拒绝'
+        let errorMessage = `申诉${actionText}失败`
+        
+        if (error.response) {
+          errorMessage = `申诉${actionText}失败：${error.response.status} ${error.response.statusText}`
+          if (error.response.data && error.response.data.error) {
+            errorMessage += ` - ${error.response.data.error}`
+          }
+        } else if (error.request) {
+          errorMessage = '无法连接到申诉服务器，请检查网络连接'
+        } else {
+          errorMessage = `申诉${actionText}失败：${error.message}`
+        }
+        
+        this.$message?.error(errorMessage) || alert(errorMessage)
+      }
+    },
+
+    // 新增：查看申诉详情
+    viewAppealDetails(appeal) {
+      this.currentAppeal = appeal
+      this.showAppealDetailModal = true
+    },
+
+    // 新增：查看申诉详情（新方法名）
+    async viewAppealDetail(appeal) {
+      this.currentAppeal = appeal
+      
+      // 根据申诉中的订单ID获取订单详情
+      try {
+        // 从现有订单列表中查找相关订单
+        const allOrders = [...this.orders.buy, ...this.orders.sell];
+        this.currentAppealOrder = allOrders.find(order => order.id === appeal.orderId);
+        
+        if (!this.currentAppealOrder) {
+          // 如果在现有订单中找不到，可以调用API获取
+          console.log('未在现有订单中找到相关订单，订单ID:', appeal.orderId);
+          // 这里可以添加API调用来获取订单详情
+        }
+      } catch (error) {
+        console.error('获取申诉相关订单失败:', error);
+      }
+      
+      this.showAppealDetailModal = true
+    },
+
+    // 新增：查找相关订单信息
+    async findRelatedOrder(orderId) {
+      // 在买家和卖家订单中查找
+      let relatedOrder = null
+      
+      // 先在已有的订单列表中查找
+      relatedOrder = this.orders.buy.find(order => order.id === orderId) ||
+                    this.orders.sell.find(order => order.id === orderId)
+      
+      if (relatedOrder) {
+        this.currentAppealOrder = relatedOrder
+        return
+      }
+      
+      // 如果在现有订单中找不到，尝试通过API获取
+      try {
+        // 这里可以调用API获取特定订单信息
+        // 暂时设置为null，表示未找到相关订单
+        this.currentAppealOrder = null
+        console.log('未找到相关订单信息，订单ID:', orderId)
+      } catch (error) {
+        console.error('获取相关订单信息失败:', error)
+        this.currentAppealOrder = null
+      }
+    },
+
+    // 新增：关闭申诉详情弹窗
+    closeAppealDetailModal() {
+      this.showAppealDetailModal = false
+      this.currentAppeal = null
+      this.currentAppealOrder = null
+    },
+
+    // 新增：获取申诉状态样式类
+    getAppealStatusClass(status) {
+      const statusClasses = {
+        'process': 'status-processing',
+        'finish': 'status-finished', 
+        'refuse': 'status-refused'
+      }
+      return statusClasses[status] || 'status-unknown'
+    },
+
+    // 新增：获取申诉状态文本
+    getAppealStatusText(status) {
+      const statusMap = {
+        'process': '处理中',
+        'finish': '已通过',
+        'reject': '已拒绝'
+      }
+      return statusMap[status] || '未知状态'
+    },
+
+    // 新增：格式化日期
+    formatDate(dateString) {
+      if (!dateString) return '无'
+      const date = new Date(dateString)
+      return date.toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      })
     }
   }
 }

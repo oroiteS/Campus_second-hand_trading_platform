@@ -8,14 +8,14 @@
 - **更新时间**: 2024年12月16日
 - **技术栈**: Java 17, Spring Boot 3.3.4, MySQL 8.0, JWT
 - **服务端口**: 8080
-- **基础路径**: `/api/user`
+- **基础路径**: `/api-8080/user`
 
 ## API接口列表
 
 ### 1. 用户注册接口
 
 #### 接口信息
-- **接口路径**: `POST /api/user/register`
+- **接口路径**: `POST /api-8080/user/register`
 - **接口描述**: 用户注册功能，支持新用户创建账户
 - **Content-Type**: `application/json`
 
@@ -64,7 +64,7 @@
 ### 2. 用户登录接口
 
 #### 接口信息
-- **接口路径**: `POST /api/user/login`
+- **接口路径**: `POST /api-8080/user/login`
 - **接口描述**: 用户登录功能，返回JWT Token
 - **Content-Type**: `application/json`
 
@@ -101,7 +101,7 @@
 ### 3. 获取用户信息接口
 
 #### 接口信息
-- **接口路径**: `GET /api/user/info`
+- **接口路径**: `GET /api-8080/user/info`
 - **接口描述**: 获取当前登录用户的基本信息
 - **认证方式**: Bearer Token (JWT)
 
@@ -124,7 +124,7 @@ Authorization: Bearer {token}
 ### 4. 获取用户头像接口
 
 #### 接口信息
-- **接口路径**: `GET /api/user/avatar`
+- **接口路径**: `GET /api-8080/user/avatar`
 - **接口描述**: 获取当前登录用户的头像URL
 - **认证方式**: Bearer Token (JWT)
 
@@ -144,7 +144,7 @@ Authorization: Bearer {token}
 ### 5. 检查用户名可用性
 
 #### 接口信息
-- **接口路径**: `GET /api/user/check-username?username={username}`
+- **接口路径**: `GET /api-8080/user/check-username?username={username}`
 - **接口描述**: 检查用户名是否已被使用
 
 #### 响应示例
@@ -158,7 +158,7 @@ Authorization: Bearer {token}
 ### 6. 检查手机号可用性
 
 #### 接口信息
-- **接口路径**: `GET /api/user/check-telephone?telephone={telephone}`
+- **接口路径**: `GET /api-8080/user/check-telephone?telephone={telephone}`
 - **接口描述**: 检查手机号是否已被使用
 
 #### 响应示例
@@ -172,7 +172,7 @@ Authorization: Bearer {token}
 ### 7. 检查身份证号可用性
 
 #### 接口信息
-- **接口路径**: `GET /api/user/check-idcard?idCard={idCard}`
+- **接口路径**: `GET /api-8080/user/check-idcard?idCard={idCard}`
 - **接口描述**: 检查身份证号是否已被使用
 
 #### 响应示例
@@ -186,7 +186,7 @@ Authorization: Bearer {token}
 ### 8. 检查用户ID可用性
 
 #### 接口信息
-- **接口路径**: `GET /api/user/check-userid?userId={userId}`
+- **接口路径**: `GET /api-8080/user/check-userid?userId={userId}`
 - **接口描述**: 检查用户ID是否已被使用
 
 #### 响应示例
@@ -200,7 +200,7 @@ Authorization: Bearer {token}
 ### 9. Token验证接口
 
 #### 接口信息
-- **接口路径**: `POST /api/user/validate-token`
+- **接口路径**: `POST /api-8080/user/validate-token`
 - **接口描述**: 验证JWT Token的有效性
 - **认证方式**: Bearer Token (JWT)
 
@@ -281,7 +281,7 @@ $body = @'
 }
 '@
 
-Invoke-RestMethod -Uri "http://localhost:8080/api/user/register" -Method POST -ContentType "application/json" -Body $body
+Invoke-RestMethod -Uri "http://localhost:8080/api-8080/user/register" -Method POST -ContentType "application/json" -Body $body
 ```
 
 #### 2. 用户登录
@@ -293,27 +293,27 @@ $loginBody = @'
 }
 '@
 
-$response = Invoke-RestMethod -Uri "http://localhost:8080/api/user/login" -Method POST -ContentType "application/json" -Body $loginBody
+$response = Invoke-RestMethod -Uri "http://localhost:8080/api-8080/user/login" -Method POST -ContentType "application/json" -Body $loginBody
 $token = $response.token
 ```
 
 #### 3. 获取用户信息
 ```powershell
 $headers = @{"Authorization" = "Bearer $token"}
-Invoke-RestMethod -Uri "http://localhost:8080/api/user/info" -Method GET -Headers $headers
+Invoke-RestMethod -Uri "http://localhost:8080/api-8080/user/info" -Method GET -Headers $headers
 ```
 
 #### 4. 获取用户头像
 ```powershell
 $headers = @{"Authorization" = "Bearer $token"}
-Invoke-RestMethod -Uri "http://localhost:8080/api/user/avatar" -Method GET -Headers $headers
+Invoke-RestMethod -Uri "http://localhost:8080/api-8080/user/avatar" -Method GET -Headers $headers
 ```
 
 ### cURL 测试命令
 
 #### 1. 用户注册
 ```bash
-curl -X POST http://localhost:8080/api/user/register \
+curl -X POST http://localhost:8080/api-8080/user/register \
   -H "Content-Type: application/json" \
   -d '{
     "userId": "848089153",
@@ -329,7 +329,7 @@ curl -X POST http://localhost:8080/api/user/register \
 
 #### 2. 用户登录
 ```bash
-curl -X POST http://localhost:8080/api/user/login \
+curl -X POST http://localhost:8080/api-8080/user/login \
   -H "Content-Type: application/json" \
   -d '{
     "username": "testuser",
@@ -339,7 +339,7 @@ curl -X POST http://localhost:8080/api/user/login \
 
 #### 3. 获取用户信息
 ```bash
-curl -X GET http://localhost:8080/api/user/info \
+curl -X GET http://localhost:8080/api-8080/user/info \
   -H "Authorization: Bearer {your_token_here}"
 ```
 
@@ -408,7 +408,7 @@ nohup java -jar target/Login-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
 curl http://localhost:8080/actuator/health
 
 # 检查数据库连接
-curl http://localhost:8080/api/user/check-username?username=test
+curl http://localhost:8080/api-8080/user/check-username?username=test
 ```
 
 ## 数据库表结构

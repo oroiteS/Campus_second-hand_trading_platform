@@ -6,6 +6,8 @@
 ### 1. 接口地址
 
 ```
+@RequestMapping("/api-8092/announcements")
+
 GET /announcements
 ```
 
