@@ -1150,8 +1150,10 @@
 }
 
 .floating-ball-icon {
-  font-size: 24px;
-  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
   animation: bounce 2s infinite;
 }
 

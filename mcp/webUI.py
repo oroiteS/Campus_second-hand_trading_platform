@@ -323,5 +323,5 @@ class WebUI(QwenWebUI):
         default_launch_kwargs.update(launch_kwargs)
 
         print(f"✅ 启动 {getattr(self.bot, 'name', 'AI')} WebUI")
-        print(f"📎 访问地址: http://localhost:{default_launch_kwargs['server_port']}")
+        print(f"📎 访问地址: http://47.117.90.63:{default_launch_kwargs['server_port']}")
         return self.demo.launch(**default_launch_kwargs)

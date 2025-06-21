@@ -176,7 +176,7 @@
     </div>
     <!-- 悬浮球 -->
     <div class="floating-ball" @click="toggleEmbedWindow" :class="{ active: showEmbedWindow }">
-      <span class="floating-ball-icon">🤖</span>
+      <img src="../photos/image.png" alt="AI助手" class="floating-ball-icon" />
     </div>
     
     <!-- 嵌入窗口 -->
@@ -238,7 +238,7 @@ export default {
       usersCacheTime: null, // 添加缓存时间戳
       // 悬浮球和嵌入窗口相关
       showEmbedWindow: false,
-      embedUrl: 'http://localhost:7860',
+      embedUrl: 'http://47.117.90.63:7860',
       stats: {
         totalProducts: 1234,
         activeUsers: 567,
@@ -653,6 +653,11 @@ export default {
      * 切换嵌入窗口显示状态
      */
      toggleEmbedWindow() {
+      const localdata = JSON.parse(localStorage.getItem('isLoggedIn'));
+      if (!localdata) {
+        alert('请先登录');
+        return;
+      }
       this.showEmbedWindow = !this.showEmbedWindow;
     },
     

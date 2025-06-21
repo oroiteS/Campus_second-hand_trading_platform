@@ -24,7 +24,10 @@ class Embedder:
         self.client = chromadb.PersistentClient(path=self.folder)
         self.chroma_collection_tag = self.client.get_or_create_collection(self.collection_tag)
         self.chroma_collection_category = self.client.get_or_create_collection(self.collection_category)
-        self.chroma_collection_commodity = self.client.get_or_create_collection(self.collection_commodity)
+        self.chroma_collection_commodity = self.client.get_or_create_collection(
+            name=self.collection_commodity,
+            metadata={"hnsw:M": "16", "hnsw:ef": "128"}
+        )
     def recommendation_by_buy(self, user_id, limit=3):
         """
         从MongoDB获取用户最近的购买记录，按时间戳倒序排列
@@ -46,7 +49,7 @@ class Embedder:
             for data in results_data:
                 results_buy_recommendation = self.chroma_collection_commodity.query(
                     query_embeddings=[data['embedding']],
-                    n_results=2,
+                    n_results=10,
                     where={"seller_id": {"$ne": user_id}},
                     include=['documents','metadatas']
                 )
