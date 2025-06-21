@@ -220,7 +220,7 @@ export default {
     // 查看商品详情
     viewProductDetail(productId) {
       this.$router.push({
-        path: `/productdetail/${productId}`,
+        path: `/product/${productId}`,  // 修改为正确的路径
         query: { from: 'sellerProfile' }
       });
     },

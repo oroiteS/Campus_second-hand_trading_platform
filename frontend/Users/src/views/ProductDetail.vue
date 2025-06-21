@@ -86,7 +86,7 @@
           <button class="btn-contact" @click="contactSeller" :disabled="isOwner">
             💬 {{ isOwner ? '您是卖家' : '联系卖家' }}
           </button>
-          <button class="btn-buy" @click="buyNow">
+          <button class="btn-buy" @click="buyNow" v-if="product.seller.id !== currentUser.id">
             立即购买
           </button>
           <button class="btn-favorite" @click="toggleFavorite" :class="{ active: isFavorited }">
@@ -743,7 +743,7 @@ export default {
               userId: userId,
               commodityId: commodityId
             },
-            timeout: 5000 // 5秒超时
+            timeout: 5000
           })
           
           if (cartResponse.data && cartResponse.data.success) {
@@ -777,8 +777,22 @@ export default {
             alert('收藏失败，请重试')
           }
         } else {
-          this.isFavorited = false
-          alert('已取消收藏')
+          // 从购物车中移除商品
+          const removeResponse = await axios.post('/cart/remove', null, {
+            params: {
+              userId: userId,
+              commodityId: commodityId
+            },
+            timeout: 5000
+          })
+          
+          if (removeResponse.data && removeResponse.data.success) {
+            this.isFavorited = false
+            alert('已取消收藏')
+            console.log('商品已从购物车移除')
+          } else {
+            alert('取消收藏失败，请重试')
+          }
         }
       } catch (error) {
         console.error('收藏操作失败:', error)

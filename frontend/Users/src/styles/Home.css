@@ -1125,36 +1125,47 @@
   position: fixed;
   bottom: 30px;
   right: 30px;
-  width: 60px;
-  height: 60px;
+  width: 65px;
+  height: 65px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease;
+  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.25);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1000;
   user-select: none;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
 }
 
 .floating-ball:hover {
-  transform: scale(1.1);
-  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 15px 40px rgba(102, 126, 234, 0.35);
+  border-color: rgba(255, 255, 255, 0.4);
 }
 
 .floating-ball.active {
-  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-  transform: scale(0.95);
+  background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 35px rgba(255, 107, 53, 0.4);
 }
 
 .floating-ball-icon {
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   object-fit: cover;
   animation: bounce 2s infinite;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.floating-ball:hover .floating-ball-icon {
+  border-color: rgba(255, 255, 255, 0.6);
+  transform: scale(1.05);
 }
 
 @keyframes bounce {

@@ -169,119 +169,405 @@ export default {
 </script>
 
 <style scoped>
+/* 容器样式 */
 .password-reset-container {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: #f5f5f5;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 20px;
+  position: relative;
+  overflow: hidden;
 }
 
+/* 背景装饰 */
+.background-decoration {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.floating-shape {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  animation: float 6s ease-in-out infinite;
+}
+
+.shape-1 {
+  width: 80px;
+  height: 80px;
+  top: 20%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.shape-2 {
+  width: 120px;
+  height: 120px;
+  top: 60%;
+  right: 15%;
+  animation-delay: 2s;
+}
+
+.shape-3 {
+  width: 60px;
+  height: 60px;
+  bottom: 20%;
+  left: 20%;
+  animation-delay: 4s;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(180deg);
+  }
+}
+
+/* 主卡片样式 */
 .password-reset-box {
   width: 100%;
-  max-width: 450px;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  padding: 30px;
+  max-width: 480px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(255, 255, 255, 0.2);
+  padding: 40px;
+  position: relative;
+  z-index: 2;
+  animation: slideUp 0.6s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 标题区域 */
+.header-section {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.icon-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 50%;
+  margin-bottom: 20px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 20px rgba(102, 126, 234, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(102, 126, 234, 0);
+  }
+}
+
+.lock-icon {
+  width: 40px;
+  height: 40px;
+  color: white;
 }
 
 .password-reset-box h2 {
-  text-align: center;
-  margin-bottom: 30px;
-  color: #333;
+  margin: 0 0 10px 0;
+  color: #2d3748;
+  font-size: 28px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
+.subtitle {
+  color: #718096;
+  font-size: 16px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* 表单样式 */
 .password-reset-form-group {
-  margin-bottom: 20px;
+  margin-bottom: 25px;
 }
 
 .password-reset-form-group label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 500;
-  color: #555;
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  font-weight: 600;
+  color: #4a5568;
+  font-size: 15px;
+}
+
+.input-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+  color: #667eea;
+}
+
+.input-wrapper {
+  position: relative;
 }
 
 .password-reset-form-group input {
   width: 100%;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  padding: 16px 20px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
   font-size: 16px;
-  transition: border-color 0.3s;
+  background: rgba(255, 255, 255, 0.8);
+  transition: all 0.3s ease;
+  box-sizing: border-box;
 }
 
 .password-reset-form-group input:focus {
-  border-color: #4CAF50;
+  border-color: #667eea;
   outline: none;
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  transform: translateY(-2px);
 }
 
+.password-reset-form-group input::placeholder {
+  color: #a0aec0;
+}
+
+/* 提示信息 */
 .password-reset-tip {
-  color: #ff6b6b;
+  color: #e53e3e;
   font-size: 14px;
-  margin-top: 5px;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  animation: shake 0.5s ease-in-out;
 }
 
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+/* 提交按钮 */
 .password-reset-submit-btn {
   width: 100%;
-  padding: 12px;
-  background-color: #4CAF50;
+  padding: 16px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 12px;
   font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.password-reset-submit-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.password-reset-submit-btn:hover::before {
+  left: 100%;
 }
 
 .password-reset-submit-btn:hover {
-  background-color: #45a049;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.password-reset-submit-btn:active {
+  transform: translateY(0);
 }
 
 .password-reset-submit-btn:disabled {
-  background-color: #cccccc;
+  background: #cbd5e0;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
-.password-reset-error {
-  color: #ff6b6b;
-  text-align: center;
-  margin-top: 15px;
+.btn-icon {
+  width: 20px;
+  height: 20px;
 }
 
-.password-reset-success {
-  color: #4CAF50;
-  text-align: center;
-  margin-top: 15px;
+/* 加载动画 */
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s ease-in-out infinite;
 }
 
-.password-reset-back {
-  text-align: center;
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 消息容器 */
+.message-container {
   margin-top: 20px;
 }
 
+.password-reset-error,
+.password-reset-success {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.password-reset-error {
+  background: rgba(254, 226, 226, 0.8);
+  color: #c53030;
+  border: 1px solid rgba(254, 202, 202, 0.8);
+}
+
+.password-reset-success {
+  background: rgba(240, 253, 244, 0.8);
+  color: #38a169;
+  border: 1px solid rgba(196, 245, 208, 0.8);
+}
+
+.message-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 返回按钮 */
+.password-reset-back {
+  text-align: center;
+  margin-top: 30px;
+}
+
 .password-reset-back-btn {
-  background: none;
-  border: none;
-  color: #666;
-  text-decoration: underline;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(113, 128, 150, 0.1);
+  border: 1px solid rgba(113, 128, 150, 0.2);
+  color: #718096;
+  padding: 12px 24px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  text-decoration: none;
 }
 
 .password-reset-back-btn:hover {
-  color: #333;
+  background: rgba(113, 128, 150, 0.15);
+  color: #4a5568;
+  transform: translateY(-1px);
 }
 
+.back-icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* 响应式设计 */
 @media (max-width: 480px) {
+  .password-reset-container {
+    padding: 15px;
+  }
+  
   .password-reset-box {
-    padding: 20px;
+    padding: 30px 25px;
+    border-radius: 16px;
+  }
+  
+  .password-reset-box h2 {
+    font-size: 24px;
   }
   
   .password-reset-form-group input {
-    padding: 10px;
+    padding: 14px 16px;
+    font-size: 15px;
+  }
+  
+  .password-reset-submit-btn {
+    padding: 14px;
+    font-size: 15px;
+  }
+  
+  .icon-wrapper {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .lock-icon {
+    width: 35px;
+    height: 35px;
+  }
+}
+
+@media (max-width: 360px) {
+  .password-reset-box {
+    padding: 25px 20px;
   }
 }
 </style>

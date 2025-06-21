@@ -80,10 +80,10 @@
                   <span class="home-stat-number">{{ stats.totalProducts.toLocaleString() }}</span>
                   <span class="home-stat-label">在售商品</span>
                 </div>
-                <div class="home-stat-item">
+                <!-- <div class="home-stat-item">
                   <span class="home-stat-number">{{ stats.activeUsers.toLocaleString() }}</span>
                   <span class="home-stat-label">活跃用户</span>
-                </div>
+                </div> -->
                 <div class="home-stat-item">
                   <span class="home-stat-number">{{ stats.completedOrders.toLocaleString() }}</span>
                   <span class="home-stat-label">成功交易</span>
@@ -736,7 +736,24 @@ export default {
         console.error('获取成功交易数量失败:', error);
       }
     },  // <- 添加这个逗号
-    
+    async fetchTotalProducts() {
+      try {
+        // 临时使用完整URL测试
+        const response = await axios.get('http://localhost:8000/api/v1/commodities/get_commodities_on_sale', {
+          timeout: 5000, // 设置超时时间
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        console.log('API响应:', response.data);
+        this.stats.totalProducts = parseInt(response.data) || 0;
+        console.log('获取在售商品数量成功:', this.stats.totalProducts);
+      } catch (error) {
+        console.error('获取在售商品数量失败:', error);
+        // 保持默认值
+        this.stats.totalProducts = 1234;
+      }
+    },
     // 获取所有统计数据
     async fetchStatistics() {
       try {
@@ -744,7 +761,7 @@ export default {
         await Promise.all([
           this.fetchCompletedOrdersCount(),
           // 可以在这里添加其他统计数据的获取方法
-          // this.fetchTotalProducts(),
+          this.fetchTotalProducts(),
           // this.fetchActiveUsers()
         ]);
       } catch (error) {

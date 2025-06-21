@@ -1,360 +1,890 @@
+/* 页面整体样式 */
 .favorites-page {
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.favorites-page::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 顶部导航 */
+.favorites-header {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  position: relative;
+  z-index: 2;
+}
+
+/* 顶部导航按钮 - 美观且清晰 */
+.header-btn {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(102, 126, 234, 0.3);
+  color: #2c3e50 !important;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 12px 24px;
+  border-radius: 25px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 600;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.15);
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.header-btn:hover {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* 分类筛选按钮 - 美观且清晰 */
+.filter-tab {
+  padding: 12px 20px;
+  border: 2px solid rgba(102, 126, 234, 0.3);
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  backdrop-filter: blur(10px);
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 14px;
+  font-weight: 600;
+  color: #2c3e50 !important;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 3px 12px rgba(102, 126, 234, 0.12);
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.filter-tab.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  transform: translateY(-2px);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.filter-tab:hover {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* 排序选择框 - 美观且清晰 */
+.sort-select {
+  padding: 12px 16px;
+  border: 2px solid rgba(102, 126, 234, 0.3);
+  border-radius: 15px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  color: #2c3e50 !important;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s;
+  box-shadow: 0 3px 12px rgba(102, 126, 234, 0.12);
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.sort-select:hover {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-color: #667eea;
+  box-shadow: 0 5px 18px rgba(102, 126, 234, 0.2);
+  transform: translateY(-1px);
+}
+
+.sort-select option {
+  background: #ffffff;
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+/* 去首页按钮 - 美观且清晰 */
+.goto-home-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff !important;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  padding: 15px 35px;
+  border-radius: 30px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+  position: relative;
+  overflow: hidden;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.goto-home-btn:hover {
+  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+/* 删除按钮 - 美观且清晰 */
+.remove-btn {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+  color: #ffffff !important;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 20px;
+  border-radius: 20px;
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.remove-btn:hover {
+  background: linear-gradient(135deg, #ff5252 0%, #e53e3e 100%);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* 批量操作信息文字 */
+.batch-info {
+  font-size: 16px;
+  color: #333;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 8px 16px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(45deg, #fff, #f0f8ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 主要内容 */
+.favorites-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  position: relative;
+  z-index: 2;
+}
+
+/* 统计区域 */
+.stats-section {
+  margin-bottom: 40px;
+  display: flex;
+  justify-content: center;
+}
+
+.stats-card {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 30px 40px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stats-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(from 0deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  animation: rotate 4s linear infinite;
+}
+
+.stats-card::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 18px;
+  backdrop-filter: blur(20px);
+}
+
+.stats-card:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+}
+
+.stats-number {
+  display: block;
+  font-size: 42px;
+  font-weight: 800;
+  background: linear-gradient(45deg, #667eea, #764ba2, #f093fb);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+  position: relative;
+  z-index: 3;
+  text-shadow: 0 0 30px rgba(102, 126, 234, 0.5);
+}
+
+.stats-label {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+  position: relative;
+  z-index: 3;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* 商品区域 */
+.products-section {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 24px;
+  padding: 40px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.products-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.filter-tabs {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filter-tab {
+  padding: 12px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  position: relative;
+  overflow: hidden;
+}
+
+.filter-tab::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.6s;
+}
+
+.filter-tab:hover::before {
+  left: 100%;
+}
+
+.filter-tab.active {
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  transform: translateY(-2px);
+}
+
+.filter-tab:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.sort-select {
+  padding: 12px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.sort-select:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.sort-select option {
+  background: #667eea;
+  color: white;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+}
+
+.product-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.product-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+  transform: scaleX(0);
+  transition: transform 0.4s;
+}
+
+.product-card:hover::before {
+  transform: scaleX(1);
+}
+
+.product-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.product-card.selected {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+  background: rgba(102, 126, 234, 0.1);
+}
+
+.product-image-container {
+  position: relative;
+  height: 220px;
+  overflow: hidden;
+}
+
+.product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s;
+}
+
+.product-card:hover .product-image {
+  transform: scale(1.05);
+}
+
+.product-status {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  padding: 6px 12px;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.product-status.available {
+  background: rgba(76, 175, 80, 0.8);
+  box-shadow: 0 0 15px rgba(76, 175, 80, 0.4);
+}
+
+.product-status.sold {
+  background: rgba(153, 153, 153, 0.8);
+}
+
+.select-checkbox {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 28px;
+  height: 28px;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 16px;
+  transition: all 0.3s;
+}
+
+.select-checkbox:hover {
+  background: rgba(102, 126, 234, 0.8);
+  border-color: white;
+  transform: scale(1.1);
+}
+
+.product-info {
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.product-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+  margin-bottom: 10px;
+  line-height: 1.4;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.product-price {
+  font-size: 20px;
+  font-weight: 700;
+  background: linear-gradient(45deg, #FF6B35, #ff8a65);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 10px;
+  text-shadow: 0 0 20px rgba(255, 107, 53, 0.5);
+}
+
+.product-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.product-seller, .product-school {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+}
+
+.favorite-time {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+  font-style: italic;
+}
+
+.unfavorite-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 18px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.unfavorite-btn:hover {
+  background: white;
+  transform: scale(1.15) rotate(10deg);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* 空状态 */
+.empty-state {
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.empty-icon {
+  font-size: 80px;
+  margin-bottom: 25px;
+  animation: float 3s ease-in-out infinite;
+}
+
+.empty-text {
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 12px;
+  font-weight: 600;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.empty-subtext {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 35px;
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
+}
+
+.goto-home-btn {
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  padding: 15px 35px;
+  border-radius: 30px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.goto-home-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.6s;
+}
+
+.goto-home-btn:hover::before {
+  left: 100%;
+}
+
+.goto-home-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+}
+
+/* 批量操作栏 */
+.batch-actions {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.1);
+  z-index: 50;
+}
+
+.batch-info {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.batch-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+.batch-btn {
+  padding: 12px 25px;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 顶部导航按钮 - 美观且清晰 */
+.header-btn {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(102, 126, 234, 0.3);
+  color: #2c3e50 !important;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 12px 24px;
+  border-radius: 25px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 600;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.15);
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.header-btn:hover {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* 分类筛选按钮 - 美观且清晰 */
+.filter-tab {
+  padding: 12px 20px;
+  border: 2px solid rgba(102, 126, 234, 0.3);
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  backdrop-filter: blur(10px);
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 14px;
+  font-weight: 600;
+  color: #2c3e50 !important;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 3px 12px rgba(102, 126, 234, 0.12);
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.filter-tab.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  transform: translateY(-2px);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.filter-tab:hover {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* 排序选择框 - 美观且清晰 */
+.sort-select {
+  padding: 12px 16px;
+  border: 2px solid rgba(102, 126, 234, 0.3);
+  border-radius: 15px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  color: #2c3e50 !important;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s;
+  box-shadow: 0 3px 12px rgba(102, 126, 234, 0.12);
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.sort-select:hover {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-color: #667eea;
+  box-shadow: 0 5px 18px rgba(102, 126, 234, 0.2);
+  transform: translateY(-1px);
+}
+
+.sort-select option {
+  background: #ffffff;
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+/* 去首页按钮 - 美观且清晰 */
+.goto-home-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff !important;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  padding: 15px 35px;
+  border-radius: 30px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+  position: relative;
+  overflow: hidden;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.goto-home-btn:hover {
+  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+/* 删除按钮 - 美观且清晰 */
+.remove-btn {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+  color: #ffffff !important;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 20px;
+  border-radius: 20px;
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.remove-btn:hover {
+  background: linear-gradient(135deg, #ff5252 0%, #e53e3e 100%);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* 动画效果 */
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
   }
-  
-  /* 顶部导航 */
-  .favorites-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  to {
+    transform: rotate(360deg);
   }
-  
-  .header-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 15px 20px;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
   }
-  
-  .header-btn {
-    background: rgba(255,255,255,0.2);
-    border: 1px solid rgba(255,255,255,0.3);
-    color: white;
-    font-size: 14px;
-    cursor: pointer;
-    padding: 10px 20px;
-    border-radius: 20px;
-    transition: all 0.3s;
-    font-weight: 500;
+  50% {
+    transform: translateY(-10px);
   }
-  
-  .header-btn:hover {
-    background: rgba(255,255,255,0.3);
-    transform: translateY(-1px);
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
   }
-  
-  .page-title {
-    font-size: 18px;
-    font-weight: bold;
-    color: white;
-    margin: 0;
+  100% {
+    background-position: calc(200px + 100%) 0;
   }
-  
-  /* 主要内容 */
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
   .favorites-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 30px 20px;
-  }
-  
-  /* 统计区域 */
-  .stats-section {
-    margin-bottom: 30px;
-  }
-  
-  .stats-card {
-    background: white;
-    border-radius: 12px;
-    padding: 20px;
-    text-align: center;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-    display: inline-block;
-  }
-  
-  .stats-number {
-    display: block;
-    font-size: 32px;
-    font-weight: bold;
-    color: #667eea;
-    margin-bottom: 5px;
-  }
-  
-  .stats-label {
-    font-size: 14px;
-    color: #666;
-  }
-  
-  /* 商品区域 */
-  .products-section {
-    background: white;
-    border-radius: 16px;
-    padding: 30px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-  }
-  
-  .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-    gap: 15px;
-  }
-  
-  .filter-tabs {
-    display: flex;
-    gap: 10px;
-  }
-  
-  .filter-tab {
-    padding: 8px 16px;
-    border: 1px solid #e0e0e0;
-    background: white;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.3s;
-    font-size: 14px;
-  }
-  
-  .filter-tab.active {
-    background: #667eea;
-    color: white;
-    border-color: #667eea;
-  }
-  
-  .filter-tab:hover {
-    border-color: #667eea;
-  }
-  
-  .sort-select {
-    padding: 8px 12px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    background: white;
-    cursor: pointer;
+    padding: 20px 15px;
   }
   
   .products-grid {
-    display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 20px;
   }
   
-  .product-card {
-    border: 1px solid #e0e0e0;
-    border-radius: 12px;
-    overflow: hidden;
-    transition: all 0.3s;
-    cursor: pointer;
-    position: relative;
+  .section-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
   }
   
-  .product-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-  }
-  
-  .product-card.selected {
-    border-color: #667eea;
-    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
-  }
-  
-  .product-image-container {
-    position: relative;
-    height: 200px;
-    overflow: hidden;
-  }
-  
-  .product-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  
-  .product-status {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: bold;
-    color: white;
-  }
-  
-  .product-status.available {
-    background: #4CAF50;
-  }
-  
-  .product-status.sold {
-    background: #999;
-  }
-  
-  .select-checkbox {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 24px;
-    height: 24px;
-    border: 2px solid white;
-    border-radius: 50%;
-    background: rgba(0,0,0,0.5);
-    display: flex;
-    align-items: center;
+  .filter-tabs {
     justify-content: center;
-    color: white;
-    font-size: 14px;
+    flex-wrap: wrap;
   }
   
-  .product-info {
+  .stats-card {
+    padding: 25px 30px;
+  }
+  
+  .stats-number {
+    font-size: 36px;
+  }
+  
+  .page-title {
+    font-size: 20px;
+  }
+  
+  .products-section {
+    padding: 25px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .header-content {
     padding: 15px;
   }
   
-  .product-title {
-    font-size: 16px;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 8px;
-    line-height: 1.4;
+  .filter-tabs {
+    gap: 8px;
   }
   
-  .product-price {
-    font-size: 18px;
-    font-weight: bold;
-    color: #FF6B35;
-    margin-bottom: 8px;
+  .filter-tab {
+    padding: 10px 16px;
+    font-size: 13px;
   }
-  
-  .product-meta {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-  }
-  
-  .product-seller, .product-school {
-    font-size: 12px;
-    color: #666;
-  }
-  
-  .favorite-time {
-    font-size: 12px;
-    color: #999;
-    margin: 0;
-  }
-  
-  .unfavorite-btn {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: rgba(255,255,255,0.9);
-    border: none;
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s;
-    font-size: 16px;
-  }
-  
-  .unfavorite-btn:hover {
-    background: white;
-    transform: scale(1.1);
-  }
-  
-  /* 空状态 */
-  .empty-state {
-    text-align: center;
-    padding: 60px 20px;
-  }
-  
-  .empty-icon {
-    font-size: 64px;
-    margin-bottom: 20px;
-  }
-  
-  .empty-text {
-    font-size: 18px;
-    color: #666;
-    margin-bottom: 10px;
-  }
-  
-  .empty-subtext {
-    font-size: 14px;
-    color: #999;
-    margin-bottom: 30px;
-  }
-  
-  .goto-home-btn {
-    background: #667eea;
-    color: white;
-    border: none;
-    padding: 12px 30px;
-    border-radius: 25px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: all 0.3s;
-  }
-  
-  .goto-home-btn:hover {
-    background: #5a6fd8;
-    transform: translateY(-1px);
-  }
-  
-  /* 批量操作栏 */
-  .batch-actions {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: white;
-    border-top: 1px solid #e0e0e0;
-    padding: 15px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-    z-index: 50;
-  }
-  
-  .batch-info {
-    font-size: 14px;
-    color: #666;
-  }
-  
-  .batch-buttons {
-    display: flex;
-    gap: 10px;
-  }
-  
-  .batch-btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: all 0.3s;
-  }
-  
-  .remove-btn {
-    background: #FF6B6B;
-    color: white;
-  }
-  
-  .remove-btn:hover {
-    background: #ff5252;
-  }
-  
-  /* 响应式设计 */
-  @media (max-width: 768px) {
-    .products-grid {
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 15px;
-    }
-    
-    .section-header {
-      flex-direction: column;
-      align-items: stretch;
-    }
-    
-    .filter-tabs {
-      justify-content: center;
-    }
-  }
+}

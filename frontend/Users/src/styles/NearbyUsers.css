@@ -1,135 +1,2512 @@
 .nearby-users-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background-color: #f8f9fa;
-    padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+  position: relative;
+}
+
+.nearby-users-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="%23ffffff" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>') repeat;
+  pointer-events: none;
+}
+
+.nearby-users-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.2);
+  width: 100%;
+  max-width: 900px;
+  padding: 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+.nearby-users-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #f5576c);
+  background-size: 300% 100%;
+  animation: gradientShift 3s ease-in-out infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.nearby-title {
+  font-size: 32px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 30px;
+  text-align: center;
+  position: relative;
+}
+
+.nearby-title::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  border-radius: 2px;
+}
+
+.search-range {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 35px;
+}
+
+.search-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 50px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.search-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.search-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+}
+
+.search-btn:hover::before {
+  left: 100%;
+}
+
+.search-btn:active {
+  transform: translateY(0);
+}
+
+.users-table-container {
+  margin-bottom: 30px;
+  overflow-x: auto;
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  background: white;
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.users-table th {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 18px 20px;
+  font-weight: 700;
+  color: #495057;
+  border: none;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.users-table th:first-child {
+  border-top-left-radius: 15px;
+}
+
+.users-table th:last-child {
+  border-top-right-radius: 15px;
+}
+
+.users-table td {
+  padding: 18px 20px;
+  border: none;
+  color: #6c757d;
+  font-size: 15px;
+  transition: all 0.3s ease;
+}
+
+.users-table tr {
+  transition: all 0.3s ease;
+  border-bottom: 1px solid #f1f3f4;
+}
+
+.users-table tr:last-child {
+  border-bottom: none;
+}
+
+.users-table tr:hover {
+  background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+  transform: scale(1.01);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+}
+
+.detail-link {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: rgba(102, 126, 234, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-block;
+}
+
+.detail-link:hover {
+  background: #667eea;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.no-data {
+  text-align: center;
+  color: #adb5bd;
+  padding: 40px 0;
+  font-size: 16px;
+  font-style: italic;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.page-btn {
+  background: white;
+  border: 2px solid #e9ecef;
+  padding: 12px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: #6c757d;
+  font-weight: 600;
+  font-size: 14px;
+  min-width: 80px;
+}
+
+.page-btn:hover:not(:disabled) {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: #f8f9fa;
+  color: #adb5bd;
+}
+
+.page-info {
+  font-size: 16px;
+  color: #495057;
+  font-weight: 600;
+  padding: 12px 20px;
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: 20px;
+  min-width: 80px;
+  text-align: center;
+}
+
+/* 在现有样式基础上添加以下样式 */
+
+.header-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+  border: 2px solid rgba(102, 126, 234, 0.2);
+  padding: 10px 16px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.back-btn:hover {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.back-btn:active {
+  transform: translateY(0);
+}
+
+.back-btn svg {
+  transition: transform 0.3s ease;
+}
+
+.back-btn:hover svg {
+  transform: translateX(-2px);
+}
+
+.nearby-title {
+  font-size: 32px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+  text-align: center;
+  position: relative;
+  flex: 1;
+}
+
+.nearby-title::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  border-radius: 2px;
+}
+
+.spacer {
+  width: 80px; /* 与返回按钮宽度相同，保持标题居中 */
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .header-section {
+    margin-bottom: 15px;
   }
   
-  .nearby-users-card {
-    background: white;
-    border-radius: 15px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 800px;
-    padding: 30px;
+  .back-btn {
+    padding: 8px 12px;
+    font-size: 13px;
   }
   
   .nearby-title {
     font-size: 24px;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 20px;
-    text-align: center;
   }
   
-  .search-range {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 25px;
+  .spacer {
+    width: 60px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
   }
   
-  .search-btn {
-    background: #667eea;
-    color: white;
-    border: none;
-    padding: 12px 25px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background 0.3s;
-    font-size: 16px;
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
   }
   
-  .search-btn:hover {
-    background: #5a6fd8;
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
   }
   
-  .users-table-container {
-    margin-bottom: 20px;
-    overflow-x: auto;
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
   }
   
-  .users-table {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: left;
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
   }
   
-  .users-table th {
-    background-color: #f8f9fa;
-    padding: 12px 15px;
-    font-weight: bold;
-    color: #333;
-    border-bottom: 2px solid #ddd;
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
   }
   
-  .users-table td {
-    padding: 12px 15px;
-    border-bottom: 1px solid #eee;
-    color: #666;
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
   }
   
-  .users-table tr:last-child td {
-    border-bottom: none;
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
   }
   
-  .users-table tr:hover td {
-    background-color: #f8f9fa;
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
   }
   
-  .detail-link {
-    color: #667eea;
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.3s;
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
   }
   
-  .detail-link:hover {
-    color: #5a6fd8;
-    text-decoration: underline;
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
   }
   
-  .no-data {
-    text-align: center;
-    color: #999;
-    padding: 30px 0;
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
   }
   
-  .pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 15px;
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
   }
   
-  .page-btn {
-    background: #f0f0f0;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.3s;
-    color: #666;
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
   }
   
-  .page-btn:hover:not(:disabled) {
-    background: #e0e0e0;
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
   }
   
-  .page-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
   }
   
-  .page-info {
-    font-size: 14px;
-    color: #666;
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
   }
   
-  @media (max-width: 768px) {
-    .nearby-users-card {
-      padding: 20px;
-    }
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
   }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .back-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .spacer {
+    width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .back-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+}

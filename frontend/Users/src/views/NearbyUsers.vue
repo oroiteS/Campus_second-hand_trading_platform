@@ -132,11 +132,12 @@ export default {
         const data = await response.json()
 
         // 将后端返回的数据映射为当前页面可用的数据格式
-        this.nearbyUsers = data.map((user, index) => ({
-          id: index + 1,
+        // 修改 fetchNearbyUsers 方法中的数据映射
+        this.nearbyUsers = data.map((user) => ({
+          id: user.userId,  // 使用真实的用户ID而不是数组索引
           studentId: user.userId,
           nickname: user.realName,
-          avatarUrl: user.avatarUrl, // 你可以在 UI 中使用这个头像字段
+          avatarUrl: user.avatarUrl,
           latitude: user.userLocLatitude,
           longitude: user.userLocLongitude
         }))
@@ -155,9 +156,15 @@ export default {
       }
     },
     viewUserDetail(userId) {
-      console.log(`查看用户详情: ${userId}`)
-      // 这里应该跳转到用户详情页面
-    }
+      console.log(`查看用户详情: ${userId}`);
+      // 跳转到卖家详情页面
+      this.$router.push({
+        path: `/sellerprofile/${userId}`,
+        query: { 
+          from: 'nearbyUsers' 
+        }
+      });
+    },
   }
 }
 </script>

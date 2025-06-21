@@ -1,16 +1,35 @@
-/* Profile页面样式 - 所有类名添加profile-前缀防止全局冲突 */
+/* 整体页面样式 - 现代化渐变背景 */
 .profile-page {
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
   min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
 }
 
-/* 顶部导航 */
+.profile-page::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 顶部导航 - 玻璃拟态效果 */
 .profile-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .profile-header-content {
@@ -19,50 +38,102 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 15px 20px;
+  padding: 20px;
+  position: relative;
+  z-index: 2;
 }
 
 .profile-header-btn {
-  background: rgba(255,255,255,0.2);
-  border: 1px solid rgba(255,255,255,0.3);
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   color: white;
   font-size: 14px;
   cursor: pointer;
-  padding: 10px 20px;
-  border-radius: 20px;
-  transition: all 0.3s;
-  font-weight: 500;
+  padding: 12px 24px;
+  border-radius: 25px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 600;
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-header-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.profile-header-btn:hover::before {
+  left: 100%;
 }
 
 .profile-header-btn:hover {
-  background: rgba(255,255,255,0.3);
-  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
 .profile-page-title {
-  font-size: 18px;
-  font-weight: bold;
+  font-size: 24px;
+  font-weight: 700;
   color: white;
   margin: 0;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(45deg, #fff, #f0f8ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-/* 主要内容 */
+/* 主要内容容器 */
 .profile-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 30px 20px;
+  padding: 40px 20px;
+  position: relative;
+  z-index: 2;
 }
 
-/* 用户卡片 */
+/* 用户卡片 - 玻璃拟态设计 */
 .profile-user-card {
-  background: white;
-  border-radius: 16px;
-  padding: 30px;
-  margin-bottom: 30px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 24px;
+  padding: 40px;
+  margin-bottom: 40px;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
   display: flex;
   align-items: center;
-  gap: 30px;
+  gap: 40px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.profile-user-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+}
+
+.profile-user-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .profile-user-avatar-section {
@@ -70,25 +141,42 @@
 }
 
 .profile-large-avatar {
-  width: 120px;
-  height: 120px;
+  width: 140px;
+  height: 140px;
   border-radius: 50%;
   object-fit: cover;
-  border: 4px solid #e0e0e0;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.2),
+    inset 0 2px 4px rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.profile-large-avatar:hover {
+  transform: scale(1.05);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.25),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2);
 }
 
 .profile-avatar-badge {
   position: absolute;
-  bottom: 0;
-  right: 0;
-  background: #4CAF50;
+  bottom: 5px;
+  right: 5px;
+  background: linear-gradient(135deg, #4CAF50, #45a049);
   color: white;
-  padding: 4px 12px;
-  border-radius: 15px;
+  padding: 6px 14px;
+  border-radius: 20px;
   font-size: 12px;
-  font-weight: bold;
-  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+  font-weight: 700;
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
 }
 
 .profile-user-basic-info {
@@ -100,277 +188,445 @@
 }
 
 .profile-username {
-  font-size: 28px;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 8px;
+  font-size: 32px;
+  font-weight: 800;
+  margin-bottom: 10px;
+  background: linear-gradient(135deg, #fff, #e3f2fd);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .profile-user-school {
-  font-size: 16px;
-  color: #666;
-  margin-bottom: 20px;
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 25px;
+  font-weight: 500;
 }
 
 .profile-user-stats {
   display: flex;
-  gap: 40px;
+  gap: 50px;
 }
 
 .profile-stat-item {
   text-align: center;
+  padding: 15px 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.profile-stat-item:hover {
+  transform: translateY(-3px);
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
 .profile-stat-number {
   display: block;
-  font-size: 24px;
-  font-weight: bold;
-  color: #667eea;
-  margin-bottom: 5px;
+  font-size: 28px;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 8px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 .profile-stat-label {
   font-size: 14px;
-  color: #999;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
 }
 
 /* 功能菜单 */
 .profile-menu-section {
-  margin-bottom: 30px;
+  margin-bottom: 40px;
 }
 
 .profile-section-title {
-  font-size: 20px;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 20px;
-  padding-bottom: 10px;
-  border-bottom: 3px solid #667eea;
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  position: relative;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.profile-section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(90deg, #fff, rgba(255, 255, 255, 0.3));
+  border-radius: 2px;
 }
 
 .profile-menu-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 15px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
 }
 
 .profile-menu-item {
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 25px;
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 20px;
   cursor: pointer;
-  transition: all 0.3s;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-menu-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+.profile-menu-item:hover::before {
+  left: 100%;
 }
 
 .profile-menu-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 .profile-menu-icon {
-  width: 50px;
-  height: 50px;
-  border-radius: 12px;
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
+  font-size: 24px;
   color: white;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.profile-menu-item:hover .profile-menu-icon {
+  transform: scale(1.1) rotate(5deg);
 }
 
 .profile-menu-name {
   flex: 1;
-  font-size: 16px;
-  font-weight: 500;
-  color: #333;
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .profile-menu-arrow {
-  color: #999;
-  font-size: 18px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 20px;
+  transition: all 0.3s ease;
+}
+
+.profile-menu-item:hover .profile-menu-arrow {
+  transform: translateX(5px);
+  color: white;
 }
 
 /* 商品区域 */
 .profile-products-section {
-  background: white;
-  border-radius: 16px;
-  padding: 30px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 24px;
+  padding: 40px;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .profile-section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
 }
 
 .profile-tab-buttons {
   display: flex;
-  gap: 10px;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 6px;
+  border-radius: 25px;
+  backdrop-filter: blur(10px);
 }
 
 .profile-tab-btn {
-  padding: 8px 20px;
-  border: 1px solid #e0e0e0;
-  background: white;
+  padding: 12px 24px;
+  border: none;
+  background: transparent;
   border-radius: 20px;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
   font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .profile-tab-btn.active {
-  background: #667eea;
+  background: rgba(255, 255, 255, 0.2);
   color: white;
-  border-color: #667eea;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .profile-tab-btn:hover {
-  border-color: #667eea;
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .profile-products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 25px;
 }
 
 /* 商品卡片样式 */
 .profile-product-card {
-  background: white;
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
 }
 
+.profile-product-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+}
+
 .profile-product-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  transform: translateY(-8px);
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 .profile-product-image {
   width: 100%;
-  height: 120px;
+  height: 140px;
   object-fit: cover;
   cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.profile-product-card:hover .profile-product-image {
+  transform: scale(1.05);
 }
 
 .profile-product-info {
-  padding: 12px;
+  padding: 16px;
   cursor: pointer;
 }
 
 .profile-product-title {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
-  margin: 0 0 8px 0;
-  color: #333;
+  margin: 0 0 10px 0;
+  color: white;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .profile-product-price {
-  font-size: 16px;
-  font-weight: bold;
-  color: #ff6b35;
-  margin: 0 0 4px 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffeb3b;
+  margin: 0 0 6px 0;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .profile-product-status {
   font-size: 12px;
-  color: #666;
+  color: rgba(255, 255, 255, 0.7);
   margin: 0;
+  font-weight: 500;
 }
 
 /* 商品操作按钮样式 */
 .profile-product-actions {
-  padding: 8px 12px;
-  border-top: 1px solid #f0f0f0;
+  padding: 12px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #fafafa;
+  background: rgba(0, 0, 0, 0.1);
 }
 
 .profile-status-buttons {
   display: flex;
-  gap: 4px;
+  gap: 6px;
 }
 
 .profile-status-btn {
-  padding: 4px 8px;
-  border: 1px solid #ddd;
-  background: white;
-  border-radius: 4px;
+  padding: 6px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
   font-size: 11px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  color: #666;
+  transition: all 0.3s ease;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+  backdrop-filter: blur(10px);
 }
 
 .profile-status-btn:hover {
-  background: #f0f0f0;
-  border-color: #999;
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: white;
 }
 
 .profile-status-btn.active {
-  background: #667eea;
+  background: rgba(255, 255, 255, 0.2);
   color: white;
-  border-color: #667eea;
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .profile-delete-btn {
-  padding: 4px 6px;
-  border: 1px solid #ff4757;
-  background: white;
-  border-radius: 4px;
+  padding: 6px 10px;
+  border: 1px solid rgba(255, 87, 87, 0.5);
+  background: rgba(255, 87, 87, 0.1);
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   font-size: 12px;
+  color: #ff5757;
+  font-weight: 500;
 }
 
 .profile-delete-btn:hover {
-  background: #ff4757;
+  background: #ff5757;
   color: white;
+  box-shadow: 0 4px 15px rgba(255, 87, 87, 0.3);
 }
 
 .profile-empty-state {
   text-align: center;
-  padding: 60px 20px;
+  padding: 80px 20px;
 }
 
 .profile-empty-icon {
-  font-size: 48px;
-  margin-bottom: 15px;
+  font-size: 64px;
+  margin-bottom: 20px;
+  opacity: 0.7;
 }
 
 .profile-empty-text {
-  font-size: 16px;
-  color: #999;
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+}
+
+/* 加载状态样式 */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255, 255, 255, 0.2);
+  border-top: 4px solid #fff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 定位相关样式 */
+.location-loading, .location-error {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 30px;
+  text-align: center;
+  z-index: 1000;
+  color: white;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.location-error button {
+  margin-top: 15px;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.location-error button:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 /* 响应式设计 */
 @media (max-width: 768px) {
+  .profile-container {
+    padding: 20px 15px;
+  }
+  
   .profile-user-card {
     flex-direction: column;
-    gap: 20px;
+    gap: 25px;
+    padding: 30px 20px;
   }
   
   .profile-user-basic-info {
     align-items: center;
+    text-align: center;
   }
   
   .profile-user-stats {
     justify-content: center;
-    gap: 20px;
+    gap: 30px;
   }
   
   .profile-menu-grid {
@@ -379,11 +635,39 @@
   
   .profile-section-header {
     flex-direction: column;
-    gap: 15px;
+    gap: 20px;
     align-items: flex-start;
   }
   
   .profile-products-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+  
+  .profile-tab-buttons {
+    align-self: stretch;
+  }
+  
+  .profile-username {
+    font-size: 28px;
+  }
+  
+  .profile-page-title {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-products-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .profile-user-stats {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .profile-stat-item {
+    padding: 12px 16px;
   }
 }

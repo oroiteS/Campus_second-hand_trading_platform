@@ -186,7 +186,9 @@ export default {
       
       // 获取用户头像URL
       this.fetchUserAvatar();
-      
+      await this.fetchFavoriteCount();
+          // 获取成功交易数量
+      await this.fetchCompletedDealsCount();
       // 加载商品数据
       await this.loadAllProducts();
     }
@@ -478,7 +480,53 @@ export default {
     retryLocation() {
       this.locationError = null
       this.handleNearbyClick()
+    },
+    async fetchFavoriteCount() {
+  try {
+    const response = await axios.get('/cart/commodities', {
+      params: {
+        userId: this.userId,
+        category: '全部'
+      }
+    });
+    
+    // 更新收藏商品数量
+    this.userInfo.favoriteCount = response.data.length;
+    console.log('收藏商品数量:', this.userInfo.favoriteCount);
+    
+  } catch (error) {
+    console.error('获取收藏商品数量失败:', error);
+    // 如果获取失败，保持默认值0
+    this.userInfo.favoriteCount = 0;
+  }
+},
+async fetchCompletedDealsCount() {
+  try {
+    console.log('开始获取用户成功交易数量...');
+    const response = await axios.post('http://localhost:8095/api/orders/query/by-status', {
+      status: 'completed'
+    });
+    
+    console.log('用户交易API响应:', response.data);
+    
+    if (response.data && response.data.code === 200) {
+      const completedOrders = response.data.data;
+      console.log('用户成功交易订单:', completedOrders);
+      
+      // 过滤出当前用户相关的订单（作为买家或卖家）
+      const userOrders = completedOrders.filter(order => 
+        order.buyerId === this.userId || order.sellerId === this.userId
+      );
+      
+      this.userInfo.dealCount = userOrders.length;
+      console.log('更新后的用户交易数量:', this.userInfo.dealCount);
     }
+  } catch (error) {
+    console.error('获取用户成功交易数量失败:', error);
+    // 如果获取失败，保持默认值0
+    this.userInfo.dealCount = 0;
+  }
+},
   }
 }
 </script>
