@@ -54,9 +54,9 @@ def get_commodities_username(db: Session) -> List[Commodity_username]:
             Commodity.updated_at,
             Commodity.newness,
             Commodity.quantity,
-            users.user_name
+            User.user_name
         )
-        .join(users, Commodity.seller_id == users.user_id)
+        .join(User, Commodity.seller_id == User.user_id)
     )
     results = db.execute(stmt).all() # SQLAlchemy 2.0 风格的执行
 
