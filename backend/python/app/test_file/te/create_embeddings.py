@@ -11,7 +11,7 @@ load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '.env'))
 OPENAI_API_BASE = os.getenv("OPENAI_API_BASE")
 OPENAI_EMBEDDING_MODEL_NAME = os.getenv("OPENAI_EMBEDDING_MODEL_NAME")
 
-num = [94, 164, 312, 384, 546, 681,688,689]  # 每个类别最后一个tag的行号（1-based）
+num = [89, 154, 302, 378, 450, 612,747,748]  # 每个类别最后一个tag的行号（1-based）
 category_classes = ["电子产品", "图书教材", "生活用品", "运动器材","学习用品", "美妆护肤","食品饮料","其他"]
 keywords_file_path = os.path.join(os.path.dirname(__file__), 'stopwords', 'keywords_only.txt')
 

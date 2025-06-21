@@ -1,6 +1,7 @@
 <template>
   <div class="search-container">
     <div class="search-header">
+      <router-link to="/" class="back-button">← 返回首页</router-link>
       <h1>搜索页面</h1>
     </div>
     
@@ -41,7 +42,6 @@
               <div class="product-price">
                 <span class="current-price">¥{{ product.current_price }}</span>
               </div>
-              <button class="add-to-cart-btn" @click="addToCart(product.commodity_id, $event)">加入购物车</button>
             </div>
           </div>
         </div>
@@ -196,40 +196,42 @@ export default {
         // 不影响正常跳转，只记录错误
       }
     },
-    // 加入购物车功能
-    async addToCart(commodityId, event) {
-      // 阻止事件冒泡
-      event.stopPropagation();
-      
-      try {
-        const userId = localStorage.getItem('userId');
-        if (!userId) {
-          alert('请先登录后再加入购物车');
-          this.$router.push('/login');
-          return;
-        }
-        
-        await axios.post('http://localhost:8000/api/v1/commodities/add_cart', {
-          user_id: userId,
-          commodity_id: commodityId
-        });
-        // 调用新的购物车添加API
-        await axios.post('http://localhost:8085/api/cart/add', {
-          userId: userId,
-          commodityId: commodityId
-        });
-        alert('商品已成功加入购物车！');
-        console.log('加入购物车成功:', { userId, commodityId });
-        
-      } catch (error) {
-        console.error('加入购物车失败:', error);
-        alert('加入购物车失败，请稍后重试');
-      }
-    }
+
   }
 }
 </script>
 
 <style scoped>
 @import '../styles/SearchResult.css';
+
+.search-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  position: relative; /* 为返回按钮定位 */
+}
+
+.search-header h1 {
+  flex-grow: 1;
+  text-align: center;
+  margin: 0;
+}
+
+.back-button {
+  padding: 10px 15px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  text-decoration: none;
+  color: #333;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.back-button:hover {
+  background-color: #f5f5f5;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+}
 </style>

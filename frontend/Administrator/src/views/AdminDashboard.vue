@@ -66,14 +66,6 @@
         <div class="page-title">
           {{ pageTitle }}
         </div>
-        <div class="top-actions">
-          <div class="action-item">
-            <span class="action-icon">🔔</span>
-          </div>
-          <div class="action-item">
-            <span class="action-icon">⚙️</span>
-          </div>
-        </div>
       </header>
 
       <!-- 内容区域 -->
@@ -376,15 +368,14 @@
                     <span 
                       class="status-badge" 
                       :class="{
-                        'status-pending': product.status === 'pending',
-                        'status-approved': product.status === 'approved',
-                        'status-rejected': product.status === 'rejected',
-                        'status-sold': product.status === 'sold'
+                        'status-pending': product.status === 'pending_payment',
+                        'status-processing': product.status === 'pending_transaction',
+                        'status-completed': product.status === 'completed'
                       }"
                     >
                       {{ 
-                        product.status === 'pending' ? '待审核' : 
-                        product.status === 'approved' ? '已上架' : 
+                        product.status === 'pending' ? '待审核' :
+                        product.status === 'approved' ? '已上架' :
                         product.status === 'rejected' ? '已下架' :
                         product.status === 'sold' ? '已卖出' : '未知状态'
                       }}
@@ -444,237 +435,441 @@
           </div>
         </div>
 
-        <!-- 订单管理 -->
+        <!-- 订单管理 - 重新设计的布局 -->
         <div v-if="activeMenu === 'orders'" class="orders-content">
-          <div class="content-header">
-            <div class="search-box">
-              <input type="text" placeholder="搜索订单..." v-model="orderSearchQuery" @input="searchOrders" />
-              <span class="search-icon">🔍</span>
+          <!-- 页面标题和统计 -->
+          <div class="orders-header">
+            <div class="header-info">
+              <div class="stats-summary">
+                <div class="stat-item">
+                  <span class="stat-number">{{ totalOrders }}</span>
+                  <span class="stat-label">总订单</span>
+                </div>
+                <div class="stat-item pending">
+                  <span class="stat-number">{{ filteredOrders.filter(o => o.status === 'pending_payment').length }}</span>
+                  <span class="stat-label">待付款</span>
+                </div>
+                <div class="stat-item processing">
+                  <span class="stat-number">{{ filteredOrders.filter(o => o.status === 'pending_transaction').length }}</span>
+                  <span class="stat-label">待交易</span>
+                </div>
+                <div class="stat-item completed">
+                  <span class="stat-number">{{ filteredOrders.filter(o => o.status === 'completed').length }}</span>
+                  <span class="stat-label">已完成</span>
+                </div>
+              </div>
             </div>
-            <div class="filter-actions">
-              <select v-model="orderStatusFilter" @change="filterOrders">
-                <option value="all">所有状态</option>
-                <option value="pending">待付款</option>
-                <option value="paid">已付款</option>
-                <option value="shipped">已发货</option>
-                <option value="completed">已完成</option>
-                <option value="cancelled">已取消</option>
-                <option value="refunding">退款中</option>
-                <option value="refunded">已退款</option>
-              </select>
+            
+            <!-- 搜索和筛选 -->
+            <div class="filter-section">
+              <div class="search-container">
+                <div class="search-input-wrapper">
+                  <i class="search-icon">🔍</i>
+                  <input 
+                    type="text" 
+                    placeholder="搜索订单ID、买家、卖家或商品名称..." 
+                    v-model="orderSearchQuery" 
+                    @input="searchOrders"
+                    class="search-input"
+                  />
+                </div>
+              </div>
+              <div class="filter-controls">
+                <select v-model="orderStatusFilter" @change="filterOrders" class="status-filter">
+                  <option value="all">全部状态</option>
+                  <option value="pending_payment">待付款</option>
+                  <option value="pending_transaction">待交易</option>
+                  <option value="completed">已完成</option>
+                </select>
+                <!-- 删除了刷新按钮 -->
+              </div>
             </div>
           </div>
 
-          <div class="table-container">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>订单ID</th>
-                  <th>买家</th>
-                  <th>卖家</th>
-                  <th>商品名称</th>
-                  <th>订单金额</th>
-                  <th>订单状态</th>
-                  <th>创建时间</th>
-                  <th>操作</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="order in filteredOrders" :key="order.id" class="clickable-row">
-                  <td @click="viewOrderDetail(order.id)">{{ order.id }}</td>
-                  <td @click="viewOrderDetail(order.id)">{{ order.buyerName }}</td>
-                  <td @click="viewOrderDetail(order.id)">{{ order.sellerName }}</td>
-                  <td @click="viewOrderDetail(order.id)">
-                    <div class="product-info">
-                      <div class="product-image">
-                        <img :src="order.productImage" :alt="order.productName" />
-                      </div>
-                      <div class="product-name">{{ order.productName }}</div>
+          <!-- 加载状态 -->
+          <div v-if="loading" class="loading-container">
+            <div class="loading-spinner"></div>
+            <p>正在加载订单数据...</p>
+          </div>
+
+          <!-- 订单卡片列表 -->
+          <div v-else-if="filteredOrders.length > 0" class="orders-grid">
+            <div 
+              v-for="order in filteredOrders" 
+              :key="order.id" 
+              class="order-card"
+              @click="viewOrderDetail(order.id)"
+            >
+              <div class="order-header">
+                <div class="order-id">
+                  <span class="id-label">订单号</span>
+                  <span class="id-value">{{ order.id }}</span>
+                </div>
+                <div class="order-status">
+                  <span 
+                    class="status-badge" 
+                    :class="{
+                      'status-pending': order.status === 'pending',
+                      'status-paid': order.status === 'paid',
+                      'status-shipped': order.status === 'shipped',
+                      'status-completed': order.status === 'completed',
+                      'status-cancelled': order.status === 'cancelled',
+                      'status-refunding': order.status === 'refunding',
+                      'status-refunded': order.status === 'refunded'
+                    }"
+                  >
+                    {{ getOrderStatusText(order.status) }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="order-content">
+                <div class="product-section">
+                  <div class="product-image">
+                    <img :src="order.productImage" :alt="order.productName" />
+                  </div>
+                  <div class="product-details">
+                    <h4 class="product-name">{{ order.productName }}</h4>
+                    <div class="price-info">
+                      <span class="price">¥{{ order.totalAmount }}</span>
                     </div>
-                  </td>
-                  <td @click="viewOrderDetail(order.id)">¥{{ order.totalAmount }}</td>
-                  <td @click="viewOrderDetail(order.id)">
-                    <span 
-                      class="status-badge" 
-                      :class="{
-                        'status-pending': order.status === 'pending',
-                        'status-paid': order.status === 'paid',
-                        'status-shipped': order.status === 'shipped',
-                        'status-completed': order.status === 'completed',
-                        'status-cancelled': order.status === 'cancelled',
-                        'status-refunding': order.status === 'refunding',
-                        'status-refunded': order.status === 'refunded'
-                      }"
-                    >
-                      {{ getOrderStatusText(order.status) }}
-                    </span>
-                  </td>
-                  <td @click="viewOrderDetail(order.id)">{{ order.createTime }}</td>
-                  <td @click.stop>
-                    <button 
-                      v-if="order.status === 'refunding'"
-                      class="action-btn approve-btn" 
-                      @click="processRefund(order.id, 'approve')"
-                    >
-                      同意退款
-                    </button>
-                    <button 
-                      v-if="order.status === 'refunding'"
-                      class="action-btn reject-btn" 
-                      @click="processRefund(order.id, 'reject')"
-                    >
-                      拒绝退款
-                    </button>
-                    <button 
-                      class="action-btn detail-btn" 
-                      @click="viewOrderDetail(order.id)"
-                    >
-                      详情
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                  </div>
+                </div>
+
+                <div class="participants-section">
+                  <div class="participant">
+                    <span class="participant-label">买家</span>
+                    <span class="participant-name">{{ order.buyerName }}</span>
+                  </div>
+                  <div class="participant">
+                    <span class="participant-label">卖家</span>
+                    <span class="participant-name">{{ order.sellerName }}</span>
+                  </div>
+                </div>
+
+                <div class="time-section">
+                  <div class="time-info">
+                    <span class="time-label">创建时间</span>
+                    <span class="time-value">{{ order.createTime }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="order-actions" @click.stop>
+                <button 
+                  v-if="order.status === 'refunding'"
+                  class="action-btn approve-btn" 
+                  @click="processRefund(order.id, 'approve')"
+                >
+                  <i class="btn-icon">✓</i>
+                  同意退款
+                </button>
+                <button 
+                  v-if="order.status === 'refunding'"
+                  class="action-btn reject-btn" 
+                  @click="processRefund(order.id, 'reject')"
+                >
+                  <i class="btn-icon">✗</i>
+                  拒绝退款
+                </button>
+                <!-- 新增：管理员主动退款按钮 -->
+                <!-- 移除：管理员主动退款按钮 -->
+                <!-- <button 
+                  v-if="order.status === 'pending_transaction' || order.status === 'completed'"
+                  class="action-btn refund-btn" 
+                  @click="initiateRefund(order)"
+                >
+                  <i class="btn-icon">💰</i>
+                  退款
+                </button> -->
+                <button 
+                  class="action-btn detail-btn" 
+                  @click="viewOrderDetail(order.id)"
+                >
+                  <i class="btn-icon">👁</i>
+                  查看详情
+                </button>
+              </div>
+            </div>
           </div>
 
-          <div class="pagination">
-            <button 
-              class="page-btn" 
-              :disabled="currentOrderPage === 1" 
-              @click="goToFirstOrderPage"
-            >
-              首页
-            </button>
-            <button 
-              class="page-btn" 
-              :disabled="currentOrderPage === 1" 
-              @click="currentOrderPage--"
-            >
-              上一页
-            </button>
-            <span class="page-info">{{ currentOrderPage }} / {{ totalOrderPages }}</span>
-            <button 
-              class="page-btn" 
-              :disabled="currentOrderPage === totalOrderPages" 
-              @click="currentOrderPage++"
-            >
-              下一页
-            </button>
-            <button 
-              class="page-btn" 
-              :disabled="currentOrderPage === totalOrderPages" 
-              @click="goToLastOrderPage"
-            >
-              末页
-            </button>
+          <!-- 空状态 -->
+          <div v-else class="empty-state">
+            <div class="empty-icon">📦</div>
+            <h3>暂无订单数据</h3>
+            <p>{{ orderSearchQuery || orderStatusFilter !== 'all' ? '没有找到符合条件的订单' : '还没有任何订单' }}</p>
+            <button @click="loadOrders" class="retry-btn">重新加载</button>
+          </div>
+
+          <!-- 分页控件 -->
+          <div v-if="totalOrderPages > 1" class="pagination-container">
+            <div class="pagination-info">
+              <span>共 {{ totalOrders }} 条订单，第 {{ currentOrderPage }} / {{ totalOrderPages }} 页</span>
+            </div>
+            <div class="pagination-controls">
+              <button 
+                class="page-btn" 
+                :disabled="currentOrderPage === 1" 
+                @click="goToFirstOrderPage"
+              >
+                首页
+              </button>
+              <button 
+                class="page-btn" 
+                :disabled="currentOrderPage === 1" 
+                @click="currentOrderPage--; loadOrders()"
+              >
+                上一页
+              </button>
+              
+              <!-- 页码显示 -->
+              <div class="page-numbers">
+                <button 
+                  v-for="page in getVisiblePages(currentOrderPage, totalOrderPages)" 
+                  :key="page"
+                  class="page-number"
+                  :class="{ active: page === currentOrderPage }"
+                  @click="currentOrderPage = page; loadOrders()"
+                >
+                  {{ page }}
+                </button>
+              </div>
+              
+              <button 
+                class="page-btn" 
+                :disabled="currentOrderPage === totalOrderPages" 
+                @click="currentOrderPage++; loadOrders()"
+              >
+                下一页
+              </button>
+              <button 
+                class="page-btn" 
+                :disabled="currentOrderPage === totalOrderPages" 
+                @click="goToLastOrderPage"
+              >
+                末页
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 订单详情弹窗（用于申诉退款） -->
+        <div v-if="showOrderDetailModal" class="modal-overlay" @click="closeOrderDetailModal">
+          <div class="modal-content order-detail-modal" @click.stop>
+            <div class="modal-header">
+              <h3>订单详情</h3>
+              <button class="close-btn" @click="closeOrderDetailModal">×</button>
+            </div>
+            <div class="modal-body">
+              <div class="order-detail-info" v-if="selectedOrderForRefund">
+                <div class="info-row">
+                  <label>订单ID：</label>
+                  <span>{{ selectedOrderForRefund.id }}</span>
+                </div>
+                <div class="info-row">
+                  <label>商品名称：</label>
+                  <span>{{ selectedOrderForRefund.productName }}</span>
+                </div>
+                <div class="info-row">
+                  <label>买家：</label>
+                  <span>{{ selectedOrderForRefund.buyerName }}</span>
+                </div>
+                <div class="info-row">
+                  <label>卖家：</label>
+                  <span>{{ selectedOrderForRefund.sellerName }}</span>
+                </div>
+                <div class="info-row">
+                  <label>订单金额：</label>
+                  <span>¥{{ selectedOrderForRefund.totalAmount }}</span>
+                </div>
+                <div class="info-row">
+                  <label>订单状态：</label>
+                  <span class="status-text">{{ getOrderStatusText(selectedOrderForRefund.status) }}</span>
+                </div>
+                <div class="info-row">
+                  <label>创建时间：</label>
+                  <span>{{ selectedOrderForRefund.createTime }}</span>
+                </div>
+                <div class="info-row" v-if="relatedAppeal">
+                  <label>申诉状态：</label>
+                  <span class="appeal-status" :class="'status-' + relatedAppeal.status">
+                    {{ relatedAppeal.status === 'process' ? '处理中' : relatedAppeal.status === 'finish' ? '已完成' : '已拒绝' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="cancel-btn" @click="closeOrderDetailModal">
+                关闭
+              </button>
+              <!-- 退款按钮 - 只在申诉状态为process且订单状态允许退款时显示 -->
+              <button 
+                v-if="relatedAppeal && relatedAppeal.status === 'process' && 
+                      (selectedOrderForRefund.status === 'pending_transaction' || 
+                       selectedOrderForRefund.status === 'completed')"
+                class="refund-btn"
+                @click="initiateRefundFromAppeal(selectedOrderForRefund, relatedAppeal)"
+              >
+                💰 执行退款
+              </button>
+            </div>
           </div>
         </div>
 
         <!-- 申诉管理 -->
         <div v-if="activeMenu === 'appeals'" class="appeals-content">
-          <div class="content-header">
-            <div class="filter-actions">
-              <select v-model="appealStatusFilter" @change="filterAppeals">
-                <option value="all">所有状态</option>
-                <option value="pending">待处理</option>
-                <option value="processing">处理中</option>
-                <option value="resolved">已解决</option>
-                <option value="rejected">已拒绝</option>
-              </select>
+          <!-- 页面标题和统计 -->
+          <div class="appeals-header">
+            <div class="header-info">
+              <div class="stats-summary">
+                <div class="stat-item">
+                  <span class="stat-number">{{ filteredRefunds.length }}</span>
+                  <span class="stat-label">总申诉</span>
+                </div>
+                <div class="stat-item pending">
+                  <span class="stat-number">{{ filteredRefunds.filter(r => r.status === 'process').length }}</span>
+                  <span class="stat-label">待处理</span>
+                </div>
+                <div class="stat-item completed">
+                  <span class="stat-number">{{ filteredRefunds.filter(r => r.status === 'finish').length }}</span>
+                  <span class="stat-label">已完成</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- 筛选器 -->
+            <div class="filter-section">
+              <div class="filter-group">
+                <label class="filter-label">状态筛选</label>
+                <select v-model="appealStatusFilter" @change="filterAppeals" class="modern-select">
+                  <option value="all">🔍 所有状态</option>
+                  <option value="process">⏳ 处理中</option>
+                  <option value="finish">✅ 已完成</option>
+                  <option value="refuse">❌ 已拒绝</option>
+                </select>
+              </div>
             </div>
           </div>
 
-          <div class="table-container">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>申诉ID</th>
-                  <th>发起申诉者ID</th>
-                  <th>被申诉者ID</th>
-                  <th>订单ID</th>
-                  <th>申诉理由</th>
-                  <th>申诉发起时间</th>
-                  <th>申诉是否完成</th>
-                  <th>申诉处理管理员ID</th>
-                  <th>操作</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="refund in filteredRefunds" :key="refund.id">
-                  <td>{{ refund.id }}</td>
-                  <td>{{ refund.applicantId }}</td>
-                  <td>{{ refund.respondentId }}</td>
-                  <td>{{ refund.orderId }}</td>
-                  <td class="content-cell" :title="refund.reason">
-                    {{ refund.reason.length > 20 ? refund.reason.substring(0, 20) + '...' : refund.reason }}
-                  </td>
-                  <td>{{ refund.submitTime }}</td>
-                  <td>
-                    <span 
-                      class="status-badge" 
-                      :class="getStatusClass(refund.status)"
-                    >
-                      {{ refund.isCompleted ? '已完成' : '未完成' }}
-                    </span>
-                  </td>
-                  <td>{{ refund.adminId || '未分配' }}</td>
-                  <td>
-                    <button 
-                      v-if="refund.status === 'pending'"
-                      class="action-btn approve-btn" 
-                      @click="approveRefund(refund)"
-                    >
-                      同意
-                    </button>
-                    <button 
-                      v-if="refund.status === 'pending'"
-                      class="action-btn reject-btn" 
-                      @click="rejectRefund(refund)"
-                    >
-                      拒绝
-                    </button>
-                    <button 
-                      class="action-btn detail-btn" 
-                      @click="viewRefundDetail(refund)"
-                    >
-                      详情
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <!-- 申诉列表 - 卡片式布局 -->
+          <div class="appeals-grid">
+            <div v-for="appeal in filteredRefunds" :key="appeal.id" class="appeal-card">
+              <!-- 卡片头部 -->
+              <div class="card-header">
+                <div class="appeal-meta">
+                  <span class="appeal-id">申诉 #{{ appeal.id.substring(0, 8) }}...</span>
+                  <span class="appeal-time">{{ formatDate(appeal.submitTime) }}</span>
+                </div>
+                <div class="status-container">
+                  <span class="status-badge" :class="getStatusClass(appeal.status)">
+                    {{ getStatusText(appeal.status) }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- 卡片主体 -->
+              <div class="card-body">
+                <div class="appeal-info">
+                  <div class="info-row">
+                    <div class="info-item">
+                      <span class="info-label">申诉人</span>
+                      <span class="info-value user-id">{{ appeal.applicantId }}</span>
+                    </div>
+                    <div class="info-item">
+                      <span class="info-label">被申诉人</span>
+                      <span class="info-value user-id">{{ appeal.respondentId }}</span>
+                    </div>
+                  </div>
+                  
+                  <div class="info-row">
+                    <div class="info-item full-width">
+                      <span class="info-label">订单编号</span>
+                      <span class="info-value order-id">{{ appeal.orderId }}</span>
+                    </div>
+                  </div>
+                  
+                  <div class="info-row">
+                    <div class="info-item full-width">
+                      <span class="info-label">申诉理由</span>
+                      <div class="reason-content" :title="appeal.reason">
+                        {{ appeal.reason }}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="info-row" v-if="appeal.adminId">
+                    <div class="info-item">
+                      <span class="info-label">处理管理员</span>
+                      <span class="info-value admin-id">{{ appeal.adminId }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 卡片底部操作 -->
+              <div class="card-footer">
+                <div class="action-buttons">
+                  <!-- 移除完成处理按钮，只保留拒绝申诉和查看详情按钮 -->
+                  <button 
+                    v-if="appeal.status === 'process'"
+                    class="btn btn-danger" 
+                    @click="rejectRefund(appeal)"
+                  >
+                    <i class="btn-icon">❌</i>
+                    拒绝申诉
+                  </button>
+                  <button 
+                    class="btn btn-info" 
+                    @click="viewRefundDetail(appeal)"
+                  >
+                    <i class="btn-icon">👁️</i>
+                    查看详情
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div class="pagination">
-            <button 
-              class="page-btn" 
-              :disabled="currentAppealPage === 1" 
-              @click="goToFirstAppealPage"
-            >
-              首页
-            </button>
-            <button 
-              class="page-btn" 
-              :disabled="currentAppealPage === 1" 
-              @click="currentAppealPage--"
-            >
-              上一页
-            </button>
-            <span class="page-info">{{ currentAppealPage }} / {{ totalAppealPages }}</span>
-            <button 
-              class="page-btn" 
-              :disabled="currentAppealPage === totalAppealPages" 
-              @click="currentAppealPage++"
-            >
-              下一页
-            </button>
-            <button 
-              class="page-btn" 
-              :disabled="currentAppealPage === totalAppealPages" 
-              @click="goToLastAppealPage"
-            >
-              末页
-            </button>
+          <!-- 空状态 -->
+          <div v-if="filteredRefunds.length === 0" class="empty-state">
+            <div class="empty-icon">📋</div>
+            <h3 class="empty-title">暂无申诉记录</h3>
+            <p class="empty-description">当前筛选条件下没有找到申诉记录</p>
+          </div>
+
+          <!-- 分页 -->
+          <div v-if="filteredRefunds.length > 0" class="pagination-container">
+            <div class="pagination">
+              <button 
+                class="page-btn" 
+                :disabled="currentAppealPage === 1" 
+                @click="currentAppealPage = 1"
+              >
+                首页
+              </button>
+              <button 
+                class="page-btn" 
+                :disabled="currentAppealPage === 1" 
+                @click="currentAppealPage--"
+              >
+                上一页
+              </button>
+              <span class="page-info">{{ currentAppealPage }} / {{ totalAppealPages }}</span>
+              <button 
+                class="page-btn" 
+                :disabled="currentAppealPage === totalAppealPages" 
+                @click="currentAppealPage++"
+              >
+                下一页
+              </button>
+              <button 
+                class="page-btn" 
+                :disabled="currentAppealPage === totalAppealPages" 
+                @click="currentAppealPage = totalAppealPages"
+              >
+                末页
+              </button>
+            </div>
           </div>
         </div>
 
@@ -741,13 +936,14 @@
 <script>
 import { userService, commodityService } from '../api/services';
 import { banService } from '../api/banService';
+import axios from 'axios';
 
 export default {
   name: 'AdminDashboard',
   data() {
     return {
       adminUsername: localStorage.getItem('adminUsername') || '管理员',
-      adminId: localStorage.getItem('adminId') || 'ADMIN0001',
+      adminId: localStorage.getItem('adminId') || localStorage.getItem('adminToken') || null,
       activeMenu: 'dashboard',
       
       // 统计数据
@@ -797,6 +993,8 @@ export default {
       orderStatusFilter: 'all',
       currentOrderPage: 1,
       totalOrderPages: 1,
+      totalOrders: 0, // 新增：总订单数
+      loading: false, // 新增：加载状态
       
       // 申诉管理
       appeals: [],
@@ -811,6 +1009,11 @@ export default {
       // 退款请求
       refundAppeals: [],
       filteredRefunds: [],
+      
+      // 订单详情弹窗（用于申诉退款）
+      showOrderDetailModal: false,
+      selectedOrderForRefund: null,
+      relatedAppeal: null,
       
       // 公告管理
       announcements: [],
@@ -861,6 +1064,11 @@ export default {
     this.loadDashboardData();
     await this.loadCommodityStats();
     this.loadAnnouncements();
+    
+    // 处理路由查询参数
+    if (this.$route.query.activeMenu) {
+      this.activeMenu = this.$route.query.activeMenu;
+    }
   },
   watch: {
     activeMenu(newValue) {
@@ -887,6 +1095,10 @@ export default {
     // 添加对商品状态筛选的监听
     productStatusFilter() {
       this.filterProducts();
+    },
+    // 添加对订单页码变化的监听
+    currentOrderPage() {
+      this.loadOrders();
     }
   },
   methods: {
@@ -913,24 +1125,43 @@ export default {
     
     // 加载控制面板数据
     loadDashboardData() {
-      // 通过getAllUsers API获取总用户数（不分页，获取所有用户）
+      console.log('开始加载控制面板数据...');
+      
+      // 直接调用API获取所有用户，不进行分页和筛选
       userService.getAllUsers({
-        pageSize: 999999, // 设置一个很大的页面大小以获取所有用户
-        page: 1
+        pageSize: 999999, // 获取所有用户
+        page: 1,
+        status: 'all' // 获取所有状态的用户
       })
         .then(response => {
-          // 使用API返回的total字段作为总用户数
+          console.log('用户统计API响应:', response);
+          // 使用映射后的所有用户数据长度作为总用户数
           this.stats.totalUsers = response.total || 0;
+          console.log('设置总用户数为:', this.stats.totalUsers);
         })
         .catch(error => {
           console.error('获取用户数据失败:', error);
           this.stats.totalUsers = 0;
+          
+          // 如果API调用失败，尝试直接调用原始API
+          fetch('http://localhost:8087/api/users/all')
+            .then(response => response.json())
+            .then(result => {
+              if (result.code === 200 && result.data) {
+                this.stats.totalUsers = result.data.length;
+                console.log('通过原始API获取总用户数:', this.stats.totalUsers);
+              }
+            })
+            .catch(err => {
+              console.error('原始API调用也失败:', err);
+            });
         });
       
       // 计算待处理申诉数量
       this.calculatePendingAppeals();
     },
     
+
     // 用户管理方法
     async loadUsers() {
       try {
@@ -1214,121 +1445,470 @@ export default {
     },
     
     // 申诉管理方法
-    loadAppeals() {
-      // 模拟退款请求数据
-      this.refundAppeals = [
-        {
-          id: 1,
-          applicantId: 'USER005',
-          respondentId: 'USER002',
-          orderId: 'ORD001',
-          reason: '商品与描述不符，要求退款',
-          submitTime: '2024-01-13 09:15:00',
-          status: 'pending',
-          isCompleted: false,
-          adminId: null
-        },
-        {
-          id: 2,
-          applicantId: 'USER006',
-          respondentId: 'USER004',
-          orderId: 'ORD002',
-          reason: '商品有质量问题，无法正常使用',
-          submitTime: '2024-01-12 14:30:00',
-          status: 'resolved',
-          isCompleted: true,
-          adminId: 'ADMIN0001'
+    async loadAppeals() {
+      console.log('开始加载申诉数据...');
+      try {
+        // 调用真实的申诉API
+        const response = await axios.get('http://localhost:8093/api/v1/appeals/all', {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        console.log('申诉API响应状态:', response.status);
+        console.log('申诉API响应数据:', response.data);
+        
+        if (response.status === 200 && response.data.appeals) {
+          // 将API返回的数据格式转换为前端需要的格式
+          this.refundAppeals = response.data.appeals.map(appeal => ({
+            id: appeal.argumentId,
+            applicantId: appeal.argue1Id,
+            respondentId: appeal.argue2Id || '未指定',
+            orderId: appeal.orderId,
+            reason: appeal.reason,
+            submitTime: this.formatDate(appeal.createdAt),
+            status: this.mapAppealStatus(appeal.status),
+            isCompleted: appeal.status === 'finish',
+            adminId: appeal.rootId || null
+          }));
+          
+          console.log('转换后的申诉数据:', this.refundAppeals);
+          console.log(`成功加载${response.data.count}条申诉记录`);
+          
+          this.filteredRefunds = [...this.refundAppeals];
+          this.totalAppealPages = Math.ceil(this.refundAppeals.length / 10);
+          
+        } else {
+          console.error('API响应格式不正确:', response.data);
+          throw new Error('获取申诉记录失败：响应格式不正确');
         }
-      ];
-      
-      this.filteredRefunds = [...this.refundAppeals];
-      this.totalAppealPages = Math.ceil(this.refundAppeals.length / 10);
+        
+      } catch (error) {
+        console.error('加载申诉数据失败:', error);
+        
+        let errorMessage = '获取申诉记录失败';
+        if (error.response) {
+          console.error('错误响应状态:', error.response.status);
+          console.error('错误响应数据:', error.response.data);
+          errorMessage = `获取申诉记录失败：${error.response.status} ${error.response.statusText}`;
+        } else if (error.request) {
+          console.error('网络请求失败:', error.request);
+          errorMessage = '无法连接到申诉服务器，请检查网络连接';
+        } else {
+          console.error('请求配置错误:', error.message);
+          errorMessage = `获取申诉记录失败：${error.message}`;
+        }
+        
+        alert(errorMessage);
+        
+        // 失败时使用空数组
+        this.refundAppeals = [];
+        this.filteredRefunds = [];
+        this.totalAppealPages = 0;
+      }
+    },
+    
+    // 修改状态映射方法
+    mapAppealStatus(apiStatus) {
+      console.log('映射申诉状态:', apiStatus);
+      // 直接使用API返回的状态，因为后端返回的就是这三个状态
+      const validStatuses = ['finish', 'refuse', 'process'];
+      return validStatuses.includes(apiStatus) ? apiStatus : 'process';
+    },
+    
+    // 添加日期格式化方法
+    formatDate(dateString) {
+      if (!dateString) return '未知时间';
+      try {
+        const date = new Date(dateString);
+        return date.toLocaleString('zh-CN', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit'
+        });
+      } catch (error) {
+        console.error('日期格式化失败:', error);
+        return dateString;
+      }
     },
     
     filterAppeals() {
-      // 过滤退款请求
+      // 过滤申诉记录
       let filteredRefunds = [...this.refundAppeals];
       if (this.appealStatusFilter !== 'all') {
         filteredRefunds = filteredRefunds.filter(refund => refund.status === this.appealStatusFilter);
       }
-      this.filteredRefunds = filteredRefunds;
       
+      // 排序：待处理状态置顶，然后按提交时间倒序
+        filteredRefunds.sort((a, b) => {
+          // 首先按状态排序：process > finish > refuse
+          const statusPriority = { 'process': 0, 'finish': 1, 'refuse': 2 };
+          const statusDiff = statusPriority[a.status] - statusPriority[b.status];
+          if (statusDiff !== 0) {
+            return statusDiff; // 状态不同时，直接返回状态差值
+          }
+          
+          // 状态相同时，按提交时间倒序（最新的在前）
+          return new Date(b.submitTime) - new Date(a.submitTime);
+        });
+      
+      this.filteredRefunds = filteredRefunds;
       this.currentAppealPage = 1;
     },
     
-    // 退款请求相关方法
     approveRefund(refund) {
-      if (confirm(`确定要同意退款 ¥${refund.amount} 吗？`)) {
-        refund.status = 'resolved';
-        this.filterAppeals();
-        alert('退款申请已同意');
+      if (confirm('确定要完成处理这个申诉吗？')) {
+        console.log('开始处理申诉完成请求:', refund);
+        
+        // 调用后端API更新申诉状态
+        axios.put(`http://localhost:8093/api/v1/appeals/${refund.id}/admin-update`, {
+          status: 'finish',
+          rootId: this.adminId // 使用当前管理员ID
+        })
+        .then(response => {
+          console.log('申诉处理成功:', response.data);
+          // 更新本地数据
+          refund.status = 'finish';
+          this.filterAppeals();
+          alert('申诉处理已完成');
+          // 重新加载申诉列表以确保数据同步
+          this.loadAppeals();
+        })
+        .catch(error => {
+          console.error('申诉处理失败:', error);
+          if (error.response) {
+            console.error('错误响应:', error.response.data);
+            alert(`申诉处理失败: ${error.response.data.error || '未知错误'}`);
+          } else {
+            alert('申诉处理失败: 网络错误');
+          }
+        });
       }
     },
     
     rejectRefund(refund) {
-      if (confirm('确定要拒绝这个退款申请吗？')) {
-        refund.status = 'rejected';
-        this.filterAppeals();
-        alert('退款申请已拒绝');
+      if (confirm('确定要拒绝这个申诉吗？')) {
+        console.log('开始处理申诉拒绝请求:', refund);
+        
+        // 调用后端API更新申诉状态
+        axios.put(`http://localhost:8093/api/v1/appeals/${refund.id}/admin-update`, {
+          status: 'refuse',
+          rootId: this.adminId // 使用当前管理员ID
+        })
+        .then(response => {
+          console.log('申诉拒绝成功:', response.data);
+          // 更新本地数据
+          refund.status = 'refuse';
+          this.filterAppeals();
+          alert('申诉已拒绝');
+          // 重新加载申诉列表以确保数据同步
+          this.loadAppeals();
+        })
+        .catch(error => {
+          console.error('申诉拒绝失败:', error);
+          if (error.response) {
+            console.error('错误响应:', error.response.data);
+            alert(`申诉拒绝失败: ${error.response.data.error || '未知错误'}`);
+          } else {
+            alert('申诉拒绝失败: 网络错误');
+          }
+        });
       }
     },
     
     viewRefundDetail(refund) {
-      const statusText = this.getStatusText(refund.status);
+      console.log('申诉详情数据:', refund);
       
-      alert(`退款详情：\n退款ID: ${refund.id}\n申请人: ${refund.applicant}\n订单号: ${refund.orderId}\n商品名称: ${refund.productName}\n退款金额: ¥${refund.amount}\n退款原因: ${refund.reason}\n提交时间: ${refund.submitTime}\n状态: ${statusText}`);
+      // 获取正确的订单ID字段
+      const orderId = refund.orderId || refund.order_id || refund.argumentId || refund.id;
+      console.log('提取的订单ID:', orderId);
+      
+      // 查找对应的订单
+      const order = this.orders.find(o => o.id == orderId);
+      if (order) {
+        // 显示带退款功能的订单详情弹窗
+        this.showOrderDetailWithRefund(order, refund);
+      } else {
+        // 如果当前订单列表中没有找到，在后台加载订单数据，但不切换页面
+        this.$nextTick(async () => {
+          try {
+            if (this.orders.length === 0) {
+              console.log('订单数据为空，开始加载...');
+              await this.loadOrders();
+            }
+            
+            // 再次查找订单
+            const foundOrder = this.orders.find(o => o.id == orderId);
+            if (foundOrder) {
+              this.showOrderDetailWithRefund(foundOrder, refund);
+            } else {
+              // 如果还是找不到，可能需要从服务器获取特定订单
+              alert('未找到对应的订单，请稍后重试');
+            }
+          } catch (error) {
+            console.error('加载订单失败:', error);
+            alert('加载订单失败，请重试');
+          }
+        });
+      }
     },
     
 
     
-    // 通用方法
+    // 修改状态显示文本方法
     getStatusText(status) {
       const statusMap = {
-        'pending': '待处理',
-        'processing': '处理中',
-        'resolved': '已解决',
-        'rejected': '已拒绝'
+        'process': '处理中',
+        'finish': '已完成', 
+        'refuse': '已拒绝'
       };
       return statusMap[status] || '未知状态';
     },
     
+    // 修改状态样式类方法
     getStatusClass(status) {
-      return {
-        'status-pending': status === 'pending',
-        'status-processing': status === 'processing',
-        'status-resolved': status === 'resolved',
-        'status-rejected': status === 'rejected'
+      const classMap = {
+        'process': 'status-processing',
+        'finish': 'status-completed',
+        'refuse': 'status-rejected'
       };
+      return classMap[status] || 'status-default';
     },
     
+        // 新增：管理员主动发起退款
+    async initiateRefund(order) {
+      if (!confirm(`确定要为订单 ${order.id} 发起退款吗？\n\n订单信息：\n商品：${order.productName}\n买家：${order.buyerName}\n卖家：${order.sellerName}\n金额：¥${order.totalAmount}`)) {
+        return;
+      }
+      
+      try {
+        // 调用钱包模块的退款API
+        const response = await fetch('http://localhost:8081/user/account/sellerRefund', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'accept': '*/*'
+          },
+          body: JSON.stringify({
+            userId: order.originalData.buyerId, // 买家ID，退款给买家
+            orderID: order.id // 订单ID
+          })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success && result.code === 200) {
+          // 退款成功
+          alert('退款成功！' + result.message);
+          
+          // 更新订单状态为已退款
+          const orderIndex = this.orders.findIndex(o => o.id === order.id);
+          if (orderIndex !== -1) {
+            this.orders[orderIndex].status = 'refunded';
+            this.orders[orderIndex].statusDescription = '已退款';
+          }
+          
+          // 重新筛选订单列表
+          this.filterOrders();
+          
+          // 重新加载订单数据以确保同步
+          await this.loadOrders();
+          
+        } else {
+          // 退款失败
+          const errorMessage = result.message || '退款失败，请重试';
+          alert('退款失败：' + errorMessage);
+          console.error('退款API返回错误:', result);
+        }
+        
+      } catch (error) {
+        console.error('调用退款API失败:', error);
+        let errorMessage = '退款操作失败';
+        
+        if (error.response) {
+          errorMessage = `退款失败: ${error.response.status} ${error.response.statusText}`;
+          if (error.response.data && error.response.data.message) {
+            errorMessage += ` - ${error.response.data.message}`;
+          }
+        } else if (error.request) {
+          errorMessage = '无法连接到钱包服务器，请检查网络连接';
+        } else {
+          errorMessage = `退款失败: ${error.message}`;
+        }
+        
+        alert(errorMessage);
+      }
+    },
+
+    // 新增：管理员主动发起退款（仅在申诉详情弹窗中使用）
+    async initiateRefundFromAppeal(order, appeal) {
+      if (!confirm(`确定要为订单 ${order.id} 发起退款吗？\n\n订单信息：\n商品：${order.productName}\n买家：${order.buyerName}\n卖家：${order.sellerName}\n金额：¥${order.totalAmount}`)) {
+        return;
+      }
+      
+      try {
+        // 调用钱包模块的退款API - 修复参数格式
+        const response = await fetch('http://localhost:8081/user/account/sellerRefund', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'accept': '*/*'
+          },
+          body: JSON.stringify({
+            userId: order.originalData.buyerId, // 买家ID，退款给买家
+            orderID: order.id // 使用orderID而不是orderId
+          })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success && result.code === 200) {
+          // 退款成功
+          alert('退款成功！' + result.message);
+          
+          // 更新订单状态为已退款
+          const orderIndex = this.orders.findIndex(o => o.id === order.id);
+          if (orderIndex !== -1) {
+            this.orders[orderIndex].status = 'refunded';
+            this.orders[orderIndex].statusDescription = '已退款';
+          }
+          
+          // 更新对应申诉的状态为已完成
+          if (appeal) {
+            await this.updateAppealStatus(appeal.id, 'finish');
+          }
+          
+          // 关闭弹窗
+          this.closeOrderDetailModal();
+          
+          // 重新加载申诉数据（不跳转页面）
+          await this.loadAppeals();
+          
+          // 确保停留在申诉管理页面
+          this.activeMenu = 'appeals';
+        } else {
+          // 退款失败
+          const errorMessage = result.message || '退款失败，请重试';
+          alert('退款失败：' + errorMessage);
+          console.error('退款API返回错误:', result);
+        }
+      } catch (error) {
+        console.error('调用退款API失败:', error);
+        let errorMessage = '退款操作失败';
+        
+        if (error.response) {
+          errorMessage = `退款失败: ${error.response.status} ${error.response.statusText}`;
+          if (error.response.data && error.response.data.message) {
+            errorMessage += ` - ${error.response.data.message}`;
+          }
+        } else if (error.request) {
+          errorMessage = '无法连接到钱包服务器，请检查网络连接';
+        } else {
+          errorMessage = `退款失败: ${error.message}`;
+        }
+        
+        alert(errorMessage);
+      }
+    },
+    
+    // 更新申诉状态
+    async updateAppealStatus(appealId, status) {
+      try {
+        console.log('正在更新申诉状态:', appealId, status);
+        
+        // 首先检查服务是否可用
+        await fetch('http://localhost:8093/api/v1/appeals/all', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }).catch(err => {
+          console.error('申诉服务连接失败:', err);
+          throw new Error('无法连接到申诉服务，请确认服务是否启动');
+        });
+        
+        const response = await axios.put(`http://localhost:8093/api/v1/appeals/${appealId}/admin-update`, {
+          rootId: this.adminId, // 使用动态获取的管理员ID
+          status: status
+        }, {
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          timeout: 10000 // 10秒超时
+        });
+        
+        console.log('申诉状态更新响应:', response.data);
+        
+        if (response.data.message && response.data.message.includes('成功')) {
+          // 更新本地申诉数据
+          const appealIndex = this.refundAppeals.findIndex(a => a.id === appealId);
+          if (appealIndex !== -1) {
+            this.refundAppeals[appealIndex].status = status;
+            this.refundAppeals[appealIndex].adminId = this.adminId; // 使用动态获取的管理员ID
+            console.log('本地申诉状态已更新:', this.refundAppeals[appealIndex]);
+          }
+          
+          // 重新过滤申诉列表
+          this.filterAppeals();
+          
+          // 显示成功提示
+          alert('申诉状态更新成功');
+        } else {
+          console.error('申诉状态更新失败:', response.data);
+          alert('申诉状态更新失败：' + (response.data.message || '未知错误'));
+        }
+      } catch (error) {
+        console.error('更新申诉状态失败:', error);
+        
+        let errorMessage = '更新申诉状态失败：';
+        if (error.message.includes('无法连接到申诉服务')) {
+          errorMessage += '申诉服务未启动或端口不正确';
+        } else if (error.code === 'ECONNREFUSED') {
+          errorMessage += '无法连接到申诉服务(端口8093)，请检查服务是否启动';
+        } else if (error.response) {
+          errorMessage += `HTTP ${error.response.status} - ${error.response.statusText}`;
+          if (error.response.data && error.response.data.error) {
+            errorMessage += ` (${error.response.data.error})`;
+          }
+        } else {
+          errorMessage += error.message;
+        }
+        
+        alert(errorMessage);
+      }
+    },
+
+
+
     // 公告管理方法
     async loadAnnouncements() {
       try {
-        const adminIds = ['ADMIN0001', 'ADMIN0002', 'ADMIN0003', 'ADMIN0004', 'ADMIN0005'];
+        // 查询所有管理员的公告
         let allAnnouncements = [];
         
-        // 遍历所有管理员ID获取公告
-        for (const adminId of adminIds) {
-          try {
-            const response = await fetch(`/api/announcements?n=9999&rootId=${adminId}`);
-            if (response.ok) {
-              const data = await response.json();
-              // 过滤只显示可见状态的公告，并为每个公告添加发布者信息
-              const visibleAnnouncements = data
-                .filter(announcement => announcement.visibleStatus === true) // 只保留可见的公告
-                .map(announcement => ({
-                  ...announcement,
-                  id: announcement.announcementId,
-                  title: announcement.content.substring(0, 20) + (announcement.content.length > 20 ? '...' : ''), // 从内容生成标题
-                  content: announcement.content,
-                  publishTime: new Date(announcement.createdAt).toLocaleString('zh-CN'),
-                  publisher: adminId
-                }));
-              allAnnouncements = allAnnouncements.concat(visibleAnnouncements);
-            }
-          } catch (error) {
-            console.warn(`获取管理员 ${adminId} 的公告失败:`, error);
+        try {
+          // 移除rootId参数，获取所有管理员的公告
+          const response = await fetch(`/api/announcements?n=9999`);
+          if (response.ok) {
+            const data = await response.json();
+            // 过滤只显示可见状态的公告，并为每个公告添加发布者信息
+            const visibleAnnouncements = data
+              .filter(announcement => announcement.visibleStatus === true) // 只保留可见的公告
+              .map(announcement => ({
+                ...announcement,
+                id: announcement.announcementId,
+                title: announcement.content.substring(0, 20) + (announcement.content.length > 20 ? '...' : ''), // 从内容生成标题
+                content: announcement.content,
+                publishTime: new Date(announcement.createdAt).toLocaleString('zh-CN'),
+                publisher: announcement.rootId || '未知管理员' // 使用实际的rootId作为发布者
+              }));
+            allAnnouncements = visibleAnnouncements;
           }
+        } catch (error) {
+          console.error('获取所有管理员公告失败:', error);
         }
         
         // 按创建时间排序（最新的在前）
@@ -1409,7 +1989,7 @@ export default {
         // 更新公告 - 使用新的 API
         const updateData = {
           announcementId: this.editingAnnouncement.announcementId,
-          rootId: this.editingAnnouncement.publisher, // 发布者ID
+          rootId: this.adminId, // 发布者ID
           createdAt: new Date().toISOString(), // 当前更新时间
           content: this.announcementForm.content,
           visibleStatus: true // 保持可见
@@ -1527,74 +2107,140 @@ export default {
         this.loadAppeals();
       }
       
-      const pendingRefunds = this.refundAppeals.filter(r => r.status === 'pending').length;
+      const pendingRefunds = this.refundAppeals.filter(r => r.status === 'process').length;
       
       this.stats.pendingAppeals = pendingRefunds; // 只计算退款申请
     },
     
     // 订单管理方法
-    loadOrders() {
-      // 模拟订单数据
-      this.orders = [
-        {
-          id: 'ORD001',
-          productName: 'iPhone 13',
-          productImage: 'https://via.placeholder.com/50',
-          buyerName: '用户001',
-          sellerName: '用户002',
-          totalAmount: 5000,
-          createTime: '2024-01-13 10:30:00',
-          status: 'pending'
-        },
-        {
-          id: 'ORD002',
-          productName: '笔记本电脑',
-          productImage: 'https://via.placeholder.com/50',
-          buyerName: '用户003',
-          sellerName: '用户004',
-          totalAmount: 3500,
-          createTime: '2024-01-12 15:20:00',
-          status: 'paid'
-        },
-        {
-          id: 'ORD003',
-          productName: '二手自行车',
-          productImage: 'https://via.placeholder.com/50',
-          buyerName: '用户005',
-          sellerName: '用户006',
-          totalAmount: 800,
-          createTime: '2024-01-11 09:15:00',
-          status: 'completed'
-        },
-        {
-          id: 'ORD004',
-          productName: '游戏机',
-          productImage: 'https://via.placeholder.com/50',
-          buyerName: '用户007',
-          sellerName: '用户008',
-          totalAmount: 1200,
-          createTime: '2024-01-10 14:20:00',
-          status: 'refunding'
-        }
-      ];
+    async loadOrders() {
+      console.log('开始加载订单数据...');
+      this.loading = true;
       
-      this.filteredOrders = [...this.orders];
-      this.totalOrderPages = Math.ceil(this.filteredOrders.length / 10);
+      try {
+        // 调用分页查询所有订单API
+        const response = await axios.post('http://localhost:8095/api/orders/query/all-paged', {
+          pageNum: this.currentOrderPage,
+          pageSize: 20
+        }, {
+          headers: {
+            'Content-Type': 'application/json',
+            'accept': '*/*'
+          }
+        });
+        
+        console.log('订单API响应:', response.data);
+        
+        if (response.data.success && response.data.data) {
+          const { orders, pageNum, total, totalPages } = response.data.data;
+          
+          // 转换API数据格式为前端需要的格式
+          this.orders = orders.map(order => ({
+            id: order.orderId,
+            productName: order.commodityName,
+            productImage: order.mainImageUrl || 'https://via.placeholder.com/50',
+            buyerName: order.buyerName,
+            sellerName: order.sellerName,
+            totalAmount: order.money,
+            createTime: order.createTime,
+            saleTime: order.saleTime,
+            status: this.mapOrderStatus(order.orderStatus),
+            statusDescription: order.orderStatusDescription,
+            // 保留原始数据以备后用
+            originalData: {
+              orderId: order.orderId,
+              commodityId: order.commodityId,
+              buyerId: order.buyerId,
+              sellerId: order.sellerId,
+              orderStatus: order.orderStatus,
+              saleLocation: order.saleLocation,
+              buyQuantity: order.buyQuantity
+            }
+          }));
+          
+          // 更新分页信息
+          this.currentOrderPage = pageNum;
+          this.totalOrderPages = totalPages;
+          this.totalOrders = total;
+          
+          // 初始化筛选结果
+          this.filteredOrders = [...this.orders];
+          
+          console.log('订单数据加载成功:', {
+            订单数量: this.orders.length,
+            当前页: pageNum,
+            总页数: totalPages,
+            总数量: total
+          });
+          
+        } else {
+          console.error('订单API返回数据格式错误:', response.data);
+          this.$message?.error('订单数据格式错误') || alert('订单数据格式错误');
+          // 使用空数组作为备选
+          this.orders = [];
+          this.filteredOrders = [];
+        }
+        
+      } catch (error) {
+        console.error('加载订单数据失败:', error);
+        
+        let errorMessage = '加载订单数据失败';
+        if (error.response) {
+          errorMessage = `加载失败: ${error.response.status} ${error.response.statusText}`;
+          if (error.response.data && error.response.data.message) {
+            errorMessage += ` - ${error.response.data.message}`;
+          }
+        } else if (error.request) {
+          errorMessage = '无法连接到订单服务器，请检查网络连接';
+        } else {
+          errorMessage = `加载失败: ${error.message}`;
+        }
+        
+        this.$message?.error(errorMessage) || alert(errorMessage);
+        
+        // 错误时使用空数组
+        this.orders = [];
+        this.filteredOrders = [];
+      } finally {
+        this.loading = false;
+      }
+    },
+    
+    // 更新：订单状态映射方法
+    mapOrderStatus(apiStatus) {
+      const statusMap = {
+        'pending_payment': 'pending_payment',
+        'pending_transaction': 'pending_transaction', 
+        'completed': 'completed',
+        'refunded': 'refunded' // 新增退款状态
+      };
+      return statusMap[apiStatus] || 'pending_payment';
     },
     
     searchOrders() {
+      console.log('执行搜索，查询条件:', this.orderSearchQuery);
+      console.log('当前订单数据:', this.orders);
+      
       if (!this.orderSearchQuery) {
         this.filteredOrders = [...this.orders];
         return;
       }
       
-      const query = this.orderSearchQuery.toLowerCase();
-      this.filteredOrders = this.orders.filter(order => 
-        order.id.toLowerCase().includes(query) ||
-        order.productName.toLowerCase().includes(query) ||
-        order.buyerName.toLowerCase().includes(query) ||
-        order.sellerName.toLowerCase().includes(query)
-      );
+      const query = this.orderSearchQuery.toString().toLowerCase();
+      this.filteredOrders = this.orders.filter(order => {
+        // 确保所有字段都转换为字符串再进行比较
+        const orderId = (order.id || '').toString().toLowerCase();
+        const productName = (order.productName || '').toString().toLowerCase();
+        const buyerName = (order.buyerName || '').toString().toLowerCase();
+        const sellerName = (order.sellerName || '').toString().toLowerCase();
+        
+        return orderId.includes(query) ||
+               productName.includes(query) ||
+               buyerName.includes(query) ||
+               sellerName.includes(query);
+      });
+      
+      console.log('搜索结果:', this.filteredOrders);
     },
     
     filterOrders() {
@@ -1605,29 +2251,31 @@ export default {
       }
       
       if (this.orderSearchQuery) {
-        const query = this.orderSearchQuery.toLowerCase();
-        filtered = filtered.filter(order => 
-          order.id.toLowerCase().includes(query) ||
-          order.productName.toLowerCase().includes(query) ||
-          order.buyerName.toLowerCase().includes(query) ||
-          order.sellerName.toLowerCase().includes(query)
-        );
+        const query = this.orderSearchQuery.toString().toLowerCase();
+        filtered = filtered.filter(order => {
+          const orderId = (order.id || '').toString().toLowerCase();
+          const productName = (order.productName || '').toString().toLowerCase();
+          const buyerName = (order.buyerName || '').toString().toLowerCase();
+          const sellerName = (order.sellerName || '').toString().toLowerCase();
+          
+          return orderId.includes(query) ||
+                 productName.includes(query) ||
+                 buyerName.includes(query) ||
+                 sellerName.includes(query);
+        });
       }
       
       this.filteredOrders = filtered;
       this.currentOrderPage = 1;
-      this.totalOrderPages = Math.ceil(this.filteredOrders.length / 10);
+      this.totalOrderPages = Math.ceil(this.filteredOrders.length / 20); // 注意这里改为20，与loadOrders中的pageSize一致
     },
     
     getOrderStatusText(status) {
       const statusMap = {
-        'pending': '待付款',
-        'paid': '已付款',
-        'shipped': '已发货',
+        'pending_payment': '待付款',
+        'pending_transaction': '待交易',
         'completed': '已完成',
-        'cancelled': '已取消',
-        'refunding': '退款中',
-        'refunded': '已退款'
+        'refunded': '已退款' // 新增退款状态文本
       };
       return statusMap[status] || '未知状态';
     },
@@ -1636,8 +2284,22 @@ export default {
       const order = this.orders.find(o => o.id === orderId);
       if (order) {
         const statusText = this.getOrderStatusText(order.status);
+        const actions = this.getAvailableActions(order.status);
         
-        alert(`订单详情：\n订单ID: ${order.id}\n商品名称: ${order.productName}\n买家: ${order.buyerName}\n卖家: ${order.sellerName}\n金额: ¥${order.totalAmount}\n下单时间: ${order.createTime}\n状态: ${statusText}`);
+        alert(`订单详情:\n订单ID: ${order.id}\n商品: ${order.productName}\n买家: ${order.buyerName}\n卖家: ${order.sellerName}\n金额: ¥${order.totalAmount}\n状态: ${statusText}\n创建时间: ${order.createTime}\n可用操作: ${actions.join(', ')}`);
+      }
+    },
+    
+    getAvailableActions(status) {
+      switch(status) {
+        case 'pending_payment':
+          return ['催促付款', '取消订单'];
+        case 'pending_transaction':
+          return ['联系买卖双方', '处理纠纷'];
+        case 'completed':
+          return ['查看评价', '导出记录'];
+        default:
+          return [];
       }
     },
     
@@ -1680,13 +2342,38 @@ export default {
     },
     
     goToFirstOrderPage() {
-      this.currentOrderPage = 1;
-      this.loadOrders();
+      if (this.currentOrderPage !== 1) {
+        this.currentOrderPage = 1;
+        this.loadOrders();
+      }
     },
     
     goToLastOrderPage() {
-      this.currentOrderPage = this.totalOrderPages;
-      this.loadOrders();
+      if (this.currentOrderPage !== this.totalOrderPages) {
+        this.currentOrderPage = this.totalOrderPages;
+        this.loadOrders();
+      }
+    },
+    
+    // 获取可见的页码
+    getVisiblePages(current, total) {
+      const pages = [];
+      const maxVisible = 5;
+      
+      if (total <= maxVisible) {
+        for (let i = 1; i <= total; i++) {
+          pages.push(i);
+        }
+      } else {
+        const start = Math.max(1, current - 2);
+        const end = Math.min(total, start + maxVisible - 1);
+        
+        for (let i = start; i <= end; i++) {
+          pages.push(i);
+        }
+      }
+      
+      return pages;
     },
     
     goToFirstAppealPage() {
@@ -1697,6 +2384,20 @@ export default {
     goToLastAppealPage() {
       this.currentAppealPage = this.totalAppealPages;
       this.loadAppeals();
+    },
+    
+    // 显示带退款功能的订单详情弹窗
+    showOrderDetailWithRefund(order, appeal) {
+      this.selectedOrderForRefund = order;
+      this.relatedAppeal = appeal;
+      this.showOrderDetailModal = true;
+    },
+    
+    // 关闭订单详情弹窗
+    closeOrderDetailModal() {
+      this.showOrderDetailModal = false;
+      this.selectedOrderForRefund = null;
+      this.relatedAppeal = null;
     },
     
     // 退出登录
@@ -1816,7 +2517,7 @@ export default {
 
 .top-bar {
   height: 60px;
-  background-color: white;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
@@ -1827,7 +2528,7 @@ export default {
 .page-title {
   font-size: 18px;
   font-weight: 600;
-  color: #2c3e50;
+  color: white;
 }
 
 .top-actions {
@@ -2267,43 +2968,1068 @@ export default {
   color: white;
 }
 
-/* 订单状态样式 */
+/* 订单管理样式 */
+.orders-content {
+  padding: 0;
+}
+
+.orders-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 30px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+}
+
+.header-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.page-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 28px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.icon-order {
+  font-size: 32px;
+}
+
+.stats-summary {
+  display: flex;
+  gap: 30px;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 20px 25px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.stat-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.stat-number {
+  display: block;
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  color: #2c3e50;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.stat-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #5a6c7d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-item.pending .stat-number {
+  color: #f39c12;
+}
+
+.stat-item.completed .stat-number {
+  color: #27ae60;
+}
+
+.stat-item.processing .stat-number {
+  color: #3498db;
+}
+
+.filter-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.search-container {
+  flex: 1;
+  max-width: 500px;
+}
+
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 15px;
+  font-size: 16px;
+  color: #666;
+  z-index: 1;
+  pointer-events: none; /* 关键：让图标不阻挡点击事件 */
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px 15px 12px 45px;
+  border: 2px solid #e0e0e0;
+  border-radius: 25px;
+  background: white;
+  color: #333;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 2; /* 确保输入框在图标之上 */
+}
+
+.search-input::placeholder {
+  color: #999;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #4CAF50;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+.filter-controls {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.status-filter {
+  padding: 10px 15px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  font-size: 14px;
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+}
+
+.status-filter option {
+  background: #333;
+  color: white;
+}
+
+
+
+.loading-container {
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.orders-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.order-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  overflow: hidden;
+  border: 1px solid #f0f0f0;
+}
+
+.order-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  border-color: #667eea;
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%);
+  border-bottom: 1px solid #e8ecf7;
+}
+
+.order-id {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.id-label {
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
+}
+
+.id-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  font-family: 'Courier New', monospace;
+}
+
+.order-content {
+  padding: 20px;
+}
+
+.product-section {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.product-image {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.product-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 8px 0;
+  line-height: 1.4;
+}
+
+.price-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.price {
+  font-size: 18px;
+  font-weight: 700;
+  color: #e74c3c;
+}
+
+.participants-section {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.participant {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.participant-label {
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
+}
+
+.participant-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.time-section {
+  margin-bottom: 15px;
+}
+
+.time-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.time-label {
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
+}
+
+.time-value {
+  font-size: 14px;
+  color: #333;
+}
+
+.order-actions {
+  display: flex;
+  gap: 10px;
+  padding: 15px 20px;
+  background: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+}
+
+.action-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.btn-icon {
+  font-size: 12px;
+}
+
+.approve-btn {
+  background: #28a745;
+  color: white;
+}
+
+.approve-btn:hover {
+  background: #218838;
+  transform: translateY(-1px);
+}
+
+.reject-btn {
+  background: #dc3545;
+  color: white;
+}
+
+.reject-btn:hover {
+  background: #c82333;
+  transform: translateY(-1px);
+}
+
+.detail-btn {
+  background: #6c757d;
+  color: white;
+}
+
+.detail-btn:hover {
+  background: #5a6268;
+  transform: translateY(-1px);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 80px 20px;
+  color: #666;
+}
+
+.empty-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+  opacity: 0.5;
+}
+
+.empty-state h3 {
+  font-size: 24px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.empty-state p {
+  font-size: 16px;
+  margin-bottom: 30px;
+  opacity: 0.8;
+}
+
+.retry-btn {
+  padding: 12px 24px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.retry-btn:hover {
+  background: #5a6fd8;
+  transform: translateY(-2px);
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  margin-top: 20px;
+}
+
+.pagination-info {
+  color: #666;
+  font-size: 14px;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.page-btn {
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  background: white;
+  color: #333;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.page-btn:hover:not(:disabled) {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
+
+.page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.page-numbers {
+  display: flex;
+  gap: 5px;
+}
+
+.page-number {
+  width: 36px;
+  height: 36px;
+  border: 1px solid #ddd;
+  background: white;
+  color: #333;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.page-number:hover {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
+
+.page-number.active {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
+
+/* 状态徽章样式 */
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-pending {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
 .status-paid {
-  background-color: #e3f2fd;
-  color: #1565c0;
+  background: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #bee5eb;
 }
 
 .status-shipped {
-  background-color: #f3e5f5;
-  color: #7b1fa2;
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
 }
 
 .status-completed {
-  background-color: #e8f5e9;
-  color: #2e7d32;
+  background: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #bee5eb;
 }
 
 .status-cancelled {
-  background-color: #ffebee;
-  color: #c62828;
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
 }
 
 .status-refunding {
-  background-color: #fff3e0;
-  color: #f57c00;
+  background: #ffeaa7;
+  color: #6c5ce7;
+  border: 1px solid #fdcb6e;
 }
 
 .status-refunded {
-  background-color: #fce4ec;
-  color: #ad1457;
+  background: #ff9800;
+  color: white;
+  border: 1px solid #e84393;
 }
 
-.cancel-order-btn {
-  background-color: #ffebee;
-  color: #c62828;
+/* 退款按钮样式 */
+.refund-btn {
+  background: linear-gradient(135deg, #ff9a56 0%, #ff6b35 100%);
+  color: white;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.refund-btn:hover {
+  background: linear-gradient(135deg, #ff8a45 0%, #ff5722 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .orders-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .header-info {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+  
+  .stats-summary {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .filter-section {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .pagination-container {
+    flex-direction: column;
+    gap: 15px;
+  }
 }
 
 /* 申诉管理样式 */
+.appeals-content {
+  padding: 0;
+}
+
+.appeals-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 30px;
+  border-radius: 16px;
+  margin-bottom: 30px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.header-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.page-title {
+  display: flex;
+  align-items: center;
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+  color: white;
+}
+
+.icon-shield {
+  margin-right: 12px;
+  font-size: 32px;
+}
+
+.appeals-header .stats-summary {
+  display: flex;
+  gap: 30px;
+}
+
+.appeals-header .stat-item {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 20px 25px;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.appeals-header .stat-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.appeals-header .stat-item.pending {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(255, 193, 7, 0.6);
+}
+
+.appeals-header .stat-item.completed {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(40, 167, 69, 0.6);
+}
+
+.appeals-header .stat-number {
+  display: block;
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  color: #2c3e50;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.appeals-header .stat-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #5a6c7d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.appeals-header .stat-item.pending .stat-number {
+  color: #f39c12;
+}
+
+.appeals-header .stat-item.completed .stat-number {
+  color: #27ae60;
+}
+
+.stats-summary {
+  display: flex;
+  gap: 30px;
+}
+
+.stat-item {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 15px 20px;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.stat-item.pending {
+  background: rgba(255, 193, 7, 0.2);
+  border-color: rgba(255, 193, 7, 0.3);
+}
+
+.stat-item.completed {
+  background: rgba(40, 167, 69, 0.2);
+  border-color: rgba(40, 167, 69, 0.3);
+}
+
+.stat-number {
+  display: block;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.stat-label {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.filter-section {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filter-label {
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.modern-select {
+  padding: 10px 15px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  font-size: 14px;
+  backdrop-filter: blur(10px);
+  min-width: 150px;
+}
+
+.modern-select option {
+  background: #2c3e50;
+  color: white;
+}
+
+.appeals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 24px;
+  margin-bottom: 30px;
+}
+
+.appeal-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 1px solid #f0f0f0;
+}
+
+.appeal-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.card-header {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 20px;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.appeal-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.appeal-id {
+  font-weight: 700;
+  color: #2c3e50;
+  font-size: 16px;
+}
+
+.appeal-time {
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.status-container {
+  display: flex;
+  align-items: center;
+}
+
+.status-badge {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-processing {
+  background: linear-gradient(135deg, #ffc107, #ff8f00);
+  color: white;
+}
+
+.status-completed {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
+}
+
+.status-rejected {
+  background: linear-gradient(135deg, #dc3545, #e83e8c);
+  color: white;
+}
+
+.card-body {
+  padding: 24px;
+}
+
+.appeal-info {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.info-row {
+  display: flex;
+  gap: 16px;
+}
+
+.info-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.info-item.full-width {
+  flex: 1 1 100%;
+}
+
+.info-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-value {
+  font-size: 14px;
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.user-id, .order-id, .admin-id {
+  font-family: 'Courier New', monospace;
+  background: #f8f9fa;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.reason-content {
+  background: #f8f9fa;
+  padding: 12px;
+  border-radius: 8px;
+  border-left: 4px solid #007bff;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #495057;
+  max-height: 80px;
+  overflow-y: auto;
+}
+
+.card-footer {
+  background: #f8f9fa;
+  padding: 20px;
+  border-top: 1px solid #e9ecef;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.btn-icon {
+  font-size: 14px;
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
+}
+
+.btn-success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #dc3545, #e83e8c);
+  color: white;
+}
+
+.btn-danger:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+.btn-info {
+  background: linear-gradient(135deg, #17a2b8, #6f42c1);
+  color: white;
+}
+
+.btn-info:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(23, 162, 184, 0.3);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.empty-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+  opacity: 0.5;
+}
+
+.empty-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+.empty-description {
+  font-size: 16px;
+  color: #6c757d;
+  margin: 0;
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: white;
+  padding: 16px 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.page-btn {
+  padding: 10px 16px;
+  border: 1px solid #dee2e6;
+  background: white;
+  color: #495057;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.page-btn:hover:not(:disabled) {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+  transform: translateY(-1px);
+}
+
+.page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.page-info {
+  margin: 0 16px;
+  font-weight: 600;
+  color: #495057;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .appeals-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .header-info {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+  
+  .stats-summary {
+    justify-content: center;
+  }
+  
+  .filter-section {
+    justify-content: center;
+  }
+  
+  .info-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
+  
+  .btn {
+    justify-content: center;
+  }
+}
+
 .type-badge {
   padding: 5px 10px;
   border-radius: 20px;
@@ -2326,16 +4052,6 @@ export default {
   color: #1565c0;
 }
 
-.status-processing {
-  background-color: #e1f5fe;
-  color: #0277bd;
-}
-
-.status-resolved {
-  background-color: #e8f5e9;
-  color: #2e7d32;
-}
-
 .process-btn {
   background-color: #e1f5fe;
   color: #0277bd;
@@ -2349,42 +4065,6 @@ export default {
 .detail-btn {
   background-color: #f3e5f5;
   color: #7b1fa2;
-}
-
-/* 申诉管理标签页样式 */
-.appeals-tabs {
-  display: flex;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
-  overflow: hidden;
-}
-
-.tab-item {
-  flex: 1;
-  padding: 15px 20px;
-  text-align: center;
-  cursor: pointer;
-  background-color: #f8f9fa;
-  color: #6c757d;
-  border-right: 1px solid #dee2e6;
-  transition: all 0.3s ease;
-  font-weight: 500;
-}
-
-.tab-item:last-child {
-  border-right: none;
-}
-
-.tab-item:hover {
-  background-color: #e9ecef;
-  color: #495057;
-}
-
-.tab-item.active {
-  background-color: #3498db;
-  color: white;
 }
 
 /* 内容单元格样式 */
@@ -2426,7 +4106,7 @@ export default {
   color: #2c3e50;
 }
 
-/* 用户详情弹窗样式 */
+/* 模态框基础样式 */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -2437,17 +4117,21 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 9999;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  position: relative;
 }
 
 .user-detail-modal {
-  background: white;
-  border-radius: 8px;
   width: 500px;
   max-width: 90vw;
   max-height: 80vh;
   overflow-y: auto;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
 .modal-header {
@@ -2460,7 +4144,8 @@ export default {
 
 .modal-header h3 {
   margin: 0;
-  color: #2c3e50;
+  color: #333;
+  font-size: 18px;
 }
 
 .close-btn {
@@ -2475,14 +4160,17 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
 }
 
 .close-btn:hover {
-  color: #666;
+  background-color: #f5f5f5;
+  color: #333;
 }
 
 .modal-body {
-  padding: 20px;
+  padding: 0 20px;
 }
 
 .user-detail-info {
@@ -2537,14 +4225,7 @@ export default {
   color: #c62828;
 }
 
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  padding: 20px;
-  border-top: 1px solid #eee;
-}
-
+/* 用户详情弹窗样式 */
 .reset-password-btn {
   background-color: #f39c12;
   color: white;
@@ -2571,6 +4252,110 @@ export default {
 
 .cancel-btn:hover {
   background-color: #7f8c8d;
+}
+
+/* 订单详情弹窗样式 */
+.order-detail-modal {
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.order-detail-info {
+  padding: 20px 0;
+}
+
+.info-row {
+  display: flex;
+  margin-bottom: 15px;
+  align-items: center;
+}
+
+.info-row label {
+  font-weight: 600;
+  color: #333;
+  min-width: 100px;
+  margin-right: 15px;
+}
+
+.info-row span {
+  color: #666;
+  flex: 1;
+}
+
+.status-text {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.appeal-status {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.appeal-status.status-process {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.appeal-status.status-finish {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.appeal-status.status-refuse {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 20px;
+  border-top: 1px solid #eee;
+}
+
+.modal-footer .refund-btn {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.modal-footer .refund-btn:hover {
+  background: linear-gradient(135deg, #ee5a24, #ff6b6b);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(238, 90, 36, 0.3);
+}
+
+.modal-footer .cancel-btn {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.modal-footer .cancel-btn:hover {
+  background-color: #5a6268;
 }
 
 /* 响应式调整 */

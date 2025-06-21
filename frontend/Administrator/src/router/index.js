@@ -6,8 +6,7 @@ import AdminProductDetail from '../views/AdminProductDetail.vue'
 const routes = [
   {
     path: '/',
-    name: 'AdminLogin',
-    component: AdminLogin
+    redirect: '/login'
   },
   {
     path: '/login',
@@ -34,31 +33,35 @@ const router = createRouter({
 })
 
 // 路由守卫
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const isAdminLoggedIn = localStorage.getItem('isAdminLoggedIn')
   const adminToken = localStorage.getItem('adminToken')
   
-  // 检查是否需要认证
+  // 如果访问登录页面，直接允许访问（移除自动跳转逻辑）
+  if (to.path === '/login') {
+    next()
+    return
+  }
+  
+  // 如果访问根路径
+  if (to.path === '/') {
+    next('/login')
+    return
+  }
+  
+  // 检查是否需要认证的页面
   if (to.matched.some(record => record.meta.requiresAuth)) {
-    // 需要认证的页面
     if (!isAdminLoggedIn || !adminToken) {
-      // 未登录，跳转到登录页
+      // 没有登录信息，跳转到登录页
       next('/login')
-    } else {
-      // 已登录，允许访问
-      next()
+      return
     }
+    
+    // token有效，允许访问
+    next()
   } else {
-    // 不需要认证的页面
-    if ((to.path === '/login') && isAdminLoggedIn && adminToken) {
-      // 已登录用户访问登录页，跳转到管理面板
-      next('/AdminDashboard')
-    } 
-    else if(to.path === '/' ){
-      next('/login')
-    }else {
-      next()
-    }
+    // 不需要认证的页面，直接允许访问
+    next()
   }
 })
 

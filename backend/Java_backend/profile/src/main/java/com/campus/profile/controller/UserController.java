@@ -83,7 +83,7 @@ public class UserController {
             Map<String, Object> userInfo = new HashMap<>();
             userInfo.put("userId", user.getUserId());
             userInfo.put("userName", user.getUserName());
-            userInfo.put("telephone", user.getMaskedTelephone()); // 使用脱敏电话
+            userInfo.put("telephone", user.getTelephone()); // 不使用脱敏电话
             userInfo.put("realName", user.getRealName());
             userInfo.put("avatarUrl", user.getAvatarUrl());
             userInfo.put("userLocLongitude", user.getUserLocLongitude());

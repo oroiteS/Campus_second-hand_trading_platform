@@ -54,9 +54,9 @@ def get_commodities_username(db: Session) -> List[Commodity_username]:
             Commodity.updated_at,
             Commodity.newness,
             Commodity.quantity,
-            users.user_name
+            User.user_name
         )
-        .join(users, Commodity.seller_id == users.user_id)
+        .join(User, Commodity.seller_id == ser.user_id)
     )
     results = db.execute(stmt).all() # SQLAlchemy 2.0 风格的执行
 
@@ -73,7 +73,7 @@ def get_commodity_recommendation(db: Session,user_id: str) -> List[Commodity_use
     embedder = Embedder()
     results_commendation_buy_cid = embedder.recommendation_by_buy(user_id= user_id)
     #部分2-按照用户的喜欢行为返回list
-    results_commendation_like_cid = embedder.recommendation_by_like(user_id=user_id,limit=10)
+    results_commendation_like_cid = embedder.recommendation_by_like(user_id=user_id,limit=60)
 
     #合并两个list
     results_commendation_cid = results_commendation_buy_cid + results_commendation_like_cid
@@ -82,7 +82,6 @@ def get_commodity_recommendation(db: Session,user_id: str) -> List[Commodity_use
     #返回
     query = select(Commodity, User.user_name, User.avatar_url).join(User, Commodity.seller_id == User.user_id).where(Commodity.commodity_id.in_(results_commendation_cid))
     results = db.execute(query).all()
-    print(results)
     # 将元组结果转换为Commodity_username_avatar对象列表
     results_commendation = []
     for row in results:
@@ -91,7 +90,7 @@ def get_commodity_recommendation(db: Session,user_id: str) -> List[Commodity_use
         commodity_data['user_name'] = user_name
         commodity_data['avatar_url'] = avatar_url
         results_commendation.append(Commodity_username_avatar(**commodity_data))
-    random.shuffle(results_commendation)
+    # random.shuffle(results_commendation)
     return results_commendation
 
 
@@ -125,12 +124,12 @@ def get_commodities_by_search(db: Session,request: SearchCommodityRequest) -> Li
     
     #部分3-桶2:返回个性化推荐内容
     embedder = Embedder()
-    results_commendation_like_cid = embedder.recommendation_by_like(user_id=user_id)
+    results_commendation_like_cid = embedder.recommendation_by_like(user_id=user_id,limit=2)
     query = select(Commodity, User.user_name, User.avatar_url).join(User, Commodity.seller_id == User.user_id).where(Commodity.commodity_id.in_(results_commendation_like_cid))
     results_commendation_like_raw = db.execute(query).all()
     
     # 桶3 查询结果与特征匹配
-    results_commendation_token_cid = embedder.recommendation_by_token(token_list,user_id=user_id)
+    results_commendation_token_cid = embedder.recommendation_by_token(token_list,user_id=user_id,limit=3)
     query = select(Commodity, User.user_name, User.avatar_url).join(User, Commodity.seller_id == User.user_id).where(Commodity.commodity_id.in_(results_commendation_token_cid))
     results_commendation_token_raw = db.execute(query).all()
 
@@ -230,8 +229,8 @@ def buy_commodity(db:Session,request:BuyCommodityRequest):
     #查找用户的画像
     user_doc = mongo_collection.find_one({"user_id": user_id,"action":"like"})
     if user_doc:
-        # 计算新的嵌入向量(利用0.7与0.3的权重更新)
-        new_embedding = 0.7*np.array(user_doc["embedding"]) + 0.3*np.array(embedding_sum)
+        # 计算新的嵌入向量(利用0.6与0.4的权重更新)
+        new_embedding = 0.55*np.array(user_doc["embedding"]) + 0.45*np.array(embedding_sum)
         # 更新用户文档
         mongo_collection.update_one(
             {"_id": user_doc["_id"]},
@@ -256,8 +255,8 @@ def click_commodity(request:ClickCommodityRequest,db: Session):
     #1.2-更新用户画像
     user_doc = mongo_collection.find_one({"user_id": user_id,"action":"like"})
     if user_doc:
-        # 计算新的嵌入向量(利用0.92与0.08的权重更新)
-        new_embedding = 0.92*np.array(user_doc["embedding"]) + 0.08*np.array(commodity_embedding)
+        # 计算新的嵌入向量(利用0.9与0.1的权重更新)
+        new_embedding = 0.82*np.array(user_doc["embedding"]) + 0.18*np.array(commodity_embedding)
         # 更新用户文档
         now = datetime.datetime.now()
         mongo_collection.update_one(
@@ -284,7 +283,7 @@ def add_cart(request:AddCartRequest,db: Session):#add与click可以考虑优化�
     user_doc = mongo_collection.find_one({"user_id": user_id,"action":"like"})
     if user_doc:
         # 计算新的嵌入向量(利用0.7与0.3的权重更新)
-        new_embedding = 0.85*np.array(user_doc["embedding"]) + 0.15*np.array(commodity_embedding)
+        new_embedding = 0.7*np.array(user_doc["embedding"]) + 0.3*np.array(commodity_embedding)
         # 更新用户文档
         now = datetime.datetime.now()
         mongo_collection.update_one(
@@ -320,3 +319,6 @@ def delete_commodity(request:Commodity_id,db:Session):
 def get_username(user_id,db:Session):
     username = db.query(users).filter(users.user_id == user_id).first().username
     return username
+def get_commodities_on_sale(db:Session):
+    commodity_num = db.query(Commodity).filter(Commodity.commodity_status == "on_sale").count()
+    return commodity_num

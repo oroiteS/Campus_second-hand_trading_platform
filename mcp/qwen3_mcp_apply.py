@@ -1,15 +1,18 @@
 # qwen3_mcp_multi.py
 from qwen_agent.agents.assistant import Assistant
 from qwen_agent.utils.output_beautify import typewriter_print
-
+import os
+from dotenv import load_dotenv
 BOT_IMAGE_PATH = "./asset/user_avatar.jpg"
 USER_IMAGE_PATH = "./asset/robot.jpg"
 
 def init_agent_service():
+    load_dotenv()
+    api_key = os.getenv("sk-api")
     llm_cfg = {
-        'model': 'Qwen/Qwen3-8B',
+        'model': 'Qwen/Qwen3-30B-A3B',
         'model_server': 'https://api.siliconflow.cn/v1',
-        'api_key': 'sk-eblkdiwuhadenebfyrlcesgepcwanatulommrmnpaajmfrjm',
+        'api_key': api_key,
         # 'model': 'Qwen3:1.7B',
         # 'model_server': 'http://localhost:11434/v1',
         # 'api_key': 'ollama',
@@ -19,7 +22,7 @@ def init_agent_service():
        "mcpServers": {
             "sql-database": {
                 "command": "python",
-                "args": ["d:/Study/Project/Python/MCP/sql-mcp-server/main.py"]
+                "args": ["./server/sql-mcp-server/main.py"]
             },
        }
     },
@@ -29,6 +32,7 @@ def init_agent_service():
     system = """
                     你是一个商品推销小助手 \
         你可以调用数据库工具查询数据库商品，并为用户合理推荐商品\
+        如果有学生找你询问他本学期要购买的书本，你可以通过books数据表并根据他提供的信息进行查找，然后告诉他\
         在回答时不要透露任何数据库字段和表结构信息，只告诉用户结果即可
     """
 

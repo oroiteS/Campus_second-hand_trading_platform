@@ -148,6 +148,7 @@ const userService = {
           success: true,
           token: 'admin-token-' + Date.now(), // 生成一个token
           username: loginData.username,
+          adminId: loginData.username, // 添加管理员ID，因为username就是rootId
           message: result.message
         };
       } else {

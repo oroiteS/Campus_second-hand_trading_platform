@@ -73,7 +73,7 @@
             @click="goToProductDetail(product.commodityId)">
             <div class="product-image-container">
               <img :src="product.mainImageUrl || '/测试图片.jpg'" :alt="product.commodityName" class="product-image" />
-              <div class="product-badge" v-if="product.commodityStatus === 'ON_SALE'">在售</div>
+              <div class="product-badge" v-if="product.commodityStatus != 'ON_SALE'">在售</div>
             </div>
             <div class="product-info">
               <h4 class="product-title">{{ product.commodityName }}</h4>
@@ -82,7 +82,6 @@
               </div>
               <div class="product-details">
                 <span class="product-condition">{{ product.newness }}</span>
-                <span class="product-status">{{ product.commodityStatusDescription }}</span>
               </div>
               <div class="product-meta">
                 <span class="product-time">{{ formatTime(product.createdAt) }}</span>
@@ -321,8 +320,25 @@ export default {
     showError(message) {
       alert(message)
     },
-    goToProductDetail(productId) {
+    async goToProductDetail(productId) {
       this.$router.push(`/product/${productId}`)
+      await this.recordClickBehavior(productId);
+    },
+        // 记录用户点击商品行为
+        async recordClickBehavior(commodityId) {
+      try {
+        const userId = localStorage.getItem('userId');
+        if (userId) {
+          await axios.post('http://localhost:8000/api/v1/commodities/click_commodity', {
+            user_id: userId,
+            commodity_id: commodityId
+          });
+          console.log('点击行为已记录:', { userId, commodityId });
+        }
+      } catch (error) {
+        console.error('记录点击行为失败:', error);
+        // 不影响正常跳转，只记录错误
+      }
     }
   },
   watch: {

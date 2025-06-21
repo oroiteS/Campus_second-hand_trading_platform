@@ -8,7 +8,7 @@ import (
 	"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/comment/config"
 	"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/comment/database"
 	"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/comment/handlers"
-	"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/comment/models"
+	//"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/comment/models"
 	"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/comment/routes"
 	"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/comment/services"
 )
