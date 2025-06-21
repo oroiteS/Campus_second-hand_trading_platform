@@ -15,7 +15,7 @@ import jakarta.validation.constraints.NotBlank;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/ban")
+@RequestMapping("/api-8082/ban")
 @RequiredArgsConstructor
 @Validated
 public class BanController {

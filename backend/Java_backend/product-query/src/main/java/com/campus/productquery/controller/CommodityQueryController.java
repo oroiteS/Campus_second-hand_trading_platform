@@ -20,7 +20,7 @@ import java.util.Map;
  * 专门处理前端分类查找和筛选功能
  */
 @RestController
-@RequestMapping("/api/v1/commodities")
+@RequestMapping("/api-8096/v1/commodities")
 @Tag(name = "商品分类查询API", description = "提供商品分类查询和筛选功能的API接口")
 @Validated
 public class CommodityQueryController {

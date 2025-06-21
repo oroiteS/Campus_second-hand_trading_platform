@@ -49,7 +49,7 @@ import java.util.HashMap;
  * 前端通过JSON格式传递参数，后端解析并构造请求体
  */
 @RestController
-@RequestMapping("/api/orders")
+@RequestMapping("/api-8095/orders")
 @CrossOrigin(origins = "*")
 public class OrderApiController {
 

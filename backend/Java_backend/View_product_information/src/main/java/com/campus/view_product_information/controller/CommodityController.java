@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/commodity")
+@RequestMapping("/api-8083/commodity")
 @RequiredArgsConstructor
 @Tag(name = "商品信息管理", description = "商品信息查看相关接口")
 public class CommodityController {

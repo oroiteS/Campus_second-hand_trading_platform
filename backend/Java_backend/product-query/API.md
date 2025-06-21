@@ -12,7 +12,7 @@
 
 ### 1. 分类查询商品
 
-**接口**: `POST /api/commodity-query/category`
+**接口**: `POST /api-8096/v1/commodities/category`
 
 **描述**: 根据商品分类查询商品，支持价格筛选、新旧度筛选、排序和分页功能
 

@@ -2,7 +2,7 @@
 
 ## 基础信息
 
-- **基础路径**: `/user/account`
+- **基础路径**: `/api-8081/user/account`
 - **内容类型**: `application/json`
 - **运行端口**: `8081`
 
@@ -30,7 +30,7 @@
 
 ### 1. 确认收货
 
-**接口地址**: `POST /user/account/confirmReceipt`
+**接口地址**: `POST /api-8081/user/account/confirmReceipt`
 
 **功能描述**: 买家确认收货，将订单金额转入卖家账户
 
@@ -64,7 +64,7 @@
 
 ### 2. 提现
 
-**接口地址**: `POST /user/account/withdraw`
+**接口地址**: `POST /api-8081/user/account/withdraw`
 
 **功能描述**: 用户从账户余额中提现
 
@@ -98,7 +98,7 @@
 
 ### 3. 充值
 
-**接口地址**: `POST /user/account/recharge`
+**接口地址**: `POST /api-8081/user/account/recharge`
 
 **功能描述**: 用户向账户充值
 
@@ -132,7 +132,7 @@
 
 ### 4. 卖家退款
 
-**接口地址**: `POST /user/account/sellerRefund`
+**接口地址**: `POST /api-8081/user/account/sellerRefund`
 
 **功能描述**: 卖家主动退款给买家
 
@@ -165,7 +165,7 @@
 
 ### 5. 支付
 
-**接口地址**: `POST /user/account/pay`
+**接口地址**: `POST /api-8081/user/account/pay`
 
 **功能描述**: 用户支付订单
 
@@ -194,6 +194,38 @@
 - `404`: 订单不存在 / 用户不存在
 - `400`: 余额不足
 - `500`: 更新账户余额失败
+
+---
+
+### 6. 获取钱包余额
+
+**接口地址**: `POST /api-8081/user/account/balance`
+
+**功能描述**: 获取用户钱包余额
+
+**请求参数**:
+```json
+{
+  "userId": "string"
+}
+```
+
+**参数说明**:
+- `userId`: 用户ID（必填）
+
+**成功响应**:
+```json
+{
+  "success": true,
+  "message": "查询成功",
+  "code": 200,
+  "data": 1000.00
+}
+```
+
+**错误响应**:
+- `404`: 用户不存在
+- `500`: 查询钱包余额失败
 
 ## 数据模型
 
@@ -236,6 +268,13 @@
 {
   "userId": "string",
   "orderID": "string"
+}
+```
+
+#### BalanceRequest (余额查询请求)
+```json
+{
+  "userId": "string"
 }
 ```
 

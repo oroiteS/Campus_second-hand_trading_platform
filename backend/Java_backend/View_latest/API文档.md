@@ -33,8 +33,8 @@
 **接口描述**: 获取最新6个发布的在售商品的完整信息，包含所有字段
 
 - **请求方式**: `GET`
-- **请求路径**: `/api/commodities/latest`
-- **完整URL**: `http://localhost:8087/api/commodities/latest`
+- **请求路径**: `/api-8087/commodities/latest`
+- **完整URL**: `http://localhost:8087/api-8087/commodities/latest`
 
 **请求参数**: 无
 
@@ -99,8 +99,8 @@
 **接口描述**: 获取所有用户的指定字段信息（User_ID、User_name、telephone、Create_at、User_sta、avatar_url）
 
 - **请求方式**: `GET`
-- **请求路径**: `/api/users/all`
-- **完整URL**: `http://localhost:8087/api/users/all`
+- **请求路径**: `/api-8087/users/all`
+- **完整URL**: `http://localhost:8087/api-8087/users/all`
 
 **请求参数**: 无
 
@@ -213,8 +213,8 @@
 3. **访问地址**:
    - 服务地址: http://localhost:8087
    - API文档: http://localhost:8087/swagger-ui.html
-   - 最新商品API: http://localhost:8087/api/commodities/latest
-   - 所有用户API: http://localhost:8087/api/users/all
+   - 最新商品API: http://localhost:8087/api-8087/commodities/latest
+- 所有用户API: http://localhost:8087/api-8087/users/all
 
 ## 注意事项
 

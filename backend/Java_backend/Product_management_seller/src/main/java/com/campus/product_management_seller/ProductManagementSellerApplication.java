@@ -13,7 +13,7 @@ public class ProductManagementSellerApplication {
     public static void main(String[] args) {
         SpringApplication.run(ProductManagementSellerApplication.class, args);
         System.out.println("=== 商品管理卖家服务启动成功 ===");
-        System.out.println("API文档地址: http://localhost:8084/api/commodity/health");
+        System.out.println("API文档地址: http://localhost:8084/api-8084/commodity/health");
         System.out.println("服务端口: 8084");
     }
 

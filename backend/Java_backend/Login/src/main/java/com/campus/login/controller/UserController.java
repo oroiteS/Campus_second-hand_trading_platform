@@ -19,7 +19,7 @@ import java.util.Map;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api-8080/user")
 @RequiredArgsConstructor
 @Validated
 public class UserController {

@@ -19,7 +19,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api-8087/users")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 @Tag(name = "用户管理", description = "用户相关API")

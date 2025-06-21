@@ -64,7 +64,7 @@ mvn spring-boot:run
 访问健康检查接口：
 
 ```
-GET http://localhost:8084/api/commodity/health
+GET http://localhost:8084/api-8084/commodity/health
 ```
 
 5. **查看API文档**
@@ -80,7 +80,7 @@ http://localhost:8084/swagger-ui.html
 ### 基础信息
 
 - **服务端口**: 8084
-- **基础路径**: `/api/commodity`
+- **基础路径**: `/api-8084/commodity`
 - **响应格式**: JSON
 - **时区**: Asia/Shanghai
 
@@ -99,7 +99,7 @@ http://localhost:8084/swagger-ui.html
 
 #### 1. 创建商品（待审核）
 
-- **URL**: `/api/commodity/create-and-put-on-sale`
+- **URL**: `/api-8084/commodity/create-and-put-on-sale`
 - **方法**: `POST`
 - **描述**: 创建新商品并设置为待审核状态(to_sale)，需要管理员审核后才能正式上架。支持同时上传商品图片到OSS。
 - **Content-Type**: `multipart/form-data`
@@ -152,7 +152,7 @@ http://localhost:8084/swagger-ui.html
 
 #### 2. 申请上架商品（设置状态为待审核）
 
-- **URL**: `/api/commodity/put-on-sale`
+- **URL**: `/api-8084/commodity/put-on-sale`
 - **方法**: `POST`
 - **描述**: 申请上架商品，将商品状态设置为 `to_sale`（待审核），等待管理员审核。
 - **Content-Type**: `application/json`
@@ -182,7 +182,7 @@ http://localhost:8084/swagger-ui.html
 
 #### 3. 商品下架
 
-- **URL**: `/api/commodity/put-off-sale`
+- **URL**: `/api-8084/commodity/put-off-sale`
 - **方法**: `POST`
 - **描述**: 将商品状态设置为 `off_sale`（下架）。
 - **Content-Type**: `application/json`
@@ -212,7 +212,7 @@ http://localhost:8084/swagger-ui.html
 
 #### 3.1. 标记商品为已售
 
-- **URL**: `/api/commodity/mark-as-sold`
+- **URL**: `/api-8084/commodity/mark-as-sold`
 - **方法**: `POST`
 - **描述**: 将商品状态设置为 `sold`（已售）。
 - **Content-Type**: `application/json`
@@ -242,7 +242,7 @@ http://localhost:8084/swagger-ui.html
 
 #### 4. 更新商品信息
 
-- **URL**: `/api/commodity/update-info`
+- **URL**: `/api-8084/commodity/update-info`
 - **方法**: `POST`
 - **描述**: 更新商品的详细信息，包括名称、描述、价格、新旧度、数量和图片。支持部分字段更新和图片文件直接上传。
 - **Content-Type**: `multipart/form-data`
@@ -283,7 +283,7 @@ http://localhost:8084/swagger-ui.html
 
 #### 5. 修改商品描述（已废弃）
 
-- **URL**: `/api/commodity/update-description`
+- **URL**: `/api-8084/commodity/update-description`
 - **方法**: `POST`
 - **描述**: ⚠️ **此接口已废弃，请使用 `/update-info` 接口进行商品信息更新**
 - **Content-Type**: `application/json`
@@ -315,7 +315,7 @@ http://localhost:8084/swagger-ui.html
 
 #### 6. 获取卖家商品列表
 
-- **URL**: `/api/commodity/list/{sellerId}`
+- **URL**: `/api-8084/commodity/list/{sellerId}`
 - **方法**: `GET`
 - **描述**: 获取指定卖家的所有商品列表。
 
@@ -351,7 +351,7 @@ http://localhost:8084/swagger-ui.html
 
 #### 7. 根据状态获取商品列表
 
-- **URL**: `/api/commodity/list/{sellerId}/status/{status}`
+- **URL**: `/api-8084/commodity/list/{sellerId}/status/{status}`
 - **方法**: `GET`
 - **描述**: 获取指定卖家特定状态的商品列表。
 
@@ -366,7 +366,7 @@ http://localhost:8084/swagger-ui.html
 
 #### 8. 获取商品详情
 
-- **URL**: `/api/commodity/detail/{commodityId}/seller/{sellerId}`
+- **URL**: `/api-8084/commodity/detail/{commodityId}/seller/{sellerId}`
 - **方法**: `GET`
 - **描述**: 获取指定商品的详细信息。
 
@@ -403,7 +403,7 @@ http://localhost:8084/swagger-ui.html
 
 #### 9. 获取标签列表
 
-- **URL**: `/api/commodity/tags`
+- **URL**: `/api-8084/commodity/tags`
 - **方法**: `GET`
 - **描述**: 根据商品类别ID获取该类别下的所有标签列表。
 
@@ -416,7 +416,7 @@ http://localhost:8084/swagger-ui.html
 **请求示例**:
 
 ```
-GET /api/commodity/tags?category_id=1
+GET /api-8084/commodity/tags?category_id=1
 ```
 
 **响应示例**:
@@ -455,7 +455,7 @@ GET /api/commodity/tags?category_id=1
 
 #### 10. 健康检查
 
-- **URL**: `/api/commodity/health`
+- **URL**: `/api-8084/commodity/health`
 - **方法**: `GET`
 - **描述**: 检查服务是否正常运行。
 
@@ -640,7 +640,7 @@ mvn verify
 - **业务价值**: 增强平台管理能力，确保商品质量，防止违规商品直接上架
 
 #### 新增商品已售状态管理
-- **新增功能**: 添加商品标记为已售接口 `POST /api/commodity/mark-as-sold`
+- **新增功能**: 添加商品标记为已售接口 `POST /api-8084/commodity/mark-as-sold`
 - **功能描述**: 将商品状态设置为 `sold`（已售）
 - **参数要求**: 只需要传入 `commodityId` 和 `sellerId`
 - **实现层级**: Service层新增 `markAsSold` 方法，Controller层新增对应接口
@@ -653,8 +653,8 @@ mvn verify
   - 接口参数：只需要传入 `commodityId` 和 `sellerId`
   - 业务逻辑：系统自动判断上架或下架操作
 - **涉及接口**:
-  - `POST /api/commodity/put-on-sale` - 商品上架
-  - `POST /api/commodity/put-off-sale` - 商品下架
+  - `POST /api-8084/commodity/put-on-sale` - 商品上架
+- `POST /api-8084/commodity/put-off-sale` - 商品下架
 - **DTO更新**: `CommodityStatusUpdateRequest.java` 移除 `status` 字段
 - **优势**: 简化接口调用，减少参数验证，提高易用性
 
@@ -700,7 +700,7 @@ mvn verify
   - 新增 `TagRepository` 数据访问层，支持按类别查询标签
   - 新增 `TagService` 业务逻辑层，提供标签查询服务
   - 新增 `TagDTO` 数据传输对象，用于API响应
-  - 新增 `/api/commodity/tags` 接口，根据类别ID获取标签列表
+  - 新增 `/api-8084/commodity/tags` 接口，根据类别ID获取标签列表
   - 支持标签与商品类别的关联查询
   - 完善了商品创建时的标签ID验证和存储
 

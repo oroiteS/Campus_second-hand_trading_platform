@@ -7,7 +7,7 @@
 ## 基础信息
 
 - **服务名称**: View Product Information Service
-- **基础路径**: `/api/commodity`
+- **基础路径**: `/api-8083/commodity`
 - **协议**: HTTP/HTTPS
 - **数据格式**: JSON
 
@@ -19,7 +19,7 @@
 根据商品ID获取商品的详细信息，包括商品基本信息和类别名称。
 
 #### 请求信息
-- **URL**: `/api/commodity/detail/{commodityId}`
+- **URL**: `/api-8083/commodity/detail/{commodityId}`
 - **方法**: `GET`
 - **Content-Type**: `application/json`
 
@@ -32,7 +32,7 @@
 #### 请求示例
 
 ```http
-GET /api/commodity/detail/01234567-89ab-cdef-0123-456789abcdef
+GET /api-8083/commodity/detail/01234567-89ab-cdef-0123-456789abcdef
 Content-Type: application/json
 ```
 
@@ -111,14 +111,14 @@ Content-Type: application/json
 检查商品信息服务是否正常运行。
 
 #### 请求信息
-- **URL**: `/api/commodity/health`
+- **URL**: `/api-8083/commodity/health`
 - **方法**: `GET`
 - **Content-Type**: `application/json`
 
 #### 请求示例
 
 ```http
-GET /api/commodity/health
+GET /api-8083/commodity/health
 Content-Type: application/json
 ```
 

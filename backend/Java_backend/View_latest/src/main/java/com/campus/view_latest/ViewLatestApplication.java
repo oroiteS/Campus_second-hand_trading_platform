@@ -20,8 +20,8 @@ public class ViewLatestApplication {
         System.out.println("\n=== View Latest Service Started Successfully ===");
         System.out.println("Port: 8087");
         System.out.println("API Documentation: http://localhost:8087/swagger-ui.html");
-        System.out.println("Latest Commodities API: http://localhost:8087/api/commodities/latest");
-        System.out.println("All Users API: http://localhost:8087/api/users/all");
+        System.out.println("Latest Commodities API: http://localhost:8087/api-8087/commodities/latest");
+        System.out.println("All Users API: http://localhost:8087/api-8087/users/all");
         System.out.println("================================================\n");
     }
 

@@ -32,18 +32,18 @@ Ban/
 ### 2. 核心功能
 
 #### 2.1 封号功能
-- **根据用户ID封号**: `POST /api/ban/user/{userId}`
-- **根据用户名封号**: `POST /api/ban/username/{userName}`
-- **批量封号**: `POST /api/ban/batch/users`
+- **根据用户ID封号**: `POST /api-8082/ban/user/{userId}`
+- **根据用户名封号**: `POST /api-8082/ban/username/{userName}`
+- **批量封号**: `POST /api-8082/ban/batch/users`
 
 #### 2.2 解封功能
-- **根据用户ID解封**: `DELETE /api/ban/user/{userId}`
-- **根据用户名解封**: `DELETE /api/ban/username/{userName}`
-- **批量解封**: `DELETE /api/ban/batch/users`
+- **根据用户ID解封**: `DELETE /api-8082/ban/user/{userId}`
+- **根据用户名解封**: `DELETE /api-8082/ban/username/{userName}`
+- **批量解封**: `DELETE /api-8082/ban/batch/users`
 
 #### 2.3 查询功能
-- **查询用户状态(ID)**: `GET /api/ban/status/user/{userId}`
-- **查询用户状态(用户名)**: `GET /api/ban/status/username/{userName}`
+- **查询用户状态(ID)**: `GET /api-8082/ban/status/user/{userId}`
+- **查询用户状态(用户名)**: `GET /api-8082/ban/status/username/{userName}`
 
 ### 3. 技术特性
 
@@ -103,7 +103,7 @@ mybatis-plus:
 
 #### 5.1 封号接口
 ```http
-POST http://localhost:8082/api/ban/user/{userId}
+POST http://localhost:8082/api-8082/ban/user/{userId}
 Content-Type: application/json
 
 响应:
@@ -116,7 +116,7 @@ Content-Type: application/json
 
 #### 5.2 解封接口
 ```http
-DELETE http://localhost:8082/api/ban/user/{userId}
+DELETE http://localhost:8082/api-8082/ban/user/{userId}
 Content-Type: application/json
 
 响应:
@@ -129,7 +129,7 @@ Content-Type: application/json
 
 #### 5.3 查询用户状态
 ```http
-GET http://localhost:8082/api/ban/status/user/{userId}
+GET http://localhost:8082/api-8082/ban/status/user/{userId}
 Content-Type: application/json
 
 响应:
@@ -231,20 +231,20 @@ Content-Type: application/json
 **可用API接口**：
 
 **封号接口**：
-- URL: `POST /api/ban/user/{userId}`
-- URL: `POST /api/ban/username/{userName}`
-- URL: `POST /api/ban/batch/users`
+- URL: `POST /api-8082/ban/user/{userId}`
+- URL: `POST /api-8082/ban/username/{userName}`
+- URL: `POST /api-8082/ban/batch/users`
 - 功能: 对指定用户进行封号操作
 
 **解封接口**：
-- URL: `DELETE /api/ban/user/{userId}`
-- URL: `DELETE /api/ban/username/{userName}`
-- URL: `DELETE /api/ban/batch/users`
+- URL: `DELETE /api-8082/ban/user/{userId}`
+- URL: `DELETE /api-8082/ban/username/{userName}`
+- URL: `DELETE /api-8082/ban/batch/users`
 - 功能: 解除用户封号状态
 
 **查询接口**：
-- URL: `GET /api/ban/status/user/{userId}`
-- URL: `GET /api/ban/status/username/{userName}`
+- URL: `GET /api-8082/ban/status/user/{userId}`
+- URL: `GET /api-8082/ban/status/username/{userName}`
 - 功能: 查询用户当前封号状态
 
 **技术栈配置**：

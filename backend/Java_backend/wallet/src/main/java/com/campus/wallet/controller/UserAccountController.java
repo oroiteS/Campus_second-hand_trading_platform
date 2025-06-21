@@ -27,7 +27,7 @@ import com.campus.wallet.pojo.BalanceRequest;
 
 @Tag(name = "用户钱包管理", description = "用户钱包相关接口")
 @RestController
-@RequestMapping("/user/account")
+@RequestMapping("/api-8081/user/account")
 @CrossOrigin(origins = "*")
 public class UserAccountController {
     private final UserAccountService userAccountService;

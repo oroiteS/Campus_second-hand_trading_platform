@@ -5,9 +5,9 @@
 
 订单管理模块提供完整的订单生命周期管理功能，包括订单创建、查询、状态更新、取消和统计等操作。所有API接口采用RESTful设计，使用JSON格式进行数据交换。
 
-**基础URL**: `/api/orders`
+**基础URL**: `/api-8095/orders`
 
-**运行端口8095**: `/api/orders`
+**运行端口8095**: `/api-8095/orders`
 
 **支持的HTTP方法**: POST
 
@@ -47,7 +47,7 @@
 
 ### 1. 创建订单
 
-**接口**: `POST /api/orders/create`
+**接口**: `POST /api-8095/orders/create`
 
 **描述**: 创建一个新的订单，订单初始状态为待付款
 
@@ -91,7 +91,7 @@
 
 ### 2. 查询订单详情
 
-**接口**: `POST /api/orders/query/by-id`
+**接口**: `POST /api-8095/orders/query/by-id`
 
 **描述**: 根据订单ID查询订单详细信息
 
@@ -109,7 +109,7 @@
 
 ### 3. 查询买家订单
 
-**接口**: `POST /api/orders/query/by-buyer`
+**接口**: `POST /api-8095/orders/query/by-buyer`
 
 **描述**: 根据买家ID查询订单列表
 
@@ -126,7 +126,7 @@
 
 ### 4. 查询卖家订单
 
-**接口**: `POST /api/orders/query/by-seller`
+**接口**: `POST /api-8095/orders/query/by-seller`
 
 **描述**: 根据卖家ID查询订单列表
 
@@ -143,7 +143,7 @@
 
 ### 5. 查询商品订单
 
-**接口**: `POST /api/orders/query/by-commodity`
+**接口**: `POST /api-8095/orders/query/by-commodity`
 
 **描述**: 根据商品ID查询订单列表
 
@@ -160,7 +160,7 @@
 
 ### 6. 按状态查询订单
 
-**接口**: `POST /api/orders/query/by-status`
+**接口**: `POST /api-8095/orders/query/by-status`
 
 **描述**: 根据订单状态查询订单列表
 
@@ -177,7 +177,7 @@
 
 ### 7. 查询用户参与的订单
 
-**接口**: `POST /api/orders/query/by-user`
+**接口**: `POST /api-8095/orders/query/by-user`
 
 **描述**: 根据用户ID查询用户作为买家或卖家参与的所有订单
 
@@ -194,7 +194,7 @@
 
 ### 8. 分页查询所有订单
 
-**接口**: `POST /api/orders/query/all-paged`
+**接口**: `POST /api-8095/orders/query/all-paged`
 
 **描述**: 分页查询所有订单，支持按创建时间倒序排列，适用于管理员查看所有订单或用户浏览订单列表
 
@@ -264,7 +264,7 @@
 
 ### 9. 更新订单状态
 
-**接口**: `POST /api/orders/update-status`
+**接口**: `POST /api-8095/orders/update-status`
 
 **描述**: 更新订单的状态
 
@@ -284,7 +284,7 @@
 
 ### 10. 取消订单
 
-**接口**: `POST /api/orders/cancel`
+**接口**: `POST /api-8095/orders/cancel`
 
 **描述**: 取消指定的订单，只有待付款状态的订单才能取消
 
@@ -316,7 +316,7 @@
 
 ### 11. 获取订单统计
 
-**接口**: `POST /api/orders/statistics`
+**接口**: `POST /api-8095/orders/statistics`
 
 **描述**: 获取用户的订单统计信息
 
