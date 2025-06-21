@@ -94,7 +94,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import {ax1} from '@/api/axios';
 
 export default {
   name: 'UserProfile',
@@ -154,7 +154,7 @@ export default {
       this.isLoading = true;
       
       // 调用API获取用户信息
-      axios.post('http://localhost:8089/api/user/info', {
+      ax1.post('/api-8089/user/info', {
         userId: userId
       })
       .then(response => {
@@ -215,7 +215,7 @@ export default {
 
       try {
         // 调用头像上传API
-        const response = await axios.post('http://localhost:8089/api/user/avatar/upload', formData, {
+        const response = await ax1.post('/api-8089/user/avatar/upload', formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
@@ -260,7 +260,7 @@ export default {
         };
         
         // 调用API更新用户信息
-        const response = await axios.post('http://localhost:8089/api/user/update', userUpdateData);
+        const response = await ax1.post('/api-8089/user/update', userUpdateData);
         
         if (response.data.success) {
           console.log('用户信息更新成功:', response.data);
@@ -286,4 +286,4 @@ export default {
 
 <style scoped>
 @import '../styles/UserProfile.css';
-</style>
+</style>@/api/axios1

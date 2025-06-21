@@ -12,7 +12,7 @@ import (
 	"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/chat/database"
 	_ "github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/chat/docs"
 	"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/chat/handlers"
-	"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/chat/middleware"
+	// "github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/chat/middleware"
 	"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/chat/services"
 )
 
@@ -59,7 +59,7 @@ func main() {
 	r := gin.Default()
 
 	// 添加CORS中间件
-	r.Use(middleware.CORS())
+
 
 	// API路由组
 	v1 := r.Group("/api-8088/v1")

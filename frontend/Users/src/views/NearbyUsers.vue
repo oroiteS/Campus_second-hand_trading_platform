@@ -59,6 +59,7 @@
 <script>
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import {ax1} from '@/api/axios'
 export default {
   name: 'NearbyUsers',
   mounted() {
@@ -115,21 +116,17 @@ export default {
       const { userId, lat, lon } = this.$route.query
 
       try {
-        const response = await fetch(
-          `http://localhost:8086/api/user/nearby?userId=${userId}&lat=${lat}&lon=${lon}`,
+        const response = await ax1.post(
+          `/api-8086/user/nearby?userId=${userId}&lat=${lat}&lon=${lon}`,
+          {},
           {
-            method: 'POST',
             headers: {
               'Accept': '*/*'
             }
           }
         )
 
-        if (!response.ok) {
-          throw new Error('请求失败')
-        }
-
-        const data = await response.json()
+        const data = response.data
 
         // 将后端返回的数据映射为当前页面可用的数据格式
         // 修改 fetchNearbyUsers 方法中的数据映射

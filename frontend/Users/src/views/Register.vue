@@ -107,7 +107,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import { ax1,instance } from '@/api/axios'
 
 export default {
   name: 'RegisterPage',
@@ -267,7 +267,7 @@ export default {
       
       // 调用后端注册API
       try {
-        const response = await axios.post('http://localhost:8080/api/user/register', {
+        const response = await ax1.post('/api-8080/user/register', {
           userId: this.userId,
           userName: this.nickname,
           realName: this.realName,
@@ -292,7 +292,7 @@ export default {
             }
             // 在控制台输出like_tags信息
             console.log('提交的爱好标签:', finalHobbies)
-            const likeResponse = await axios.post('http://localhost:8000/api/v1/commodities/register', {
+            const likeResponse = await instance.post('/api/v1/commodities/register', {
               user_id: this.userId,
               like_tags: finalHobbies,
             })
@@ -329,4 +329,4 @@ export default {
 
 <style scoped>
 @import '../styles/Register.css';
-</style>
+</style>@/api/axios1

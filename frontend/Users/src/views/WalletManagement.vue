@@ -126,7 +126,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import {ax1} from '@/api/axios'
 
 export default {
   name: 'WalletManagement',
@@ -185,7 +185,7 @@ export default {
       this.isLoading = true;
       
       // 调用后端API获取钱包余额
-      axios.post('http://localhost:8081/user/account/balance', {
+      ax1.post('/api-8081/user/account/balance', {
         userId: this.userId
       })
       .then(response => {
@@ -219,7 +219,7 @@ export default {
       this.isLoading = true;
       
       // 调用后端API获取全部交易记录
-      axios.post('http://localhost:8095/api/orders/query/by-user', {
+      ax1.post('/api-8095/orders/query/by-user', {
         user_id: this.userId
       })
       .then(response => {
@@ -264,7 +264,7 @@ export default {
       this.isLoading = true;
       
       // 调用后端API进行充值
-      axios.post('http://localhost:8081/user/account/recharge', {
+      ax1.post('/api-8081/user/account/recharge', {
         userId: this.userId,
         amount: parseFloat(this.rechargeAmount),
         paymentMethod: this.selectedPaymentMethod
@@ -313,7 +313,7 @@ export default {
       this.isLoading = true;
       
       // 调用后端API进行提现
-      axios.post('http://localhost:8081/user/account/withdraw', {
+      ax1.post('/api-8081/user/account/withdraw', {
         userId: this.userId,
         amount: amount
       })
@@ -904,4 +904,4 @@ export default {
 * {
   touch-action: manipulation; /* 优化触摸操作 */
 }
-</style>
+</style>@/api/axios1

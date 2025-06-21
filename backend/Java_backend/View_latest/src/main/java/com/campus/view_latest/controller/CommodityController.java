@@ -21,7 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api-8087/commodities")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
+//@CrossOrigin(origins = "*")
 @Tag(name = "商品管理", description = "商品相关API")
 public class CommodityController {
     

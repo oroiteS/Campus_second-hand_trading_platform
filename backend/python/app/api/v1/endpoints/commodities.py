@@ -133,3 +133,11 @@ def get_commodities_on_sale(db: Session = Depends(get_db)):
     """获取在售商品数量"""
     commodity_num = crud_commodity.get_commodities_on_sale(db)
     return commodity_num
+@router.get("/get_user_name_avert/{user_id}")
+def get_user_name(user_id: str, db: Session = Depends(get_db)):
+    """根据用户ID获取用户名"""
+    user = crud_commodity.get_user_name_avert(user_id,db)
+    if user:
+        return {"code": 0, "username": user.user_name ,"user_avert": user.avatar_url}
+    else:
+        return {"code": 1, "message": "用户不存在"}

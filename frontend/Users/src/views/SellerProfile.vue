@@ -88,7 +88,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import {ax1} from '@/api/axios';
 // 删除这行未使用的导入
 // import { getSellerProducts } from '../api/commodity.js';
 
@@ -137,7 +137,7 @@ export default {
       this.isLoading = true;
       this.errorMessage = '';
       
-      axios.post('http://localhost:8089/api/user/info', {
+      ax1.post('/api-8089/user/info', {
         userId: sellerId
       })
       .then(response => {
@@ -174,22 +174,11 @@ export default {
       this.productsLoading = true;
       
       try {
-        // 直接调用不带分页参数的API
-        const response = await fetch(`http://localhost:8084/api/commodity/list/${sellerId}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
+        // 使用ax1 axios实例调用API
+        const response = await ax1.get(`/api-8084/commodity/list/${sellerId}`);
         
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const result = await response.json();
-        
-        if (result.success) {
-          this.products = (result.data || []).map(item => ({
+        if (response.data.success) {
+          this.products = (response.data.data || []).map(item => ({
             id: item.commodityId,
             title: item.commodityName,
             price: item.currentPrice,
@@ -199,11 +188,13 @@ export default {
             description: item.commodityDescription
           }));
         } else {
-          throw new Error(result.message || '获取商品列表失败');
+          throw new Error(response.data.message || '获取商品列表失败');
         }
       } catch (error) {
         console.error('获取卖家商品列表出错:', error);
         this.products = [];
+        // 可以添加用户友好的错误提示
+        this.errorMessage = '获取商品列表失败，请稍后重试';
       } finally {
         this.productsLoading = false;
       }
@@ -252,4 +243,4 @@ export default {
 
 <style scoped>
 @import '../styles/SellerProfile.css';
-</style>
+</style>@/api/axios1

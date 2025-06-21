@@ -56,11 +56,7 @@ def get_commodities_username(db: Session) -> List[Commodity_username]:
             Commodity.quantity,
             User.user_name
         )
-<<<<<<< HEAD
         .join(User, Commodity.seller_id == User.user_id)
-=======
-        .join(User, Commodity.seller_id == ser.user_id)
->>>>>>> 83aeec51c5b819f8e21793540034f97c618e67c5
     )
     results = db.execute(stmt).all() # SQLAlchemy 2.0 风格的执行
 
@@ -94,7 +90,7 @@ def get_commodity_recommendation(db: Session,user_id: str) -> List[Commodity_use
         commodity_data['user_name'] = user_name
         commodity_data['avatar_url'] = avatar_url
         results_commendation.append(Commodity_username_avatar(**commodity_data))
-    # random.shuffle(results_commendation)
+    random.shuffle(results_commendation)
     return results_commendation
 
 
@@ -321,8 +317,11 @@ def delete_commodity(request:Commodity_id,db:Session):
     return code
 
 def get_username(user_id,db:Session):
-    username = db.query(users).filter(users.user_id == user_id).first().username
+    username = db.query(User).filter(User.user_id == user_id).first().username
     return username
 def get_commodities_on_sale(db:Session):
     commodity_num = db.query(Commodity).filter(Commodity.commodity_status == "on_sale").count()
     return commodity_num
+def get_user_name_avert(user_id,db:Session):
+    user = db.query(User).filter(User.user_id == user_id).first()
+    return user

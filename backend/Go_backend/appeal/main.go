@@ -1,14 +1,13 @@
 package main
 
 import (
-	"github.com/gin-contrib/cors"
+
 	"github.com/gin-gonic/gin"
 	"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/appeal/config"
 	"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/appeal/database"
 	"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/appeal/handlers"
 	"github.com/oroiteS/Campus_second-hand_trading_platform/tree/main/backend/Go_backend/appeal/services"
 	"log"
-	"time"
 )
 
 // @title 申诉服务 API
@@ -45,7 +44,7 @@ func main() {
 	// 初始化Gin路由
 	r := gin.Default()
 
-	// 使用官方CORS中间件
+	/*// 使用官方CORS中间件
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
@@ -53,7 +52,7 @@ func main() {
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
-	}))
+	}))*/
 
 	// 设置路由
 	api := r.Group("/api-8093/v1")

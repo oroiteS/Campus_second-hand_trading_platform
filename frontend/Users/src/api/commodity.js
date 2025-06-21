@@ -1,7 +1,7 @@
-import axios from "axios";
+import {ax1,instance} from "./axios";
 
 // 商品相关API
-const API_BASE_URL = 'http://localhost:8087';
+// const API_BASE_URL = '';
 
 /**
  * 获取最新发布的商品
@@ -9,48 +9,39 @@ const API_BASE_URL = 'http://localhost:8087';
  */
 export const getLatestCommodities = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/commodities/latest`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    // 使用 axios 发送请求
+    const response = await ax1.get(`/api-8087/commodities/latest`);
     
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+    // 直接获取解析后的 data（axios 自动处理 JSON 解析）
+    const result = response.data;
     
-    const result = await response.json();
-    
+    // 检查业务状态码
     if (result.code === 200) {
+      // 返回商品列表数据
       return result.data;
     } else {
       throw new Error(result.message || '获取商品数据失败');
     }
   } catch (error) {
     console.error('获取最新商品失败:', error);
-    throw error;
+    
+    // 区分错误类型（网络错误 vs 业务错误）
+    if (error.response) {
+      console.error('HTTP错误:', error.response.status);
+    }
+    
+    throw error; // 向上抛出错误
   }
 };
-
 /**
  * 获取所有用户信息
  * @returns {Promise} 返回所有用户数据
  */
 export const getAllUsers = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/users/all`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    const response = await ax1.get('/api/users/all'); //虚空api
     
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    const result = await response.json();
+    const result = response.data;
     
     if (result.code === 200) {
       return result.data;
@@ -69,11 +60,12 @@ export const getAllUsers = async () => {
  * @param {Array} users 用户数据（可选，用于获取卖家信息）
  * @returns {Array} 转换后的商品数据
  */
-export const transformCommodityData = (commodities, users = []) => {
-  return commodities.map(item => {
+export const transformCommodityData = async (commodities, users = []) => {
+  const transformedItems = commodities.map(async item => {
     // 查找对应的卖家信息
-    const seller = users.find(user => user.userId === item.sellerId) || {};
-    
+    console.log(users)
+    const seller = users.find(user => user.userId === item.userId) || {};
+
     // 解析图片列表
     let imageList = [];
     try {
@@ -86,7 +78,6 @@ export const transformCommodityData = (commodities, users = []) => {
     
     // 计算发布时间距离现在的时间
     const timeAgo = calculateTimeAgo(item.createdAt);
-    
     return {
       id: item.commodityId,
       name: item.commodityName,
@@ -105,6 +96,9 @@ export const transformCommodityData = (commodities, users = []) => {
       updatedAt: item.updatedAt
     };
   });
+  
+  // 等待所有异步操作完成
+  return await Promise.all(transformedItems);
 };
 
 /**
@@ -198,27 +192,24 @@ function extractSchool(userName) {
  */
 export const getCommodityDetail = async (commodityId) => {
   try {
-    const response = await fetch(`http://localhost:8083/api/commodity/detail/${commodityId}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    // 使用 axios 发送请求
+    const response = await ax1.get(`/api-8083/commodity/detail/${commodityId}`);
     
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+    // axios 直接返回解析后的 data，不需要 response.json()
+    const result = response.data;
     
-    const result = await response.json();
+    // 调试用：显示商品名称而不是整个对象
+    alert(`商品名称: ${result.data.commodityName}`);
     
+    // 检查业务状态码
     if (result.code === 200) {
-      return result.data;
+      return result.data; // 返回商品数据
     } else {
       throw new Error(result.message || '获取商品详情失败');
     }
   } catch (error) {
     console.error('获取商品详情失败:', error);
-    throw error;
+    throw error; // 向上抛出错误
   }
 };
 
@@ -385,28 +376,16 @@ export const transformCommodityDetailData = async (commodityData) => {
  * @returns {Promise} 返回用户信息数据
  */
 export const getUserInfo = async (userId) => {
+  console.log('iiiuserid',userId)
   try {
-    const response = await fetch('http://localhost:8089/api/user/info', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
+    const response = await ax1.post('/api-8089/user/info', {
         userId: userId
-      })
     });
     
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+    const result = response;
     
-    const result = await response.json();
-    
-    if (result.code === 200) {
-      return result.data;
-    } else {
-      throw new Error(result.message || '获取用户信息失败');
-    }
+    console.log('sssss',result)
+    return result.data.data;
   } catch (error) {
     console.error('获取用户信息失败:', error);
     throw error;
@@ -423,18 +402,13 @@ export const getUserInfo = async (userId) => {
 export const getSellerProducts = async (sellerId, page = 1, size = 6) => {
   // 默认每页6个商品
   try {
-    const response = await fetch(`http://localhost:8084/api/commodity/list/${sellerId}?page=${page}&size=${size}`, {
-      method: 'GET',
+    const response = await ax1.get(`/api-8084/commodity/list/${sellerId}?page=${page}&size=${size}`, {
       headers: {
         'Content-Type': 'application/json',
       },
     });
     
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    const result = await response.json();
+    const result = response.data;
     
     if (result.success) {
       return {
@@ -480,7 +454,7 @@ export const get_commodities_recommendation = async (user_id) => {
     return [];
   }
   try {
-    const response = await axios.get(`http://localhost:8000/api/v1/commodities/recommendation/${user_id}`);
+    const response = await instance.get(`/api/v1/commodities/recommendation/${user_id}`);
     if (response.data) {
       return response.data;
     } else {

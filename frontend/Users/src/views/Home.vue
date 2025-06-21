@@ -200,7 +200,7 @@
   </div>
 </template>
 <script>
-import axios from 'axios';
+import {ax1,instance} from '@/api/axios';
 // 导入API函数
 import { getLatestCommodities, getAllUsers, transformCommodityData, get_commodities_recommendation } from '../api/commodity.js';
 
@@ -250,6 +250,7 @@ export default {
   async mounted() {
     // 检查用户登录状态
     this.checkLoginStatus();
+
     // 获取统计数据
     await this.fetchStatistics();
     // 自动加载最新商品数据
@@ -310,7 +311,7 @@ export default {
       }
 
       // 验证token有效性
-      axios.post('http://localhost:8080/api/user/validate-token', {}, {
+      ax1.post('/api-8080/user/validate-token', {}, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -373,7 +374,7 @@ export default {
     // 从后端获取用户信息
     fetchUserInfo(userId) {
       // 使用axios发送请求获取用户信息
-      axios.post('http://localhost:8089/api/user/info', {
+      ax1.post('/api-8089/user/info', {
         userId: userId
       })
         .then(response => {
@@ -420,7 +421,7 @@ export default {
       try {
         const userId = localStorage.getItem('userId');
         if (userId) {
-          await axios.post('http://localhost:8000/api/v1/commodities/click_commodity', {
+          await instance.post('/api/v1/commodities/click_commodity', {
             user_id: userId,
             commodity_id: commodityId
           });
@@ -538,17 +539,16 @@ export default {
           getLatestCommodities(),
           this.getUsersData()
         ]);
-
         // 转换数据格式
-        this.newProducts = transformCommodityData(commodities, users);
-
+        this.newProducts = await transformCommodityData(commodities, users);
+        
         console.log('成功加载最新商品:', this.newProducts);
-
+          
       } catch (error) {
         console.error('加载最新商品失败:', error);
 
         // 显示错误提示
-        this.showErrorMessage('加载最新商品失败，请稍后重试');
+        // this.showErrorMessage('加载最新商品失败，请稍后重试');
 
         // 使用默认数据作为后备
         this.newProducts = this.getDefaultNewProducts();
@@ -681,7 +681,7 @@ export default {
           params.rootId = rootId;
         }
 
-        const response = await axios.get('http://localhost:8092/api/announcements', { params });
+        const response = await ax1.get('/api-8092/announcements', { params });
 
         // 过滤公告，只显示visibleStatus为false的公告
         this.notices = response.data.filter(announcement => announcement.visibleStatus === true);
@@ -701,7 +701,7 @@ export default {
       }
 
       try {
-        const response = await axios.get(`http://localhost:8088/api/v1/chat/user/${userId}/unread`);
+        const response = await ax1.get(`/api-8088/v1/chat/user/${userId}/unread`);
 
         if (response.data && typeof response.data.unread_count === 'number') {
           this.unreadCount = response.data.unread_count;
@@ -719,7 +719,7 @@ export default {
     async fetchCompletedOrdersCount() {
       try {
         console.log('开始获取成功交易数量...');
-        const response = await axios.post('http://localhost:8095/api/orders/query/by-status', {
+        const response = await ax1.post('/api-8095/orders/query/by-status', {
           status: 'completed'
         });
         
@@ -739,8 +739,8 @@ export default {
     async fetchTotalProducts() {
       try {
         // 临时使用完整URL测试
-        const response = await axios.get('http://localhost:8000/api/v1/commodities/get_commodities_on_sale', {
-          timeout: 5000, // 设置超时时间
+        const response = await instance.get('/api/v1/commodities/get_commodities_on_sale', {
+          timeout: 500000, // 设置超时时间
           headers: {
             'Content-Type': 'application/json'
           }
@@ -774,4 +774,4 @@ export default {
 
 <style scoped>
 @import '../styles/Home.css';
-</style>
+</style>@/api/axios1.js

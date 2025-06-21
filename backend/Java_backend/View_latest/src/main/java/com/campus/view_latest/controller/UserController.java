@@ -21,7 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api-8087/users")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
+//@CrossOrigin(origins = "*")
 @Tag(name = "用户管理", description = "用户相关API")
 public class UserController {
     

@@ -4,8 +4,11 @@
     <div class="chat-list">
       <div class="chat-header">
         <h3>消息</h3>
-        <div class="user-info">
-          <span>{{ currentUser.user_name }}</span>
+        <div class="header-actions">
+          <div class="user-info">
+            <span>{{ currentUser.user_name }}</span>
+          </div>
+          <button @click="goToHome" class="home-button">返回首页</button>
         </div>
       </div>
 
@@ -75,6 +78,8 @@
 </template>
 
 <script>
+import { ax1 } from '@/api/axios.js'
+
 export default {
   name: 'ChatList',
   data() {
@@ -118,14 +123,10 @@ export default {
       }
 
       try {
-        const response = await fetch(`http://localhost:8088/api/v1/chat/user/${userId}/info`)
-        if (response.ok) {
-          this.currentUser = await response.json()
-          // 保存到localStorage
-          localStorage.setItem('currentUserId', this.currentUser.user_id)
-        } else {
-          throw new Error('获取用户信息失败')
-        }
+        const response = await ax1.get(`/api-8088/v1/chat/user/${userId}/info`)
+        this.currentUser = response.data
+        // 保存到localStorage
+        localStorage.setItem('currentUserId', this.currentUser.user_id)
       } catch (error) {
         console.error('获取用户信息失败:', error)
         this.$router.push('/login')
@@ -134,8 +135,8 @@ export default {
 
     async loadSessions() {
       try {
-        const response = await fetch(`http://localhost:8088/api/v1/chat/user/${this.currentUser.user_id}/sessions`)
-        this.sessions = await response.json()
+        const response = await ax1.get(`/api-8088/v1/chat/user/${this.currentUser.user_id}/sessions`)
+        this.sessions = response.data
 
         // 为每个会话加载最后一条消息和未读数量
         for (let session of this.sessions) {
@@ -149,8 +150,8 @@ export default {
 
     async loadSessionLastMessage(session) {
       try {
-        const response = await fetch(`http://localhost:8088/api/v1/chat/session/${session.session_id}/messages?limit=1&offset=0`)
-        const messages = await response.json()
+        const response = await ax1.get(`/api-8088/v1/chat/session/${session.session_id}/messages?limit=1&offset=0`)
+        const messages = response.data
         if (messages.length > 0) {
           session.lastMessage = messages[0].content
         }
@@ -163,8 +164,8 @@ export default {
     async loadSessionUnreadCount(session) {
       try {
         // 获取会话中当前用户未读的消息数量
-        const response = await fetch(`http://localhost:8088/api/v1/chat/session/${session.session_id}/messages?limit=100&offset=0`)
-        const messages = await response.json()
+        const response = await ax1.get(`/api-8088/v1/chat/session/${session.session_id}/messages?limit=100&offset=0`)
+        const messages = response.data
 
         // 计算当前用户作为接收者的未读消息数量
         const unreadCount = messages.filter(msg =>
@@ -190,8 +191,8 @@ export default {
     async markSessionAsRead(session) {
       try {
         // 获取会话中当前用户未读的消息
-        const response = await fetch(`http://localhost:8088/api/v1/chat/session/${session.session_id}/messages?limit=100&offset=0`)
-        const messages = await response.json()
+        const response = await ax1.get(`/api-8088/v1/chat/session/${session.session_id}/messages?limit=100&offset=0`)
+        const messages = response.data
 
         const unreadMessages = messages.filter(msg =>
           msg.receiver_id === this.currentUser.user_id && !msg.read_status
@@ -199,9 +200,7 @@ export default {
 
         // 标记所有未读消息为已读
         for (let message of unreadMessages) {
-          await fetch(`http://localhost:8088/api/v1/chat/messages/${message.message_id}/read?user_id=${this.currentUser.user_id}`, {
-            method: 'PUT'
-          })
+          await ax1.put(`/api-8088/v1/chat/messages/${message.message_id}/read?user_id=${this.currentUser.user_id}`)
         }
 
         // 更新本地会话的未读数量
@@ -213,8 +212,8 @@ export default {
 
     async loadMessages() {
       try {
-        const response = await fetch(`http://localhost:8088/api/v1/chat/session/${this.selectedSessionId}/messages?limit=50&offset=0`)
-        this.messages = await response.json()
+        const response = await ax1.get(`/api-8088/v1/chat/session/${this.selectedSessionId}/messages?limit=50&offset=0`)
+        this.messages = response.data
         this.scrollToBottom()
       } catch (error) {
         console.error('获取消息失败:', error)
@@ -281,26 +280,19 @@ export default {
       }
 
       const otherUser = this.getOtherUser(this.selectedSession)
-
       try {
-        const response = await fetch('http://localhost:8088/api/v1/chat/messages', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            session_id: this.selectedSessionId,
-            sender_id: this.currentUser.user_id,
-            receiver_id: otherUser.user_id,
-            message_type: 'text',
-            content: this.newMessage
-          })
+        await ax1.post('/api-8088/v1/chat/messages', {
+          session_id: this.selectedSessionId,
+          sender_id: this.currentUser.user_id,
+          receiver_id: otherUser.user_id,
+          message_type: 'text',
+          content: this.newMessage
         })
 
-        if (response.ok) {
-          this.newMessage = ''
-          await this.loadMessages()
-          // 重新加载会话列表以更新最后消息
-          await this.loadSessions()
-        }
+        this.newMessage = ''
+        await this.loadMessages()
+        // 重新加载会话列表以更新最后消息
+        await this.loadSessions()
       } catch (error) {
         console.error('发送消息失败:', error)
         this.showErrorMessage('发送失败，请重试')
@@ -308,7 +300,7 @@ export default {
     },
 
     connectWebSocket() {
-      this.ws = new WebSocket(`ws://localhost:8088/api/v1/ws/${this.currentUser.user_id}`)
+      this.ws = new WebSocket(`ws://47.117.90.63:8088/api/v1/ws/${this.currentUser.user_id}`)
 
       this.ws.onmessage = (event) => {
         const data = JSON.parse(event.data)
@@ -352,26 +344,20 @@ export default {
       if (autoCreate === 'true' && sellerId && buyerId) {
         try {
           // 1. 首先尝试创建或获取会话
-          const sessionResponse = await fetch('http://localhost:8088/api/v1/chat/sessions', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              first_id: buyerId,
-              second_id: sellerId
-            })
+          const sessionResponse = await ax1.post('/api-8088/v1/chat/sessions', {
+            first_id: buyerId,
+            second_id: sellerId
           })
 
-          if (sessionResponse.ok) {
-            const session = await sessionResponse.json()
+          const session = sessionResponse.data
 
-            // 2. 重新加载会话列表
-            await this.loadSessions()
+          // 2. 重新加载会话列表
+          await this.loadSessions()
 
-            // 3. 自动选择这个会话
-            const targetSession = this.sessions.find(s => s.session_id === session.session_id)
-            if (targetSession) {
-              await this.selectSession(targetSession)
-            }
+          // 3. 自动选择这个会话
+          const targetSession = this.sessions.find(s => s.session_id === session.session_id)
+          if (targetSession) {
+            await this.selectSession(targetSession)
           }
         } catch (error) {
           console.error('创建聊天会话失败:', error)
@@ -382,10 +368,292 @@ export default {
         this.$router.replace({ path: '/chat-list' })
       }
     },
+
+    // 返回首页
+    goToHome() {
+      const userId = this.currentUser.user_id || localStorage.getItem('userId')
+      if (userId) {
+        this.$router.push(`/?userId=${userId}`)
+      } else {
+        this.$router.push('/home')
+      }
+    }
   }
 }
 </script>
 
 <style scoped>
-@import '../styles/ChatList.css';
+/* 聊天容器 */
+.chat-container {
+  display: flex;
+  height: 100vh;
+  background-color: #f5f5f5;
+}
+
+/* 左侧聊天列表 */
+.chat-list {
+  width: 300px;
+  background-color: white;
+  border-right: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-header {
+  padding: 20px;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chat-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 18px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.user-info {
+  color: #666;
+  font-size: 14px;
+}
+
+.home-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.3s;
+}
+
+.home-button:hover {
+  background-color: #0056b3;
+}
+
+/* 会话列表 */
+.session-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.session-item {
+  display: flex;
+  padding: 15px 20px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.session-item:hover {
+  background-color: #f8f9fa;
+}
+
+.session-item.active {
+  background-color: #e3f2fd;
+}
+
+.avatar {
+  margin-right: 12px;
+}
+
+.avatar img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.session-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.name {
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.last-message {
+  color: #666;
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.session-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.time {
+  color: #999;
+  font-size: 12px;
+}
+
+.unread-badge {
+  background-color: #ff4757;
+  color: white;
+  border-radius: 10px;
+  padding: 2px 6px;
+  font-size: 11px;
+  min-width: 18px;
+  text-align: center;
+}
+
+/* 右侧聊天内容 */
+.chat-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-window {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.chat-window .chat-header {
+  background-color: white;
+  padding: 15px 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.chat-window .chat-header h4 {
+  margin: 0;
+  color: #333;
+}
+
+.messages-container {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  background-color: #f8f9fa;
+}
+
+.message {
+  margin-bottom: 15px;
+  display: flex;
+}
+
+.message.own-message {
+  justify-content: flex-end;
+}
+
+.message-content {
+  max-width: 70%;
+  background-color: white;
+  padding: 12px 16px;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.own-message .message-content {
+  background-color: #007bff;
+  color: white;
+}
+
+.message-text {
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
+.message-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+.read-status {
+  margin-left: 8px;
+}
+
+.error-bubble {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #ff4757;
+  color: white;
+  padding: 12px 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.input-area {
+  padding: 20px;
+  background-color: white;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  gap: 10px;
+}
+
+.message-input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: 24px;
+  outline: none;
+  font-size: 14px;
+}
+
+.message-input:focus {
+  border-color: #007bff;
+}
+
+.send-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 24px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.send-button:hover {
+  background-color: #0056b3;
+}
+
+.no-session {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #666;
+  font-size: 16px;
+}
 </style>

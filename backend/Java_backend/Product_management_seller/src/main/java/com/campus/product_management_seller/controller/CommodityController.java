@@ -36,7 +36,7 @@ import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/api-8084/commodity")
-@CrossOrigin(originPatterns = "*", maxAge = 3600, allowCredentials = "true")
+//@CrossOrigin(originPatterns = "*", maxAge = 3600, allowCredentials = "true")
 @Tag(name = "商品管理", description = "商品管理相关接口")
 public class CommodityController {
     

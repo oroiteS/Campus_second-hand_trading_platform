@@ -54,7 +54,7 @@ func main() {
 	r := gin.Default()
 
 	// 添加CORS中间件
-	r.Use(func(c *gin.Context) {
+	/*r.Use(func(c *gin.Context) {
 		c.Header("Access-Control-Allow-Origin", "*")
 		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
@@ -63,7 +63,7 @@ func main() {
 			return
 		}
 		c.Next()
-	})
+	})*/
 
 	// 设置路由
 	routes.SetupRoutes(r, commentHandler)

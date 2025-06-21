@@ -136,7 +136,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import {ax1} from '@/api/axios'
 import AMapLoader from '@amap/amap-jsapi-loader'
 export default {
   name: 'ProfilePage',
@@ -207,7 +207,7 @@ export default {
         return;
       }
       
-      axios.post('http://localhost:8089/api/user/avatar/url', {
+      ax1.post('/api-8089/user/avatar/url', {
         userId: this.userId
       })
       .then(response => {
@@ -252,8 +252,8 @@ export default {
     // 根据状态获取商品列表
     async fetchProductsByStatus(apiStatus, tabId) {
       try {
-        const response = await axios.get(
-          `http://localhost:8084/api/commodity/list/${this.userId}/status/${apiStatus}`
+        const response = await ax1.get(
+          `/api-8084/commodity/list/${this.userId}/status/${apiStatus}`
         );
         
         if (response.data.success) {
@@ -302,15 +302,15 @@ export default {
         // 根据新状态选择对应的API接口
         switch(newApiStatus) {
           case 'on_sale':
-            apiUrl = 'http://localhost:8084/api/commodity/put-on-sale';
+            apiUrl = '/api-8084/commodity/put-on-sale';
             successMessage = '商品上架成功';
             break;
           case 'off_sale':
-            apiUrl = 'http://localhost:8084/api/commodity/put-off-sale';
+            apiUrl = '/api-8084/commodity/put-off-sale';
             successMessage = '商品下架成功';
             break;
           case 'sold':
-            apiUrl = 'http://localhost:8084/api/commodity/mark-as-sold';
+            apiUrl = '/api-8084/commodity/mark-as-sold';
             successMessage = '商品已标记为已售';
             break;
           default:
@@ -319,7 +319,7 @@ export default {
         }
         
         // 调用对应的API接口
-        const response = await axios.post(apiUrl, {
+        const response = await ax1.post(apiUrl, {
           commodityId: product.commodityId,
           sellerId: this.userId
         });
@@ -342,8 +342,8 @@ export default {
       if (confirm(`确定要删除商品"${product.commodityName}"吗？此操作不可撤销。`)) {
         try {
           // 这里需要调用删除商品的API
-          const response = await axios.delete(
-            `http://localhost:8084/api/commodity/${product.commodityId}`
+          const response = await ax1.delete(
+            `/api-8084/commodity/${product.commodityId}`
           );
           
           if (response.data.success) {
@@ -483,7 +483,7 @@ export default {
     },
     async fetchFavoriteCount() {
   try {
-    const response = await axios.get('/cart/commodities', {
+    const response = await ax1.get('/api-8085/cart/commodities', {
       params: {
         userId: this.userId,
         category: '全部'
@@ -503,7 +503,7 @@ export default {
 async fetchCompletedDealsCount() {
   try {
     console.log('开始获取用户成功交易数量...');
-    const response = await axios.post('http://localhost:8095/api/orders/query/by-status', {
+    const response = await ax1.post('/api-8095/orders/query/by-status', {
       status: 'completed'
     });
     
@@ -558,4 +558,4 @@ async fetchCompletedDealsCount() {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
-</style>
+</style>@/api/axios1

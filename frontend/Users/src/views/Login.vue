@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import {ax1} from '@/api/axios'
 
 export default {
   name: 'LoginPage',
@@ -64,7 +64,7 @@ export default {
         password: this.password
       }
       
-      axios.post('http://localhost:8080/api/user/login', loginRequest, {
+      ax1.post('/api-8080/user/login', loginRequest, {
         headers: {
           'Content-Type': 'application/json'
         }
@@ -119,4 +119,4 @@ export default {
 
 <style scoped>
 @import '../styles/Login.css';
-</style>
+</style>@/api/axios1

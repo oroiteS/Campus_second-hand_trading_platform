@@ -57,7 +57,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import {ax1} from '@/api/axios'
 
 export default {
   name: 'PasswordReset',
@@ -124,7 +124,7 @@ export default {
         }
         
         // 调用后端API
-        const response = await axios.post('http://localhost:8089/api/user/password/change', {
+        const response = await ax1.post('/api-8089/user/password/change', {
           userId: this.userId,
           oldPassword: this.currentPassword,
           newPassword: this.newPassword
@@ -570,4 +570,4 @@ export default {
     padding: 25px 20px;
   }
 }
-</style>
+</style>@/api/axios1

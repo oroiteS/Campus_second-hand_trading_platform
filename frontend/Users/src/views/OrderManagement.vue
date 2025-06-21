@@ -376,7 +376,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import {ax1} from '@/api/axios'
 
 export default {
   name: 'OrderManagement',
@@ -589,8 +589,8 @@ export default {
           }
 
           // 调用确认收货API（同时完成卖家收款和订单状态更新）
-          const confirmReceiptResponse = await axios.post(
-            'http://localhost:8081/user/account/confirmReceipt',
+          const confirmReceiptResponse = await ax1.post(
+            '/api-8081/user/account/confirmReceipt',
             {
               userId: sellerId,  // 使用卖家ID
               orderID: order.id
@@ -701,7 +701,7 @@ export default {
         console.log('提交申诉数据:', appealData); // 调试信息
 
         // 直接使用axios调用后端API
-        const response = await axios.post('http://localhost:8093/api/v1/appeals', appealData, {
+        const response = await ax1.post('/api-8093/v1/appeals', appealData, {
           headers: {
             'Content-Type': 'application/json'
           }
@@ -878,7 +878,7 @@ export default {
         }
 
         // 修改API路径，去掉/v3前缀，与后端保持一致
-        axios.post('http://localhost:8095/api/orders/query/by-buyer', requestBody, {
+        ax1.post('/api-8095/orders/query/by-buyer', requestBody, {
           headers: {
             userId: buyerId  // 使用同一个buyerId
           },
@@ -958,7 +958,7 @@ export default {
           sellerId: sellerId
         }
 
-        axios.post('http://localhost:8095/api/orders/query/by-seller', requestBody, {
+        ax1.post('/api-8095/orders/query/by-seller', requestBody, {
           headers: {
             userId: sellerId
           },
@@ -1124,9 +1124,9 @@ export default {
       try {
         this.loading = true
         console.log('开始获取申诉记录...')
-        console.log('请求URL: http://localhost:8093/api/v1/appeals/all'); // 添加URL调试
+        console.log('请求URL: http://localhost:8093/api-8093/v1/appeals/all'); // 添加URL调试
         
-        const response = await axios.get('http://localhost:8093/api/v1/appeals/all', {
+        const response = await ax1.get('/api-8093/v1/appeals/all', {
           timeout: 10000
         })
         
@@ -1185,8 +1185,8 @@ export default {
           return
         }
 
-        const response = await axios.put(
-          `http://localhost:8093/api/v1/appeals/${appeal.argumentId}/admin-update`,
+        const response = await ax1.put(
+          `/api-8093/v1/appeals/${appeal.argumentId}/admin-update`,
           {
             status: action,
             rootId: localStorage.getItem('userId') || 'admin001' // 使用当前登录用户ID作为管理员ID
@@ -1326,3 +1326,4 @@ export default {
 <style scoped>
 @import '../styles/OrderManagement.css';
 </style>
+@/api/axios1

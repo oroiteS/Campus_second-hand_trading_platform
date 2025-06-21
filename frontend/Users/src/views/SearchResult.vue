@@ -86,7 +86,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import {instance} from '@/api/axios';
 
 export default {
   name: 'SearchResult',
@@ -147,7 +147,7 @@ export default {
           const userId = localStorage.getItem('userId');
           
           // 调用后端搜索API
-          const response = await axios.post('http://localhost:8000/api/v1/commodities/search', {
+          const response = await instance.post('/api/v1/commodities/search', {
             user_id: userId,
             search_content: this.searchQuery
           });
@@ -185,7 +185,7 @@ export default {
       try {
         const userId = localStorage.getItem('userId');
         if (userId) {
-          await axios.post('http://localhost:8000/api/v1/commodities/click_commodity', {
+          await instance.post('/api/v1/commodities/click_commodity', {
             user_id: userId,
             commodity_id: commodityId
           });
@@ -234,4 +234,4 @@ export default {
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   transform: translateY(-2px);
 }
-</style>
+</style>@/api/axios1

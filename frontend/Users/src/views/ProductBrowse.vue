@@ -139,7 +139,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import {ax1,instance} from '@/api/axios'
 
 export default {
   name: 'ProductBrowse',
@@ -217,8 +217,8 @@ export default {
         console.log('请求参数:', requestData)
 
         // 调用后端API
-        const response = await axios.post(
-          'http://localhost:8096/product-query/api/v1/commodities/category',
+        const response = await ax1.post(
+          '/product-query/api-8096/v1/commodities/category',
           requestData,
           {
             headers: {
@@ -329,7 +329,7 @@ export default {
       try {
         const userId = localStorage.getItem('userId');
         if (userId) {
-          await axios.post('http://localhost:8000/api/v1/commodities/click_commodity', {
+          await instance.post('/api/v1/commodities/click_commodity', {
             user_id: userId,
             commodity_id: commodityId
           });
@@ -354,4 +354,4 @@ export default {
 
 <style scoped>
 @import '../styles/ProductBrowse.css';
-</style>
+</style>@/api/axios1

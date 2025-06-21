@@ -293,7 +293,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import {ax1,instance} from '@/api/axios'
 import { getCommodityDetail, transformCommodityDetailData } from '@/api/commodity'
 
 export default {
@@ -451,7 +451,7 @@ export default {
         }
 
         // 调用购物车API获取用户收藏的商品列表
-        const response = await axios.get('/cart/commodities', {
+        const response = await ax1.get('/api-8085/cart/commodities', {
           params: {
             userId: userId,
             category: '全部'
@@ -483,7 +483,7 @@ export default {
       try {
         this.loadingComments = true
 
-        const response = await axios.get('http://localhost:8091/api/v1/comments', {
+        const response = await ax1.get('/api-8091/v1/comments', {
           params: {
             commodity_id: this.product.id,
             page: page,
@@ -529,9 +529,10 @@ export default {
         if (!this.userCache[userId]) {
           try {
             // 调用后端用户基本信息API
-            const response = await axios.post('http://localhost:8089/api/user/basic', {
+            const response = await ax1.post('/api-8089/user/basic', {
               userId: userId
             })
+            console.log(response.data)
 
             if (response.data && response.data.success && response.data.data) {
               const userData = response.data.data
@@ -579,7 +580,7 @@ export default {
       try {
         this.submittingComment = true
 
-        const response = await axios.post('http://localhost:8091/api/v1/comments', {
+        const response = await ax1.post('/api-8091/v1/comments', {
           commodity_id: this.product.id,
           user_id: this.currentUser.id,
           message: this.newComment.trim()
@@ -621,7 +622,7 @@ export default {
       try {
         this.submittingReply = true
 
-        const response = await axios.post('http://localhost:8091/api/v1/comments', {
+        const response = await ax1.post('/api-8091/v1/comments', {
           commodity_id: this.product.id,
           user_id: this.currentUser.id,
           message: this.replyContent.trim(),
@@ -652,7 +653,7 @@ export default {
       if (!confirm('确定要删除这条评论吗？')) return
 
       try {
-        await axios.delete(`http://localhost:8091/api/v1/comments/${messageId}`, {
+        await ax1.delete(`/api-8091/v1/comments/${messageId}`, {
           params: {
             user_id: this.currentUser.id
           }
@@ -717,9 +718,159 @@ export default {
         }
       })
     },
-    buyNow() {
-      alert('立即购买功能')
-      // 实际项目中这里会跳转到订单确认页面
+    async buyNow() {
+      try {
+        const userId = this.currentUser.id || localStorage.getItem('userId')
+        
+        // 检查用户是否登录
+        if (!userId) {
+          alert('请先登录')
+          return
+        }
+        
+        // 检查是否是自己的商品
+        if (userId === this.product.sellerId) {
+          alert('不能购买自己的商品')
+          return
+        }
+        
+        // 检查商品库存
+        if (this.product.quantity <= 0) {
+          alert('商品库存不足')
+          return
+        }
+        
+        // 创建订单数据
+        const orderData = {
+          commodityId: this.product.id,
+          buyerId: userId,
+          sellerId: this.product.sellerId,
+          money: this.product.price,
+          saleLocation: '校园交易', // 可以根据需要修改
+          buyQuantity: 1
+        }
+        
+        console.log('创建订单数据:', orderData)
+        
+        // 调用订单创建API
+        const orderResponse = await ax1.post('/api-8095/orders/create', orderData, {
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          timeout: 10000
+        })
+        
+        if (orderResponse.data && orderResponse.data.success) {
+          const orderInfo = orderResponse.data.data
+          console.log('订单创建成功:', orderInfo)
+          
+          // 调用支付API
+          try {
+            const paymentResponse = await ax1.post('/api-8081/user/account/pay', {
+              userId: userId,
+              orderID: orderInfo.orderId
+            }, {
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              timeout: 10000
+            })
+            
+            if (paymentResponse.data && paymentResponse.data.success) {
+              // 支付成功后，调用用户兴趣行为更新API
+              try {
+                const buyBehaviorData = {
+                  user_id: userId,
+                  category_id: this.product.categoryId || 1, // 使用商品的分类ID，如果没有则默认为1
+                  tags: this.product.tags || [] // 使用商品的标签，如果没有则为空数组
+                }
+                
+                const behaviorResponse = await instance.post('/api/v1/commodities/buy', buyBehaviorData, {
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  timeout: 30000
+                })
+                
+                if (behaviorResponse.data && behaviorResponse.data.code === 0) {
+                  console.log('用户购买行为记录成功')
+                  // 支付成功
+                  alert(`购买成功！\n订单号: ${orderInfo.orderId}\n订单状态: ${orderInfo.orderStatusDescription}\n交易金额: ¥${orderInfo.money}\n用户行为已更新`)
+                } else {
+                  console.warn('用户购买行为记录失败:', behaviorResponse.data)
+                  // 支付成功，但行为记录失败
+                  alert(`购买成功！\n订单号: ${orderInfo.orderId}\n订单状态: ${orderInfo.orderStatusDescription}\n交易金额: ¥${orderInfo.money}\n(用户行为记录失败)`)
+                }
+              } catch (behaviorError) {
+                console.error('用户购买行为记录失败:', behaviorError)
+                // 支付成功，但行为记录失败
+                alert(`购买成功！\n订单号: ${orderInfo.orderId}\n订单状态: ${orderInfo.orderStatusDescription}\n交易金额: ¥${orderInfo.money}\n(用户行为记录失败)`)
+              }
+              
+              // 重新获取商品详情以更新库存等信息
+              await this.fetchProductDetail(this.product.id)
+              
+            } else {
+              // 支付失败
+              const errorMsg = paymentResponse.data?.message || '支付失败'
+              alert(`支付失败: ${errorMsg}\n订单已创建，订单号: ${orderInfo.orderId}\n请前往订单管理页面完成支付`)
+            }
+            
+          } catch (paymentError) {
+            console.error('支付请求失败:', paymentError)
+            
+            let errorMessage = '支付失败'
+            if (paymentError.response) {
+              const status = paymentError.response.status
+              const data = paymentError.response.data
+              
+              if (status === 404) {
+                errorMessage = '订单或用户不存在'
+              } else if (status === 400) {
+                errorMessage = data?.message || '余额不足'
+              } else if (status === 500) {
+                errorMessage = '更新账户余额失败'
+              } else {
+                errorMessage = data?.message || '支付服务异常'
+              }
+            } else if (paymentError.code === 'ERR_NETWORK') {
+              errorMessage = '无法连接到支付服务器'
+            } else if (paymentError.code === 'ECONNABORTED') {
+              errorMessage = '支付请求超时'
+            }
+            
+            alert(`支付失败: ${errorMessage}\n订单已创建，订单号: ${orderInfo.orderId}\n请前往订单管理页面完成支付`)
+          }
+          
+        } else {
+          // 订单创建失败
+          const errorMsg = orderResponse.data?.message || '订单创建失败'
+          alert(`订单创建失败: ${errorMsg}`)
+        }
+        
+      } catch (error) {
+        console.error('购买操作失败:', error)
+        
+        let errorMessage = '购买失败，请重试'
+        if (error.response) {
+          const status = error.response.status
+          const data = error.response.data
+          
+          if (status === 400) {
+            errorMessage = data?.message || '请求参数错误或库存不足'
+          } else if (status === 500) {
+            errorMessage = '服务器内部错误'
+          } else {
+            errorMessage = data?.message || '订单服务异常'
+          }
+        } else if (error.code === 'ERR_NETWORK') {
+          errorMessage = '无法连接到订单服务器，请检查网络连接'
+        } else if (error.code === 'ECONNABORTED') {
+          errorMessage = '请求超时，请重试'
+        }
+        
+        alert(errorMessage)
+      }
     },
     async toggleFavorite() {
       try {
@@ -738,18 +889,18 @@ export default {
         
         if (!this.isFavorited) {
           // 添加到购物车
-          const cartResponse = await axios.post('/cart/add', null, {
+          const cartResponse = await ax1.post('/api-8085/cart/add', null, {
             params: {
               userId: userId,
               commodityId: commodityId
             },
-            timeout: 5000
+            timeout: 500000
           })
           
           if (cartResponse.data && cartResponse.data.success) {
             // 购物车添加成功后，更新用户画像
             try {
-              const profileResponse = await axios.post('http://localhost:8000/api/v1/commodities/add_cart/', {
+              const profileResponse = await instance.post('/api/v1/commodities/add_cart/', {
                 user_id: userId,
                 commodity_id: commodityId
               }, {
@@ -778,12 +929,12 @@ export default {
           }
         } else {
           // 从购物车中移除商品
-          const removeResponse = await axios.post('/cart/remove', null, {
+          const removeResponse = await ax1.post('/api-8085/cart/remove', null, {
             params: {
               userId: userId,
               commodityId: commodityId
             },
-            timeout: 5000
+            timeout: 5000000
           })
           
           if (removeResponse.data && removeResponse.data.success) {
@@ -933,7 +1084,7 @@ export default {
         console.log('正在发送更新请求...')
         
         // 调用后端API更新商品信息 - 使用FormData格式
-        const response = await axios.post('http://localhost:8084/api/commodity/update-info', formData, {
+        const response = await ax1.post('/api-8084/commodity/update-info', formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
@@ -979,7 +1130,7 @@ export default {
       })
       
       try {
-        const response = await axios.post('/api/upload/images', formData, {
+        const response = await ax1.post('/api/upload/images', formData, {//虚空api
           headers: {
             'Content-Type': 'multipart/form-data'
           }
@@ -1005,3 +1156,4 @@ export default {
 </style>
 
 
+@/api/axios1

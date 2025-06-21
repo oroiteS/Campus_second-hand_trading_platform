@@ -101,7 +101,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import {ax1} from '@/api/axios'
 
 export default {
   name: 'FavoritesPage',
@@ -187,7 +187,7 @@ export default {
     
     async fetchCartCommodities() {
       try {
-        const res = await axios.get('/cart/commodities', {
+        const res = await ax1.get('/api-8085/cart/commodities', {
           params: {
             userId: localStorage.getItem('userId'),
             category: this.activeCategory === 'all' ? '全部' : this.getCategoryNameById(this.activeCategory)
@@ -210,7 +210,7 @@ export default {
     },
     async addToCart(commodityId) {
       try {
-        const res = await axios.post('/cart/add', null, {
+        const res = await ax1.post('/api-8085/cart/add', null, {
           params: {
             userId: localStorage.getItem('userId'),
             commodityId
@@ -228,7 +228,7 @@ export default {
     },
     async removeFavorite(commodityId) {
     try {
-      const res = await axios.post('/cart/remove', null, {
+      const res = await ax1.post('/api-8085/cart/remove', null, {
         params: {
           userId: localStorage.getItem('userId'),
           commodityId
@@ -245,7 +245,7 @@ export default {
   async batchRemoveFavorites() {
     const removed = []
     for (const id of this.selectedProducts) {
-      const res = await axios.post('/cart/remove', null, {
+      const res = await ax1.post('/api-8085/cart/remove', null, {
         params: {
           userId:localStorage.getItem('userId'),
           commodityId: id
@@ -295,4 +295,4 @@ export default {
 
 <style scoped>
 @import '../styles/Favorites.css';
-</style>
+</style>@/api/axios1

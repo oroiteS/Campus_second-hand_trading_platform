@@ -50,7 +50,7 @@ import java.util.HashMap;
  */
 @RestController
 @RequestMapping("/api-8095/orders")
-@CrossOrigin(origins = "*")
+//@CrossOrigin(origins = "*")
 public class OrderApiController {
 
     @Autowired

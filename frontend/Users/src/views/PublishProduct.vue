@@ -162,7 +162,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import {ax1,instance} from '@/api/axios';
 
 export default {
   name: 'PublishProduct',
@@ -210,7 +210,7 @@ export default {
       this.isLoadingTags = true
       try {
         // 调用API获取标签数据
-        const response = await axios.get('http://localhost:8084/api/commodity/tags', {
+        const response = await ax1.get('/api-8084/commodity/tags', {
           params: {
             category_id: this.productForm.category
           }
@@ -349,7 +349,7 @@ export default {
         console.log('准备提交商品数据...')
         
         // 调用API发布商品，使用multipart/form-data格式
-        const response = await axios.post('http://localhost:8084/api/commodity/create-and-put-on-sale', formData, {
+        const response = await ax1.post('/api-8084/commodity/create-and-put-on-sale', formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
@@ -373,7 +373,7 @@ export default {
            
            try {
              // 调用第二个API上传商品信息
-             const uploadResponse = await axios.post('http://localhost:8000/api/v1/commodities/upload_commodity', uploadRequestData, {
+             const uploadResponse = await instance.post('/api/v1/commodities/upload_commodity', uploadRequestData, {
                headers: {
                  'Content-Type': 'application/json'
                }
@@ -407,3 +407,4 @@ export default {
 </style>
 
 
+@/api/axios1
