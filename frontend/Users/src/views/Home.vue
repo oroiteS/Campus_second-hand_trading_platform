@@ -164,10 +164,10 @@
                 <div class="home-product-details">
                   <span class="home-product-condition">{{ product.condition }}</span>
                 </div>
-                <div class="home-seller-info">
+                <!-- <div class="home-seller-info">
                   <img :src="product.sellerAvatar" class="home-seller-avatar" />
                   <span class="home-seller-name">{{ product.sellerName }}</span>
-                </div>
+                </div> -->
               </div>
             </div>
           </div>
@@ -672,7 +672,7 @@ export default {
      * @param {Number} n - 获取公告的数量，默认为5
      * @param {String} rootId - 可选的管理员ID过滤
      */
-    async fetchAnnouncements(n = 5, rootId = null) {
+    async fetchAnnouncements(n = 100, rootId = null) {
       try {
         const params = { n };
 

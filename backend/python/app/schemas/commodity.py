@@ -66,4 +66,4 @@ class Commodity_username(CommodityInDB):
     user_name:str
 class Commodity_username_avatar(Commodity_username):
     """有用户名和头像的商品模型"""
-    avatar_url:str
+    avatar_url:Optional[str] = None

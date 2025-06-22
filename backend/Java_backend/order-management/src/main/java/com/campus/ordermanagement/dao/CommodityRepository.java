@@ -22,17 +22,7 @@ public interface CommodityRepository extends BaseMapper<Commodity> {
     @Update("UPDATE commodities SET quantity = #{quantity}, updated_at = CURRENT_TIMESTAMP WHERE commodity_id = #{commodityId}")
     int updateQuantity(@Param("commodityId") String commodityId, @Param("quantity") Integer quantity);
 
-    /**
-     * 更新商品状态和库存
-     * @param commodityId 商品ID
-     * @param quantity 新的库存数量
-     * @param status 新的商品状态
-     * @return 更新的行数
-     */
-    @Update("UPDATE commodities SET quantity = #{quantity}, commodity_status = #{status}, updated_at = CURRENT_TIMESTAMP WHERE commodity_id = #{commodityId}")
-    int updateQuantityAndStatus(@Param("commodityId") String commodityId, 
-                               @Param("quantity") Integer quantity, 
-                               @Param("status") String status);
+    // 移除updateQuantityAndStatus方法，状态更新现在由数据库触发器处理
 
     /**
      * 减少商品库存（原子操作）
@@ -43,14 +33,7 @@ public interface CommodityRepository extends BaseMapper<Commodity> {
     @Update("UPDATE commodities SET quantity = quantity - #{decreaseAmount}, updated_at = CURRENT_TIMESTAMP WHERE commodity_id = #{commodityId} AND quantity >= #{decreaseAmount}")
     int decreaseQuantity(@Param("commodityId") String commodityId, @Param("decreaseAmount") Integer decreaseAmount);
 
-    /**
-     * 减少库存并在库存为0时更新状态为已售出
-     * @param commodityId 商品ID
-     * @param decreaseAmount 减少的数量
-     * @return 更新的行数
-     */
-    @Update("UPDATE commodities SET quantity = quantity - #{decreaseAmount}, commodity_status = CASE WHEN quantity = #{decreaseAmount} THEN 'sold' ELSE commodity_status END, updated_at = CURRENT_TIMESTAMP WHERE commodity_id = #{commodityId} AND quantity >= #{decreaseAmount}")
-    int decreaseQuantityAndUpdateStatus(@Param("commodityId") String commodityId, @Param("decreaseAmount") Integer decreaseAmount);
+    // 移除decreaseQuantityAndUpdateStatus方法，状态更新现在由数据库触发器处理
 
     /**
      * 根据商品ID查询商品名称和主图URL

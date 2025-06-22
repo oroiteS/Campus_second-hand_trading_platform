@@ -128,7 +128,7 @@ const userService = {
     };
     
     // 直接调用后端8094端口的管理员登录接口
-    return fetch('http://localhost:8094/api/admin/login', {
+    return fetch('http://localhost:3000/api-8094/admin/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -146,9 +146,9 @@ const userService = {
       if (result.code === 200) {
         return {
           success: true,
-          token: 'admin-token-' + Date.now(), // 生成一个token
+          token: 'admin-test-token-' + Date.now(), // 修改token格式以匹配验证逻辑
           username: loginData.username,
-          adminId: loginData.username, // 添加管理员ID，因为username就是rootId
+          adminId: loginData.username,
           message: result.message
         };
       } else {
@@ -254,7 +254,7 @@ const userService = {
    */
   getAllUsers(params) {
     // 使用新的API接口
-    return fetch('http://localhost:8087/api/users/all')
+    return fetch('http://localhost:3000/api-8087/users/all')
       .then(response => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);

@@ -338,22 +338,22 @@
           </div>
 
           <div class="table-container">
-            <table class="data-table">
+            <table class="data-table products-table">
               <thead>
                 <tr>
-                  <th>ID</th>
-                  <th>商品名称</th>
-                  <th>价格</th>
-                  <th>卖家</th>
-                  <th>发布时间</th>
-                  <th>状态</th>
-                  <th>操作</th>
+                  <th class="id-column">ID</th>
+                  <th class="product-column">商品名</th>
+                  <th class="price-column">价格</th>
+                  <th class="seller-column">卖家</th>
+                  <th class="time-column">发布时间</th>
+                  <th class="status-column">状态</th>
+                  <th class="action-column">操作</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="product in sortedFilteredProducts" :key="product.id" class="clickable-row" @click="viewProductDetail(product.id)">
-                  <td>{{ product.id }}</td>
-                  <td>
+                  <td class="id-column">#{{ product.id }}</td>
+                  <td class="product-column">
                     <div class="product-info">
                       <div class="product-image">
                         <img :src="product.image" :alt="product.name" />
@@ -361,16 +361,21 @@
                       <div class="product-name">{{ product.name }}</div>
                     </div>
                   </td>
-                  <td>¥{{ product.price }}</td>
-                  <td>{{ product.seller }}</td>
-                  <td>{{ product.publishTime }}</td>
-                  <td>
+                  <td class="price-column">
+                    <span class="price-value">¥{{ product.price }}</span>
+                  </td>
+                  <td class="seller-column">{{ product.seller }}</td>
+                  <td class="time-column">
+                    <span class="time-value">{{ product.publishTime }}</span>
+                  </td>
+                  <td class="status-column">
                     <span 
                       class="status-badge" 
                       :class="{
-                        'status-pending': product.status === 'pending_payment',
-                        'status-processing': product.status === 'pending_transaction',
-                        'status-completed': product.status === 'completed'
+                        'status-pending': product.status === 'pending',
+                        'status-approved': product.status === 'approved',
+                        'status-rejected': product.status === 'rejected',
+                        'status-sold': product.status === 'sold'
                       }"
                     >
                       {{ 
@@ -381,21 +386,27 @@
                       }}
                     </span>
                   </td>
-                  <td @click.stop>
-                    <button 
-                      v-if="product.status === 'pending'"
-                      class="action-btn approve-btn" 
-                      @click="approveProduct(product.id)"
-                    >
-                      通过
-                    </button>
-                    <button 
-                      v-if="product.status !== 'rejected' && product.status !== 'sold'"
-                      class="action-btn reject-btn" 
-                      @click="rejectProduct(product.id)"
-                    >
-                      下架
-                    </button>
+                  <td class="action-column" @click.stop>
+                    <div class="action-buttons">
+                      <button 
+                        v-if="product.status === 'pending'"
+                        class="action-btn approve-btn" 
+                        @click="approveProduct(product.id)"
+                        title="通过审核"
+                      >
+                        <span class="btn-icon">✓</span>
+                        <span class="btn-text">通过</span>
+                      </button>
+                      <button 
+                        v-if="product.status !== 'rejected' && product.status !== 'sold'"
+                        class="action-btn reject-btn" 
+                        @click="rejectProduct(product.id)"
+                        title="下架商品"
+                      >
+                        <span class="btn-icon">✕</span>
+                        <span class="btn-text">下架</span>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -445,10 +456,6 @@
                   <span class="stat-number">{{ totalOrders }}</span>
                   <span class="stat-label">总订单</span>
                 </div>
-                <div class="stat-item pending">
-                  <span class="stat-number">{{ filteredOrders.filter(o => o.status === 'pending_payment').length }}</span>
-                  <span class="stat-label">待付款</span>
-                </div>
                 <div class="stat-item processing">
                   <span class="stat-number">{{ filteredOrders.filter(o => o.status === 'pending_transaction').length }}</span>
                   <span class="stat-label">待交易</span>
@@ -477,7 +484,6 @@
               <div class="filter-controls">
                 <select v-model="orderStatusFilter" @change="filterOrders" class="status-filter">
                   <option value="all">全部状态</option>
-                  <option value="pending_payment">待付款</option>
                   <option value="pending_transaction">待交易</option>
                   <option value="completed">已完成</option>
                 </select>
@@ -702,11 +708,9 @@
               <button class="cancel-btn" @click="closeOrderDetailModal">
                 关闭
               </button>
-              <!-- 退款按钮 - 只在申诉状态为process且订单状态允许退款时显示 -->
+              <!-- 退款按钮 - 只在申诉状态为process时显示 -->
               <button 
-                v-if="relatedAppeal && relatedAppeal.status === 'process' && 
-                      (selectedOrderForRefund.status === 'pending_transaction' || 
-                       selectedOrderForRefund.status === 'completed')"
+                v-if="relatedAppeal && relatedAppeal.status === 'process'"
                 class="refund-btn"
                 @click="initiateRefundFromAppeal(selectedOrderForRefund, relatedAppeal)"
               >
@@ -723,15 +727,15 @@
             <div class="header-info">
               <div class="stats-summary">
                 <div class="stat-item">
-                  <span class="stat-number">{{ filteredRefunds.length }}</span>
+                  <span class="stat-number">{{ refundAppeals.length }}</span>
                   <span class="stat-label">总申诉</span>
                 </div>
                 <div class="stat-item pending">
-                  <span class="stat-number">{{ filteredRefunds.filter(r => r.status === 'process').length }}</span>
+                  <span class="stat-number">{{ refundAppeals.filter(r => r.status === 'process').length }}</span>
                   <span class="stat-label">待处理</span>
                 </div>
                 <div class="stat-item completed">
-                  <span class="stat-number">{{ filteredRefunds.filter(r => r.status === 'finish').length }}</span>
+                  <span class="stat-number">{{ refundAppeals.filter(r => r.status === 'finish').length }}</span>
                   <span class="stat-label">已完成</span>
                 </div>
               </div>
@@ -1144,7 +1148,7 @@ export default {
           this.stats.totalUsers = 0;
           
           // 如果API调用失败，尝试直接调用原始API
-          fetch('http://localhost:8087/api/users/all')
+          fetch('http://localhost:3000/api-8087/users/all')
             .then(response => response.json())
             .then(result => {
               if (result.code === 200 && result.data) {
@@ -1449,7 +1453,7 @@ export default {
       console.log('开始加载申诉数据...');
       try {
         // 调用真实的申诉API
-        const response = await axios.get('http://localhost:8093/api/v1/appeals/all', {
+        const response = await axios.get('http://localhost:3000/api-8093/v1/appeals/all', {
           headers: {
             'Content-Type': 'application/json'
           }
@@ -1564,7 +1568,7 @@ export default {
         console.log('开始处理申诉完成请求:', refund);
         
         // 调用后端API更新申诉状态
-        axios.put(`http://localhost:8093/api/v1/appeals/${refund.id}/admin-update`, {
+        axios.put(`http://localhost:3000/api-8093/v1/appeals/${refund.id}/admin-update`, {
           status: 'finish',
           rootId: this.adminId // 使用当前管理员ID
         })
@@ -1594,7 +1598,7 @@ export default {
         console.log('开始处理申诉拒绝请求:', refund);
         
         // 调用后端API更新申诉状态
-        axios.put(`http://localhost:8093/api/v1/appeals/${refund.id}/admin-update`, {
+        axios.put(`http://localhost:3000/api-8093/v1/appeals/${refund.id}/admin-update`, {
           status: 'refuse',
           rootId: this.adminId // 使用当前管理员ID
         })
@@ -1686,7 +1690,7 @@ export default {
       
       try {
         // 调用钱包模块的退款API
-        const response = await fetch('http://localhost:8081/user/account/sellerRefund', {
+        const response = await fetch('http://localhost:3000/api-8081/user/account/sellerRefund', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -1751,7 +1755,7 @@ export default {
       
       try {
         // 调用钱包模块的退款API - 修复参数格式
-        const response = await fetch('http://localhost:8081/user/account/sellerRefund', {
+        const response = await fetch('http://localhost:3000/api-8081/user/account/sellerRefund', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -1820,7 +1824,7 @@ export default {
         console.log('正在更新申诉状态:', appealId, status);
         
         // 首先检查服务是否可用
-        await fetch('http://localhost:8093/api/v1/appeals/all', {
+        await fetch('http://localhost:3000/api-8093/v1/appeals/all', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json'
@@ -1830,7 +1834,7 @@ export default {
           throw new Error('无法连接到申诉服务，请确认服务是否启动');
         });
         
-        const response = await axios.put(`http://localhost:8093/api/v1/appeals/${appealId}/admin-update`, {
+        const response = await axios.put(`http://localhost:3000/api-8093/v1/appeals/${appealId}/admin-update`, {
           rootId: this.adminId, // 使用动态获取的管理员ID
           status: status
         }, {
@@ -1891,7 +1895,7 @@ export default {
         
         try {
           // 移除rootId参数，获取所有管理员的公告
-          const response = await fetch(`/api/announcements?n=9999`);
+          const response = await fetch(`http://localhost:3000/api-8092/announcements?n=9999`);
           if (response.ok) {
             const data = await response.json();
             // 过滤只显示可见状态的公告，并为每个公告添加发布者信息
@@ -1947,7 +1951,7 @@ export default {
           visibleStatus: false // 设置为不可见（删除）
         };
         
-        fetch('/api/announcements', {
+        fetch('http://localhost:3000/api-8092/announcements', {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -1995,7 +1999,7 @@ export default {
           visibleStatus: true // 保持可见
         };
         
-        fetch('/api/announcements', {
+        fetch('http://localhost:3000/api-8092/announcements', {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -2048,7 +2052,7 @@ export default {
         console.log('当前时间:', currentTime);
         
         // 4. 发送 POST 请求创建公告
-        const createResponse = await fetch('/api/announcements', {
+        const createResponse = await fetch('http://localhost:3000/api-8092/announcements', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -2119,7 +2123,7 @@ export default {
       
       try {
         // 调用分页查询所有订单API
-        const response = await axios.post('http://localhost:8095/api/orders/query/all-paged', {
+        const response = await axios.post('http://localhost:3000/api-8095/orders/query/all-paged', {
           pageNum: this.currentOrderPage,
           pageSize: 20
         }, {
@@ -2272,7 +2276,6 @@ export default {
     
     getOrderStatusText(status) {
       const statusMap = {
-        'pending_payment': '待付款',
         'pending_transaction': '待交易',
         'completed': '已完成',
         'refunded': '已退款' // 新增退款状态文本
@@ -2599,43 +2602,143 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
+  padding: 25px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .search-box {
   position: relative;
-  width: 300px;
+  width: 350px;
 }
 
 .search-box input {
   width: 100%;
-  padding: 10px 15px;
-  padding-right: 40px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
+  padding: 15px 20px;
+  padding-right: 50px;
+  border: none;
+  border-radius: 25px;
+  font-size: 16px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  color: #2c3e50;
+}
+
+.search-box input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.search-box input::placeholder {
+  color: #7f8c8d;
+  font-weight: 500;
 }
 
 .search-icon {
   position: absolute;
-  right: 15px;
+  right: 18px;
   top: 50%;
   transform: translateY(-50%);
-  color: #95a5a6;
+  font-size: 18px;
+  color: #667eea;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.search-box:hover .search-icon {
+  color: #764ba2;
+  transform: translateY(-50%) scale(1.1);
 }
 
 .filter-actions {
   display: flex;
-  gap: 10px;
+  gap: 15px;
   align-items: center;
 }
 
 .filter-actions select {
-  padding: 10px 15px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 20px;
   font-size: 14px;
-  background-color: white;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  color: #2c3e50;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 120px;
+}
+
+.filter-actions select:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.filter-actions select:hover {
+  background: rgba(255, 255, 255, 1);
+  transform: translateY(-1px);
+}
+
+/* 统一背景色 - 用户管理和商品管理都使用相同的渐变 */
+.users-content .content-header,
+.products-content .content-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* 订单管理保持不同的颜色以区分 */
+.orders-content .content-header {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .content-header {
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  .search-box {
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  .filter-actions {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .filter-actions select {
+    flex: 1;
+    max-width: 200px;
+  }
+}
+
+/* 搜索框动画效果 */
+@keyframes searchPulse {
+  0% {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+  50% {
+    box-shadow: 0 6px 25px rgba(102, 126, 234, 0.3);
+  }
+  100% {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.search-box input:focus {
+  animation: searchPulse 2s infinite;
 }
 
 
@@ -4358,10 +4461,267 @@ export default {
   background-color: #5a6268;
 }
 
+/* 商品管理表格优化样式 */
+.products-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* 列宽优化 */
+.products-table .id-column {
+  width: 80px;
+  text-align: center;
+}
+
+.products-table .product-column {
+  width: 28%;
+  min-width: 200px;
+}
+
+.products-table .price-column {
+  width: 100px;
+  text-align: right;
+}
+
+.products-table .seller-column {
+  width: 120px;
+}
+
+.products-table .time-column {
+  width: 140px;
+}
+
+.products-table .status-column {
+  width: 100px;
+  text-align: center;
+}
+
+.products-table .action-column {
+  width: 140px;
+  text-align: center;
+}
+
+/* 表头样式优化 */
+.products-table th {
+  background: #f8f9fa;
+  padding: 18px 15px;
+  text-align: left;
+  font-weight: 600;
+  color: #495057;
+  border-bottom: 2px solid #dee2e6;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+}
+
+.products-table td {
+  padding: 16px 15px;
+  border-bottom: 1px solid #f1f3f4;
+  color: #2c3e50;
+  vertical-align: middle;
+}
+
+/* 商品信息样式优化 */
+.product-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.product-image {
+  width: 45px;
+  height: 45px;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  flex-shrink: 0;
+}
+
+.product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.product-image:hover img {
+  transform: scale(1.05);
+}
+
+.product-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.product-name {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 14px;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.product-category {
+  font-size: 12px;
+  color: #6c757d;
+  background: #f8f9fa;
+  padding: 2px 8px;
+  border-radius: 12px;
+  display: inline-block;
+}
+
+/* ID列样式 */
+.id-column {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  color: #6c757d;
+  font-size: 13px;
+}
+
+/* 价格样式 */
+.price-value {
+  font-weight: 700;
+  color: #e74c3c;
+  font-size: 16px;
+}
+
+/* 时间样式 */
+.time-value {
+  font-size: 13px;
+  color: #6c757d;
+}
+
+/* 状态徽章优化 */
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 2px solid transparent;
+}
+
+.status-pending {
+  background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+  color: #856404;
+  border-color: #ffeaa7;
+}
+
+.status-approved {
+  background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+  color: #0c5460;
+  border-color: #bee5eb;
+}
+
+.status-rejected {
+  background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+  color: #721c24;
+  border-color: #f5c6cb;
+}
+
+.status-sold {
+  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+  color: #155724;
+  border-color: #c3e6cb;
+}
+
+/* 操作按钮区域优化 */
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-width: 60px;
+  justify-content: center;
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.action-btn:active {
+  transform: translateY(0);
+}
+
+.approve-btn {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+}
+
+.approve-btn:hover {
+  background: linear-gradient(135deg, #218838 0%, #1ea080 100%);
+}
+
+.reject-btn {
+  background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
+  color: white;
+}
+
+.reject-btn:hover {
+  background: linear-gradient(135deg, #c82333 0%, #dc2626 100%);
+}
+
+.btn-icon {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.btn-text {
+  font-size: 11px;
+}
+
+/* 行悬停效果优化 */
+.products-table .clickable-row {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.products-table .clickable-row:hover {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
 /* 响应式调整 */
 @media (max-width: 1200px) {
   .stats-cards {
     grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .products-table .product-column {
+    width: 30%;
+    min-width: 200px;
+  }
+  
+  .btn-text {
+    display: none;
+  }
+  
+  .action-btn {
+    min-width: 36px;
+    padding: 8px;
   }
 }
 
@@ -4392,6 +4752,25 @@ export default {
   .info-row label {
     min-width: auto;
     margin-bottom: 5px;
+  }
+  
+  .products-table {
+    font-size: 12px;
+  }
+  
+  .products-table th,
+  .products-table td {
+    padding: 12px 8px;
+  }
+  
+  .product-image {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    gap: 4px;
   }
 }
 </style>

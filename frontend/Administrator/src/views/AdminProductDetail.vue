@@ -118,16 +118,6 @@
       </div>
     </div>
 
-    <!-- 商品详细描述 -->
-    <div class="description-section" v-if="product">
-      <h3 class="section-title">商品详情</h3>
-      <div class="description-content">
-        <p v-for="(paragraph, index) in product.detailDescription" :key="index">
-          {{ paragraph }}
-        </p>
-      </div>
-    </div>
-
     <!-- 审核记录 -->
     <div class="audit-card" v-if="product && product.auditHistory && product.auditHistory.length > 0">
       <h3 class="section-title">审核记录</h3>
@@ -202,8 +192,25 @@ export default {
           // 安全处理图片列表
           let imageList = []
           try {
-            imageList = commodityData.imageList ? JSON.parse(commodityData.imageList) : []
-          } catch (e) {
+            // 检查是否已经是数组
+            if (Array.isArray(commodityData.imageList)) {
+              imageList = commodityData.imageList
+            } else if (typeof commodityData.imageList === 'string') {
+              // 尝试解析JSON字符串
+              try {
+                imageList = JSON.parse(commodityData.imageList)
+              } catch (jsonError) {
+                // 如果JSON解析失败，检查是否是单个URL
+                if (commodityData.imageList.startsWith('http')) {
+                  imageList = [commodityData.imageList]
+                } else {
+                  // 尝试按逗号分割多个URL
+                  imageList = commodityData.imageList.split(',').map(url => url.trim()).filter(url => url)
+                }
+              }
+            }
+          }
+          catch (e) {
             console.warn('解析图片列表失败:', e)
             imageList = []
           }

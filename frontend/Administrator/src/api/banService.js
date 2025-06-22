@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // 创建专门用于封号服务的axios实例，使用8082端口
 const banApi = axios.create({
-  baseURL: 'http://localhost:8082/api/ban',
+  baseURL: 'http://localhost:8082/api-8082/ban',
   //baseURL: 'http://localhost:8.tcp.cpolar.cn:14893/api/ban',
   timeout: 10000,
   headers: {

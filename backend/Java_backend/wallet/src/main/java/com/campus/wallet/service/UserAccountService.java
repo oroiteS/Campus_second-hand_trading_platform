@@ -122,7 +122,7 @@ public class UserAccountService implements IUserAccountService{
         if (userAccount == null) {
             return ServiceResult.error(404, "用户不存在");
         }
-        if (order.getOrderStatus() != OrderStatus.pending_payment) {
+        if (order.getOrderStatus() != OrderStatus.pending_transaction) {
             return ServiceResult.error(400, "订单状态错误：当前状态为" + order.getOrderStatus());
         }
         BigDecimal amount = order.getMoney();
@@ -134,7 +134,7 @@ public class UserAccountService implements IUserAccountService{
 
         userAccount.setMoney(userAccount.getMoney().subtract(amount));
         int updateResult = userAccountRepository.updateById(userAccount);
-        order.setOrderStatus(OrderStatus.completed);
+        order.setOrderStatus(OrderStatus.pending_transaction);
         int updateOrderResult = orderRepository.updateById(order);
         if (updateResult != 1) {
             return ServiceResult.error(500, "更新账户余额失败");

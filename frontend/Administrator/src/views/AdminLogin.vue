@@ -10,14 +10,14 @@
         <div class="form-group">
           <label for="username" class="form-label">
             <span class="label-icon">👤</span>
-            用户名
+            ID
           </label>
           <input 
             type="text" 
             id="username" 
             v-model="loginForm.username" 
             class="form-input"
-            placeholder="请输入管理员用户名"
+            placeholder="请输入管理员用户ID"
             required
           />
         </div>
@@ -44,7 +44,7 @@
       </form>
       
       <div class="login-footer">
-        <p class="footer-text">© 2023 校园二手交易平台 - 管理员系统</p>
+        <p class="footer-text">© 2025 校园二手交易平台 - 管理员系统</p>
       </div>
     </div>
   </div>

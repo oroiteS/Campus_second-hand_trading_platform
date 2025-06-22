@@ -6,7 +6,7 @@ import AdminProductDetail from '../views/AdminProductDetail.vue'
 const routes = [
   {
     path: '/',
-    redirect: '/login'
+    redirect: '/AdminDashboard'
   },
   {
     path: '/login',
@@ -17,7 +17,7 @@ const routes = [
     path: '/AdminDashboard',
     name: 'AdminDashboard',
     component: AdminDashboard,
-    meta: { requiresAuth: true }
+    //meta: { requiresAuth: true }
   },
   {
     path: '/admin/product/:id',
@@ -38,14 +38,14 @@ router.beforeEach(async (to, from, next) => {
   const adminToken = localStorage.getItem('adminToken')
   
   // 如果访问登录页面，直接允许访问（移除自动跳转逻辑）
-  if (to.path === '/login') {
+  if (to.path === '/AdminDashboard') {
     next()
     return
   }
   
   // 如果访问根路径
   if (to.path === '/') {
-    next('/login')
+    next('/AdminDashboard')
     return
   }
   
@@ -53,7 +53,7 @@ router.beforeEach(async (to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
     if (!isAdminLoggedIn || !adminToken) {
       // 没有登录信息，跳转到登录页
-      next('/login')
+      next('/AdminDashboard')
       return
     }
     

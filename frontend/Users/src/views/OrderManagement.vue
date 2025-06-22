@@ -22,7 +22,7 @@
       </div>
 
       <!-- 订单状态筛选器 -->
-      <div class="status-filter">
+      <div class="status-filter" v-if="activeTab !== 'appeals'">
         <div class="filter-label">订单状态：</div>
         <div class="filter-options">
           <button class="filter-btn" :class="{ active: selectedStatus === 'all' }" @click="filterByStatus('all')">
@@ -31,6 +31,22 @@
           <button v-for="status in statusOptions" :key="status.value" class="filter-btn"
             :class="{ active: selectedStatus === status.value }" @click="filterByStatus(status.value)">
             {{ status.label }}
+          </button>
+        </div>
+      </div>
+
+      <!-- 申诉筛选器 -->
+      <div class="status-filter" v-if="activeTab === 'appeals'">
+        <div class="filter-label">申诉筛选：</div>
+        <div class="filter-options">
+          <button class="filter-btn" :class="{ active: selectedAppealFilter === 'all' }" @click="filterByAppealType('all')">
+            全部申诉
+          </button>
+          <button class="filter-btn" :class="{ active: selectedAppealFilter === 'my_appeals' }" @click="filterByAppealType('my_appeals')">
+            我申诉的
+          </button>
+          <button class="filter-btn" :class="{ active: selectedAppealFilter === 'appeals_against_me' }" @click="filterByAppealType('appeals_against_me')">
+            收到申诉
           </button>
         </div>
       </div>
@@ -69,8 +85,8 @@
 
       <!-- 申诉管理列表 -->
       <div class="appeals-list" v-if="activeTab === 'appeals'">
-        <div v-if="sortedAppealsList.length > 0">
-          <div class="appeal-card" v-for="appeal in sortedAppealsList" :key="appeal.argumentId">
+        <div v-if="filteredAppealsList.length > 0">
+          <div class="appeal-card" v-for="appeal in filteredAppealsList" :key="appeal.argumentId">
             <div class="appeal-header">
               <div class="appeal-id">申诉ID：{{ appeal.argumentId }}</div>
               <div class="appeal-status" :class="getAppealStatusClass(appeal.status)">
@@ -175,12 +191,6 @@
           </div>
         </div>
         <div class="modal-footer">
-          <!-- 调试信息 -->
-          <div style="margin-bottom: 10px; font-size: 12px; color: #666;">
-            调试信息：type = "{{ appealForm.type }}", description = "{{ appealForm.description }}"
-            <br>
-            按钮状态：{{ !appealForm.type || !appealForm.description ? '禁用' : '启用' }}
-          </div>
 
           <button @click="closeAppealModal" class="btn btn-cancel">取消</button>
           <button @click="submitAppeal" class="btn btn-primary"
@@ -384,6 +394,12 @@ export default {
     return {
       activeTab: 'buy',
       selectedStatus: 'all',
+      selectedAppealFilter: 'all', // 新增申诉筛选状态
+      appealFilterOptions: [ // 新增申诉筛选选项
+        { value: 'all', label: '全部申诉' },
+        { value: 'my_appeals', label: '我申诉的' },
+        { value: 'appeals_against_me', label: '收到申诉' }
+      ],
       statusOptions: [
         { value: 'pending_transaction', label: '待交易' },
         { value: 'completed', label: '已完成' }
@@ -442,19 +458,35 @@ export default {
 
       return orders
     },
-    // 新增：排序后的申诉列表，处理中的申诉置顶
-    sortedAppealsList() {
-      return [...this.appealsList].sort((a, b) => {
-        // 处理中的申诉排在前面
+    // 新增：筛选后的申诉列表
+    filteredAppealsList() {
+      const currentUserId = localStorage.getItem('userId');
+      let appeals = [...this.appealsList];
+      
+      // 根据筛选条件过滤申诉
+      if (this.selectedAppealFilter === 'my_appeals') {
+        // 我申诉的：当前用户是申诉方
+        appeals = appeals.filter(appeal => appeal.argue1Id === currentUserId);
+      } else if (this.selectedAppealFilter === 'appeals_against_me') {
+        // 收到申诉：当前用户是被申诉方
+        appeals = appeals.filter(appeal => appeal.argue2Id === currentUserId);
+      }
+      
+      // 排序：处理中的申诉置顶
+      return appeals.sort((a, b) => {
         if (a.status === 'process' && b.status !== 'process') {
-          return -1
+          return -1;
         }
         if (a.status !== 'process' && b.status === 'process') {
-          return 1
+          return 1;
         }
-        // 相同状态按创建时间倒序排列
-        return new Date(b.createdAt) - new Date(a.createdAt)
-      })
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      });
+    },
+    
+    // 修改原有的sortedAppealsList，改为使用filteredAppealsList
+    sortedAppealsList() {
+      return this.filteredAppealsList;
     }
   },
   mounted() {
@@ -478,6 +510,11 @@ export default {
 
     filterByStatus(status) {
       this.selectedStatus = status
+    },
+
+    // 新增：申诉类型筛选方法
+    filterByAppealType(filterType) {
+      this.selectedAppealFilter = filterType
     },
 
     getOrderStatusValue(order) {
@@ -507,7 +544,10 @@ export default {
       if (tabId === 'all') {
         return this.orders.buy.length + this.orders.sell.length
       } else if (tabId === 'appeals') {
-        return this.appealsList.length
+        const currentUserId = localStorage.getItem('userId');
+        return this.appealsList.filter(appeal => 
+          appeal.argue1Id === currentUserId || appeal.argue2Id === currentUserId
+        ).length;
       }
       return this.orders[tabId]?.length || 0
     },
@@ -660,8 +700,49 @@ export default {
     },
 
     contactUser(order) {
-      console.log('联系用户:', order.orderNumber)
-      this.$message?.info(`联系订单 ${order.orderNumber} 的相关用户`) || alert(`联系订单 ${order.orderNumber} 的相关用户`)
+      // 获取当前用户ID
+      const userId = localStorage.getItem('userId');
+
+      if (!userId) {
+        // 如果用户未登录，提示登录
+        this.$message?.error('请先登录后联系用户') || alert('请先登录后联系用户');
+        this.$router.push('/login');
+        return;
+      }
+
+      // 判断当前用户是买家还是卖家，确定要联系的对象
+      let targetUserId;
+      if (this.activeTab === 'buy') {
+        // 如果是买家订单，联系卖家
+        targetUserId = order.sellerId || order.seller_id;
+      } else if (this.activeTab === 'sell') {
+        // 如果是卖家订单，联系买家
+        targetUserId = order.buyerId || order.buyer_id;
+      } else {
+        // 全部订单页面，需要判断当前用户角色
+        if (order.buyerId === userId || order.buyer_id === userId) {
+          // 当前用户是买家，联系卖家
+          targetUserId = order.sellerId || order.seller_id;
+        } else {
+          // 当前用户是卖家，联系买家
+          targetUserId = order.buyerId || order.buyer_id;
+        }
+      }
+
+      if (!targetUserId) {
+        this.$message?.error('无法获取联系人信息') || alert('无法获取联系人信息');
+        return;
+      }
+
+      // 跳转到聊天页面
+      this.$router.push({
+        path: '/chat-list',
+        query: {
+          sellerId: this.activeTab === 'buy' ? targetUserId : userId,
+          buyerId: this.activeTab === 'buy' ? userId : targetUserId,
+          autoCreate: 'true'
+        }
+      });
     },
 
     // 申诉相关方法
@@ -1073,7 +1154,7 @@ export default {
           case 'pending_transaction':
             // 待交易状态：显示已收货按钮
             actions.push(
-              { type: 'confirm', text: '已收货' },
+              { type: 'confirm', text: '去收货' },
               { type: 'contact', text: '联系卖家' },
               { type: 'appeal', text: '申诉' }
             )
@@ -1119,11 +1200,19 @@ export default {
       return statusMap[status] || 'status-default'
     },
 
-    // 新增：获取所有申诉记录
+    // 新增：获取当前用户相关的申诉记录
     async fetchAllAppeals() {
       try {
         this.loading = true
         console.log('开始获取申诉记录...')
+        
+        // 获取当前用户ID
+        const currentUserId = localStorage.getItem('userId')
+        if (!currentUserId) {
+          throw new Error('用户未登录')
+        }
+        
+        console.log('当前用户ID:', currentUserId)
         console.log('请求URL: http://localhost:8093/api-8093/v1/appeals/all'); // 添加URL调试
         
         const response = await ax1.get('/api-8093/v1/appeals/all', {
@@ -1135,10 +1224,16 @@ export default {
         console.log('申诉API响应数据:', response.data)
         
         if (response.status === 200 && response.data.appeals) {
-          this.appealsList = response.data.appeals
-          console.log('申诉列表数据:', this.appealsList); // 添加列表数据调试
-          console.log(`成功获取${response.data.count}条申诉记录`)
-          this.$message?.success(`成功获取${response.data.count}条申诉记录`) || console.log(`成功获取${response.data.count}条申诉记录`)
+          // 过滤申诉记录：只保留申诉方或被申诉方是当前用户的申诉
+          const allAppeals = response.data.appeals
+          this.appealsList = allAppeals.filter(appeal => 
+            appeal.argue1Id === currentUserId || appeal.argue2Id === currentUserId
+          )
+          
+          console.log('过滤前申诉总数:', allAppeals.length)
+          console.log('过滤后申诉列表数据:', this.appealsList); // 添加列表数据调试
+          console.log(`成功获取${this.appealsList.length}条相关申诉记录`)
+          this.$message?.success(`成功获取${this.appealsList.length}条相关申诉记录`) || console.log(`成功获取${this.appealsList.length}条相关申诉记录`)
         } else {
           console.log('响应格式检查失败 - status:', response.status, 'appeals字段:', response.data.appeals); // 添加格式检查调试
           throw new Error('获取申诉记录失败：响应格式不正确')

@@ -67,8 +67,8 @@
               <option value="3">生活用品</option>
               <option value="4">服装配饰</option>
               <option value="5">运动器材</option>
-              <option value="6">美妆护肤</option>
-              <option value="7">食品饮料</option>
+              <option value="6">学习用品</option>
+              <option value="7">美妆护肤</option>
               <option value="8">其他</option>
             </select>
           </div>

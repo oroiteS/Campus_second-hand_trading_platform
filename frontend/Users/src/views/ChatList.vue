@@ -8,7 +8,7 @@
           <div class="user-info">
             <span>{{ currentUser.user_name }}</span>
           </div>
-          <button @click="goToHome" class="home-button">返回首页</button>
+          <button @click="goBack" class="home-button">返回</button>
         </div>
       </div>
 
@@ -369,14 +369,9 @@ export default {
       }
     },
 
-    // 返回首页
-    goToHome() {
-      const userId = this.currentUser.user_id || localStorage.getItem('userId')
-      if (userId) {
-        this.$router.push(`/?userId=${userId}`)
-      } else {
-        this.$router.push('/home')
-      }
+    // 返回上一页
+    goBack() {
+      this.$router.go(-1)
     }
   }
 }

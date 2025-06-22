@@ -125,5 +125,16 @@ const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
 })
-
+// // 路由守卫 - 防止直接URL访问
+// router.beforeEach((to, from, next) => {
+//   // 检查是否为直接URL访问（from.name为null表示直接访问）
+//   if (from.name === null && to.name !== 'HomePage') {
+//     // 直接通过URL访问非首页，重定向到首页
+//     next({ name: 'HomePage' })
+//     return
+//   }
+  
+//   // 允许正常导航
+//   next()
+// })
 export default router

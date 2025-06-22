@@ -2,7 +2,7 @@ import axios from 'axios'
 
 // 创建 axios 实例
 const api = axios.create({
-  baseURL: 'http://localhost:8083',
+  baseURL: 'http://localhost:3000',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -15,7 +15,7 @@ export const productService = {
   // 获取商品详情
   async getCommodityDetail(commodityId) {
     try {
-      const response = await api.get(`/api/commodity/detail/${commodityId}`)
+      const response = await api.get(`/api-8083/commodity/detail/${commodityId}`)
       return {
         success: true,
         data: response.data

@@ -425,6 +425,13 @@ export default {
 
         console.log('获取到的商品详情:', this.product)
 
+        // 检查商品库存
+        if (this.product.quantity <= 0) {
+          alert('该商品已售罄，即将返回首页')
+          this.$router.push('/')
+          return
+        }
+
         // 检查商品是否已被收藏
         await this.checkFavoriteStatus(commodityId)
 
@@ -720,19 +727,22 @@ export default {
     },
     async buyNow() {
       try {
-        const userId = this.currentUser.id || localStorage.getItem('userId')
-        
         // 检查用户是否登录
+        const userId = localStorage.getItem('userId')
         if (!userId) {
           alert('请先登录')
+          this.$router.push('/login')
           return
         }
         
-        // 检查是否是自己的商品
-        if (userId === this.product.sellerId) {
+        // 检查是否为自己的商品
+        if (this.product.sellerId === parseInt(userId)) {
           alert('不能购买自己的商品')
           return
         }
+        
+        // 记录购买前的商品数量
+        const quantityBeforePurchase = this.product.quantity
         
         // 检查商品库存
         if (this.product.quantity <= 0) {
@@ -749,7 +759,7 @@ export default {
           saleLocation: '校园交易', // 可以根据需要修改
           buyQuantity: 1
         }
-        
+       
         console.log('创建订单数据:', orderData)
         
         // 调用订单创建API
@@ -806,9 +816,19 @@ export default {
                 // 支付成功，但行为记录失败
                 alert(`购买成功！\n订单号: ${orderInfo.orderId}\n订单状态: ${orderInfo.orderStatusDescription}\n交易金额: ¥${orderInfo.money}\n(用户行为记录失败)`)
               }
-              
+              if(this.product.quantity - 1 === 0) {
+                alert('商品余量为0，暂不支持继续购买')
+                this.$router.go(-1)
+              }
               // 重新获取商品详情以更新库存等信息
               await this.fetchProductDetail(this.product.id)
+              
+              // 如果购买前商品数量为1，购买成功后跳转到首页
+              if (quantityBeforePurchase === 1) {
+                this.$router.push('/')
+                return
+              }
+              
               
             } else {
               // 支付失败

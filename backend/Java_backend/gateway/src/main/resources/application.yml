@@ -12,6 +12,9 @@ spring:
           '[/**]': # 匹配所有路径
             allowedOrigins: 
               - "http://localhost:8079"
+              - "http://localhost:9418"
+              - "http://47.117.90.63:8079"
+              - "http://127.0.0.1:8079"
             allowedMethods:
               - GET
               - POST
