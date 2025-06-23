@@ -10,7 +10,11 @@ Java 17 (Maven)
 
 MySQL
 
+Redis
+
 MongoDB
+
+ChromaDB
 
 ## 初始化环境
 
